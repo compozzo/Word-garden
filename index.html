@@ -2611,6 +2611,11 @@
         + '<span class="ct">' + p.words.length + '</span>';
       box.appendChild(b);
     });
+    // bring the picked pack into sight without moving the page itself
+    const on = $('.pack-pill.on', box);
+    if (on) {
+      box.scrollLeft = Math.max(0, on.offsetLeft - (box.clientWidth - on.offsetWidth) / 2);
+    }
   }
 
   function selectPack(id) {
@@ -2624,10 +2629,6 @@
     state.testRandom = false;
     sfx.pick();
     renderHome();
-    const on = $('.pack-pill.on');
-    if (on && on.scrollIntoView) {
-      try { on.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' }); } catch (e) {}
-    }
   }
 
   function renderHome() {
