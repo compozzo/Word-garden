@@ -179,7 +179,8 @@
   .dots{position:absolute;bottom:7px;left:0;right:0;display:flex;justify-content:center;gap:5px}
   .dots i{width:6px;height:6px;border-radius:50%;background:rgba(47,58,74,.22);display:block;transition:.2s}
   .dots i.on{background:#3f9e63;width:16px;border-radius:3px}
-  .scene-cap{font-size:11px;color:var(--ink-faint);text-align:center;font-weight:700;min-height:14px}
+  .scene-cap{font-size:11px;color:var(--ink-faint);text-align:center;font-weight:700;line-height:1.35}
+  .scene-cap[hidden]{display:none !important}
   .meaning-en{
     font-size:15px;line-height:1.42;font-weight:700;color:#33414f;text-align:center;
     padding:2px 8px;letter-spacing:-.1px;
@@ -496,11 +497,11 @@
             <button class="scene-nav next" id="sceneNext" aria-label="다음 그림" hidden>›</button>
             <div class="dots" id="sceneDots"></div>
           </div>
-          <div class="scene-cap" id="sceneCap"></div>
           <div class="meaning-en notranslate" id="learnEn" translate="no"></div>
           <div class="ko-row">
             <button class="ko-toggle" id="btnKo">한글 뜻 보기</button>
             <div class="meaning-ko" id="learnKo" hidden></div>
+            <div class="scene-cap" id="sceneCap" hidden></div>
           </div>
         </div>
       </div>
@@ -2714,6 +2715,7 @@
     $('#learnEn').textContent = w.en || '(영어 뜻을 넣어 주세요)';
     $('#learnKo').textContent = w.ko || '(한글 뜻을 넣어 주세요)';
     $('#learnKo').hidden = true;
+    $('#sceneCap').hidden = true;
     const koBtn = $('#btnKo');
     koBtn.textContent = '한글 뜻 보기';
     koBtn.classList.remove('on');
@@ -2745,6 +2747,7 @@
       box.classList.remove('dim');
     }, 90);
     $('#sceneCap').textContent = sc.cap || '';
+    syncSceneCap();
     const multi = scenes.length > 1;
     $('#scenePrev').hidden = !multi;
     $('#sceneNext').hidden = !multi;
@@ -2768,9 +2771,17 @@
     sfx.flip();
   }
 
+  /* The scene caption is Korean, so it must never show before 한글 뜻 보기. */
+  function syncSceneCap() {
+    const cap = $('#sceneCap');
+    if (!cap) return;
+    cap.hidden = !state.showKo || !cap.textContent.trim();
+  }
+
   function toggleKo() {
     state.showKo = !state.showKo;
     $('#learnKo').hidden = !state.showKo;
+    syncSceneCap();
     const b = $('#btnKo');
     b.textContent = state.showKo ? '한글 뜻 숨기기' : '한글 뜻 보기';
     b.classList.toggle('on', state.showKo);

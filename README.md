@@ -6,7 +6,7 @@ Open `index.html` (or the GitHub Pages URL) on a phone or tablet.
 
 ## What's inside
 
-**Learn Stage** — a flashcard per word. The front shows the word and a pronunciation button (browser speech synthesis, `en-US`). Tap the card to flip it: the back shows 2–3 situation pictures that explain the meaning, then the English definition, and a `한글 뜻 보기` button that reveals the Korean meaning.
+**Learn Stage** — a flashcard per word. The front shows the word and a pronunciation button (browser speech synthesis, `en-US`). Tap the card to flip it: the back shows 2–3 situation pictures that explain the meaning, then the English definition, and a `한글 뜻 보기` button that reveals the Korean meaning together with the picture's Korean caption underneath it.
 
 **Test Stage** — 9 cards (3 words × Spell / Picture / Meaning) face down in a 3×3 grid. Flip as many cards as you like, then tap three of the open cards to try a match. Three cards of the same word score +100 and a fruit sticker; a miss only clears the selection and leaves the cards open, so the child can pick again. Ten words are tested in rounds of three, with a `랜덤 3개` option.
 
@@ -46,3 +46,4 @@ Every word carries two hand-drawn inline SVG scenes.
 - **The English is never translated.** A phone browser with auto-translate on used to turn the English definitions into Korean on its own, which gave away the answer before the 한 / 한글 뜻 보기 button was tapped. The page now carries `<meta name="google" content="notranslate">`, `translate="no"` on `<html>`, and `translate="no"` + `.notranslate` on every English text node (`#learnWord`, `#learnPos`, `#learnEn`, `.tl-spell`, `.tl-meaning`, the Home word chips, and the word/sticker lists). `markEnglish()` re-applies those attributes after every render, so new English output must either use one of those classes or be added to `ENGLISH_SELECTORS`.
 - A word with no English definition never falls back to its Korean meaning on a 뜻 card; the card shows `한 버튼을 눌러 뜻을 봐요` and the Korean stays behind the 한 button.
 - `tl-ko` and `#learnKo` are hidden with the `hidden` attribute, `display:none !important` in CSS, and a state flag (`koOpen` / `showKo`) that resets on every new round, pack change and shuffle.
+- `#sceneCap` is Korean too (e.g. `다 쓴 유리병을 연필꽂이로 다시 써요`), so it lives under `#learnKo` in `.ko-row` and follows the same `showKo` flag: before `한글 뜻 보기` is pressed the back shows only the picture, the English definition and the button. Empty captions stay hidden even after the button is pressed.
