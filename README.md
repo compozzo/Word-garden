@@ -43,3 +43,6 @@ Every word carries two hand-drawn inline SVG scenes.
 - Layout targets 360–430 px widths with no horizontal scrolling and large touch targets.
 - All state is local to the device; clearing site data resets score and stickers.
 - The Korean UI text is for the parent and the child; the English definitions are the study material.
+- **The English is never translated.** A phone browser with auto-translate on used to turn the English definitions into Korean on its own, which gave away the answer before the 한 / 한글 뜻 보기 button was tapped. The page now carries `<meta name="google" content="notranslate">`, `translate="no"` on `<html>`, and `translate="no"` + `.notranslate` on every English text node (`#learnWord`, `#learnPos`, `#learnEn`, `.tl-spell`, `.tl-meaning`, the Home word chips, and the word/sticker lists). `markEnglish()` re-applies those attributes after every render, so new English output must either use one of those classes or be added to `ENGLISH_SELECTORS`.
+- A word with no English definition never falls back to its Korean meaning on a 뜻 card; the card shows `한 버튼을 눌러 뜻을 봐요` and the Korean stays behind the 한 button.
+- `tl-ko` and `#learnKo` are hidden with the `hidden` attribute, `display:none !important` in CSS, and a state flag (`koOpen` / `showKo`) that resets on every new round, pack change and shuffle.
