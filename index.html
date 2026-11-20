@@ -226,8 +226,26 @@
   .hintbar.shake{animation:shake .4s}
   @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(5px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
 
-  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;flex:0 0 auto}
+  .grid{display:flex;flex-direction:column;gap:7px;flex:0 0 auto}
+  .card-row{
+    display:flex;flex-direction:column;gap:5px;padding:5px 6px 7px;border-radius:16px;
+    border:1px solid var(--line);background:#fff;box-shadow:var(--shadow-sm);
+  }
+  .card-row[data-type="spell"]{background:linear-gradient(180deg,#f1fbf4,#fff 62%);border-color:#d6eede}
+  .card-row[data-type="picture"]{background:linear-gradient(180deg,#eef8ff,#fff 62%);border-color:#d5e9f8}
+  .card-row[data-type="meaning"]{background:linear-gradient(180deg,#fff9e9,#fff 62%);border-color:#f4e4bd}
+  .row-label{
+    display:inline-flex;align-items:center;gap:4px;align-self:flex-start;
+    font-size:11px;font-weight:900;letter-spacing:-.2px;line-height:1.3;
+    padding:2px 9px 2px 7px;border-radius:999px;
+  }
+  .row-label .ico{font-size:11px;line-height:1}
+  .card-row[data-type="spell"] .row-label{color:#2f7a52;background:#dcf2e4}
+  .card-row[data-type="picture"] .row-label{color:#2b6c96;background:#dcefff}
+  .card-row[data-type="meaning"] .row-label{color:#a5622a;background:#fdeecf}
+  .row-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
   .card{position:relative;aspect-ratio:1/1.2;perspective:900px}
+  .card-row .card{aspect-ratio:1/1.02}
   .card-inner{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.3,.85,.3,1)}
   .card.flipped .card-inner{transform:rotateY(180deg)}
   .card-face{
@@ -462,7 +480,7 @@
   <section class="screen" id="scr-test">
     <div class="screen-head">
       <button class="round-btn" data-go="home">‹</button>
-      <div><div class="title">Test Stage</div><div class="sub" id="testSub">같은 단어 3장을 모아요</div></div>
+      <div><div class="title">Test Stage</div><div class="sub" id="testSub">단어·그림·뜻 한 장씩, 같은 단어를 모아요</div></div>
     </div>
 
     <div class="test-bar">
@@ -477,7 +495,7 @@
     <div class="grid" id="grid"></div>
 
     <div class="test-foot">
-      <div class="pick-status" id="pickStatus">뒤집은 카드를 눌러 <b>3장</b>을 골라 보세요</div>
+      <div class="pick-status" id="pickStatus">단어·그림·뜻 줄에서 <b>1장씩</b> 골라 보세요</div>
     </div>
   </section>
 </div>
@@ -1632,6 +1650,12 @@
     return shuffle(allWords()).slice(0, 3);
   }
 
+  const CARD_ROWS = [
+    { type: 'spell', emoji: '🔤', label: '단어' },
+    { type: 'picture', emoji: '🎨', label: '그림' },
+    { type: 'meaning', emoji: '📖', label: '뜻' }
+  ];
+
   function startTest(resetGroup) {
     const groups = testGroups();
     const total = allWords().length;
@@ -1642,15 +1666,13 @@
     if (words.length < 3) { toast('단어가 3개 이상 필요해요'); }
 
     state.cards = [];
-    words.forEach(w => {
-      ['spell', 'picture', 'meaning'].forEach(type => {
-        state.cards.push({
-          wordId: w.id, type: type,
-          flipped: false, selected: false, matched: false, koOpen: false
-        });
-      });
+    CARD_ROWS.forEach(row => {
+      const rowCards = words.map(w => ({
+        wordId: w.id, type: row.type,
+        flipped: false, selected: false, matched: false, koOpen: false
+      }));
+      shuffle(rowCards).forEach(c => state.cards.push(c));
     });
-    state.cards = shuffle(state.cards);
     state.sel = [];
     state.matchedWords = [];
     state.busy = false;
@@ -1674,7 +1696,15 @@
 
     renderGrid();
     updateTestChrome();
-    setHint('💡', '카드를 여러 장 뒤집어 보고, 같은 단어 3장을 골라 보세요!', '');
+    setHint('💡', '각 줄에서 카드 1장씩, 같은 단어 3장을 골라 보세요!', '');
+  }
+
+  function cardRowIndex(card) {
+    if (!card) return -1;
+    for (let r = 0; r < CARD_ROWS.length; r++) {
+      if (CARD_ROWS[r].type === card.type) return r;
+    }
+    return -1;
   }
 
   function cardFaceHTML(card) {
@@ -1705,20 +1735,32 @@
   function renderGrid() {
     const grid = $('#grid');
     grid.innerHTML = '';
-    state.cards.forEach((card, i) => {
-      const node = el('div', 'card');
-      node.dataset.i = String(i);
-      node.innerHTML = '<div class="sel-badge">1</div>'
-        + '<div class="card-inner">'
-        + '<div class="card-face card-back">' + LEAF_SVG + '</div>'
-        + '<div class="card-face card-front">' + cardFaceHTML(card) + '</div>'
-        + '</div>';
-      grid.appendChild(node);
+    CARD_ROWS.forEach(row => {
+      const rowEl = el('div', 'card-row', '');
+      rowEl.dataset.type = row.type;
+      const label = el('div', 'row-label', '');
+      label.innerHTML = '<span class="ico">' + row.emoji + '</span><span>' + escapeHTML(row.label) + '</span>';
+      rowEl.appendChild(label);
+      const cardsEl = el('div', 'row-cards', '');
+      state.cards.forEach((card, i) => {
+        if (card.type !== row.type) return;
+        const node = el('div', 'card', '');
+        node.dataset.i = String(i);
+        node.innerHTML = '<div class="sel-badge">1</div>'
+          + '<div class="card-inner">'
+          + '<div class="card-face card-back">' + LEAF_SVG + '</div>'
+          + '<div class="card-face card-front">' + cardFaceHTML(card) + '</div>'
+          + '</div>';
+        cardsEl.appendChild(node);
+      });
+      rowEl.appendChild(cardsEl);
+      grid.appendChild(rowEl);
     });
   }
 
   function syncCards() {
-    $$('#grid .card').forEach((node, i) => {
+    $$('#grid .card').forEach((node) => {
+      const i = Number(node.dataset.i);
       const c = state.cards[i];
       if (!c) return;
       node.classList.toggle('flipped', c.flipped || c.matched);
@@ -1737,13 +1779,13 @@
   function updateTestChrome() {
     const total = 3;
     $('#testProgress').textContent = state.matchedWords.length + ' / ' + total + ' 짝';
-    const left = 3 - state.sel.length;
+    const rowsLeft = Math.max(0, CARD_ROWS.length - state.sel.length);
     if (state.sel.length === 0) {
-      $('#pickStatus').innerHTML = '뒤집은 카드를 눌러 <b>3장</b>을 골라 보세요';
-    } else if (left > 0) {
-      $('#pickStatus').innerHTML = '<b>' + state.sel.length + '장</b> 골랐어요 · ' + left + '장 더!';
+      $('#pickStatus').innerHTML = '단어·그림·뜻 줄에서 <b>1장씩</b> 골라 보세요';
+    } else if (rowsLeft > 0) {
+      $('#pickStatus').innerHTML = '<b>' + state.sel.length + '줄</b> 골랐어요 · ' + rowsLeft + '줄 더!';
     } else {
-      $('#pickStatus').innerHTML = '<b>3장</b> 골랐어요 · 맞는지 볼까요?';
+      $('#pickStatus').innerHTML = '<b>3줄</b> 다 골랐어요 · 맞는지 볼까요?';
     }
   }
 
@@ -1776,7 +1818,20 @@
     }
     if (state.sel.length >= 3) return;
 
-    state.sel.push(i);
+    // one pick per row: tapping another card in the same row swaps the pick
+    const row = cardRowIndex(c);
+    let swapped = false;
+    for (let k = 0; k < state.sel.length; k++) {
+      const other = state.cards[state.sel[k]];
+      if (cardRowIndex(other) === row) {
+        other.selected = false;
+        state.sel[k] = i;
+        swapped = true;
+        break;
+      }
+    }
+    if (!swapped) state.sel.push(i);
+
     c.selected = true;
     sfx.pick();
     syncCards();
@@ -1827,7 +1882,7 @@
         if (state.matchedWords.length === (state.roundWords ? state.roundWords.length : 3)) {
           showCelebration();
         } else {
-          setHint('💡', '좋아요! 남은 단어의 카드 3장을 더 찾아보세요.', '');
+          setHint('💡', '좋아요! 각 줄에서 남은 단어의 카드 1장씩을 더 찾아보세요.', '');
         }
       }, 620);
     } else {
