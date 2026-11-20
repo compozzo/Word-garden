@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" translate="no" class="notranslate">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#eaf7ff">
+<meta name="google" content="notranslate">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="description" content="Word Garden - a friendly flashcard word game">
 <title>단어 정원 · Word Garden</title>
@@ -190,7 +191,7 @@
   }
   .ko-toggle.on{background:#fff;color:var(--ink-faint);border-color:var(--line)}
   .meaning-ko{font-size:16px;font-weight:900;color:#2f7a52;letter-spacing:-.3px;text-align:center;animation:pop .22s ease}
-  .meaning-ko[hidden]{display:none}
+  .meaning-ko[hidden]{display:none !important}
   @keyframes pop{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
 
   .learn-nav{display:flex;align-items:center;justify-content:center;gap:14px;flex:0 0 auto}
@@ -285,12 +286,13 @@
 
   .tl-spell{font-size:clamp(11px,3.6vw,15px);font-weight:900;letter-spacing:-.4px;line-height:1.15;word-break:break-word}
   .tl-meaning{font-size:clamp(8.5px,2.55vw,11.5px);font-weight:700;line-height:1.28;color:#3d4b5c;letter-spacing:-.15px;padding:0 1px}
+  .tl-meaning-none{color:#93a0b1;font-size:clamp(8px,2.3vw,10.5px);font-weight:700}
   .tl-pic{width:100%;height:100%;display:flex;align-items:center;justify-content:center;border-radius:11px;overflow:hidden;background:#f3faff}
   .tl-pic svg{width:104%;height:104%}
   .mini{position:absolute;right:4px;bottom:4px;font-size:9px;font-weight:800;color:#a5622a;background:#fff4d4;border-radius:6px;padding:2px 4px}
   .mini-ko{position:absolute;right:5px;top:5px;font-size:10px;font-weight:900;color:#b4632f;background:#fff3dc;border-radius:8px;padding:2px 6px;line-height:1.3}
   .tl-ko{font-size:clamp(9px,2.6vw,11.5px);font-weight:800;color:#2f7a52;margin-top:1px}
-  .tl-ko[hidden]{display:none}
+  .tl-ko[hidden]{display:none !important}
   .spk-mini{font-size:11px;opacity:.7}
 
   .test-foot{display:flex;flex-direction:column;gap:9px;margin-top:2px;padding-top:4px}
@@ -482,8 +484,8 @@
     <div class="flashcard" id="flashcard">
       <div class="fc-inner">
         <div class="fc-face fc-front">
-          <div class="pos" id="learnPos">noun</div>
-          <div class="word" id="learnWord">mountain</div>
+          <div class="pos notranslate" id="learnPos" translate="no">noun</div>
+          <div class="word notranslate" id="learnWord" translate="no">mountain</div>
           <button class="speak-btn" id="btnSpeak"><span class="ico">🔊</span>발음 듣기</button>
           <div class="tap-hint"><span class="dot"></span>카드를 눌러 뜻을 봐요</div>
         </div>
@@ -495,7 +497,7 @@
             <div class="dots" id="sceneDots"></div>
           </div>
           <div class="scene-cap" id="sceneCap"></div>
-          <div class="meaning-en" id="learnEn"></div>
+          <div class="meaning-en notranslate" id="learnEn" translate="no"></div>
           <div class="ko-row">
             <button class="ko-toggle" id="btnKo">한글 뜻 보기</button>
             <div class="meaning-ko" id="learnKo" hidden></div>
@@ -561,7 +563,7 @@
     <div class="word-list" id="wordList"></div>
     <div class="field">
       <label for="inWord">영어 단어</label>
-      <input id="inWord" type="text" placeholder="예: apple" autocomplete="off" autocapitalize="none" spellcheck="false">
+      <input id="inWord" type="text" placeholder="예: apple" autocomplete="off" autocapitalize="none" spellcheck="false" translate="no">
     </div>
     <div class="field">
       <label for="inKo">한글 뜻</label>
@@ -569,7 +571,7 @@
     </div>
     <div class="field">
       <label for="inEn">영어 뜻 (없으면 비워 두세요)</label>
-      <input id="inEn" type="text" placeholder="예: a round fruit with red skin" autocomplete="off" spellcheck="false">
+      <input id="inEn" type="text" placeholder="예: a round fruit with red skin" autocomplete="off" spellcheck="false" translate="no">
     </div>
     <div class="field">
       <label for="inPos">품사</label>
@@ -634,6 +636,23 @@
     }
     return a;
   };
+
+  /* The English in this app is the lesson, not something to translate.
+     Chrome's auto-translator turned the English meanings into Korean on its
+     own, so every English text node carries translate="no" + .notranslate. */
+  const ENGLISH_SELECTORS = [
+    '#learnWord', '#learnPos', '#learnEn',
+    '.tl-spell', '.tl-meaning',
+    '.word-chip',
+    '.word-row .w', '.word-row .m',
+    '.stick-item .w'
+  ].join(',');
+  function markEnglish(root) {
+    $$(ENGLISH_SELECTORS, root || document).forEach(n => {
+      n.classList.add('notranslate');
+      n.setAttribute('translate', 'no');
+    });
+  }
 
   /* storage that never throws */
   const store = {
@@ -2671,6 +2690,7 @@
     $('#homeTag').textContent = cur.emoji + ' ' + cur.label + ' · 단어 ' + words.length + '개';
     $('#homeStickerDesc').textContent = '모은 과일 ' + Object.keys(state.stickers).length + '개';
     renderPackPicker();
+    markEnglish($('#scr-home'));
   }
 
   /* ------------------------- LEARN ------------------------- */
@@ -2708,6 +2728,7 @@
     });
 
     renderScene();
+    markEnglish($('#scr-learn'));
     setTimeout(() => speak(w.word), 220);
   }
 
@@ -2837,13 +2858,21 @@
   function cardFaceHTML(card) {
     const w = allWords().find(x => x.id === card.wordId) || { word: '?', en: '', ko: '', scenes: [] };
     if (card.type === 'spell') {
-      return '<div class="tl-spell">' + escapeHTML(w.word) + '</div>';
+      return '<div class="tl-spell notranslate" translate="no">' + escapeHTML(w.word) + '</div>';
     }
     if (card.type === 'picture') {
       const sc = (w.scenes && w.scenes[0]) ? w.scenes[0].html : emojiSceneHTML('🖼️');
       return '<div class="tl-pic">' + sc + '</div>';
     }
-    return '<div class="tl-meaning">' + escapeHTML(w.en || w.ko || '') + '</div>'
+    const en = (w.en || '').trim();
+    if (!en) {
+      // No English definition in the word book: never fall back to the Korean
+      // meaning, or the 뜻 card would give the answer before the 한 button.
+      return '<div class="tl-meaning tl-meaning-none">한 버튼을 눌러 뜻을 봐요</div>'
+        + '<button class="mini-ko" data-ko="1">한</button>'
+        + '<div class="tl-ko" hidden>' + escapeHTML(w.ko || '') + '</div>';
+    }
+    return '<div class="tl-meaning notranslate" translate="no">' + escapeHTML(en) + '</div>'
       + '<button class="mini-ko" data-ko="1">한</button>'
       + '<div class="tl-ko" hidden>' + escapeHTML(w.ko || '') + '</div>';
   }
@@ -2883,6 +2912,7 @@
       rowEl.appendChild(cardsEl);
       grid.appendChild(rowEl);
     });
+    markEnglish(grid);
   }
 
   function syncCards() {
@@ -3093,6 +3123,7 @@
     if (!grid.children.length) {
       grid.appendChild(el('div', 'stick-item locked', '<div class="f">🍓</div><div class="w">아직 없음</div>'));
     }
+    markEnglish(grid);
     $('#modalStickers').classList.add('open');
   }
 
@@ -3129,6 +3160,7 @@
       }
       list.appendChild(row);
     });
+    markEnglish(list);
   }
 
   function openWords() {
