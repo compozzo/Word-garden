@@ -302,15 +302,15 @@
   .stat .v{font-size:19px;font-weight:900;margin-top:2px;letter-spacing:-.4px}
   .stat.score .v{color:#b8801a} .stat.fruit .v{color:#c4527a}
   .sticker-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:14px}
-  .sticker{
+  .stick-item{
     background:#fff;border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 6px;
     display:flex;flex-direction:column;align-items:center;gap:3px;box-shadow:var(--shadow-sm);min-height:86px;justify-content:center;
   }
-  .sticker .f{font-size:27px;line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,.08))}
-  .sticker .w{font-size:10.5px;font-weight:800;color:#4a5866;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .sticker.locked{background:#f7f9fb;border-style:dashed;box-shadow:none}
-  .sticker.locked .f{filter:grayscale(1);opacity:.28}
-  .sticker.locked .w{color:#b6c0cc}
+  .stick-item .f{font-size:27px;line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,.08))}
+  .stick-item .w{font-size:10.5px;font-weight:800;color:#4a5866;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .stick-item.locked{background:#f7f9fb;border-style:dashed;box-shadow:none}
+  .stick-item.locked .f{filter:grayscale(1);opacity:.28}
+  .stick-item.locked .w{color:#b6c0cc}
 
   .field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
   .field label{font-size:12px;font-weight:800;color:var(--ink-soft)}
@@ -1895,7 +1895,7 @@
     // collected first, then locked slots for the rest of the pack
     words.forEach(w => {
       const st = got[w.id];
-      const d = el('div', 'sticker' + (st ? '' : ' locked'));
+      const d = el('div', 'stick-item' + (st ? '' : ' locked'));
       d.innerHTML = '<div class="f">' + (st ? st.fruit : '🔒') + '</div>'
         + '<div class="w">' + escapeHTML(st ? st.word : '???') + '</div>';
       if (st) d.title = escapeHTML(st.word);
@@ -1905,12 +1905,12 @@
     Object.keys(got).forEach(id => {
       if (words.some(w => w.id === id)) return;
       const st = got[id];
-      const d = el('div', 'sticker');
+      const d = el('div', 'stick-item');
       d.innerHTML = '<div class="f">' + st.fruit + '</div><div class="w">' + escapeHTML(st.word || '') + '</div>';
       grid.appendChild(d);
     });
     if (!grid.children.length) {
-      grid.appendChild(el('div', 'sticker locked', '<div class="f">🍓</div><div class="w">아직 없음</div>'));
+      grid.appendChild(el('div', 'stick-item locked', '<div class="f">🍓</div><div class="w">아직 없음</div>'));
     }
     $('#modalStickers').classList.add('open');
   }
