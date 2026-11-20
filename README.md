@@ -12,9 +12,17 @@ Open `index.html` (or the GitHub Pages URL) on a phone or tablet.
 
 **Sticker book** — collected fruits and total score are kept in `localStorage` on the device.
 
+**단어 팩 고르기** — the Home screen has a horizontal strip of word packs. The pick is kept in `localStorage` (`wg_pack_v1`), and the hero chips, Learn Stage and Test Stage all follow the picked pack. Words added with 단어 관리 ride along in whichever pack is picked.
+
 **단어 관리** — a parent can add a word (English, Korean meaning, English definition, part of speech, and a picture emoji). Words added there are stored on the device only; for illustrated multi-scene pictures, update the word list in the file.
 
-## The current word set
+## The word packs
+
+`📸 오늘의 단어장` is the environment unit (Reduce ~ Waste). The six grade packs follow the 2022 revised curriculum elementary vocabulary, ten words each: 초1 기초 (apple ~ happy), 초2 일상 (run ~ school), 초3 필수 (animal ~ smile), 초4 필수 (arrive ~ weather), 초5 심화 (agree ~ wonder), 초6 심화 (achieve ~ responsible). English starts in grade 3 in the curriculum, so the 초1·초2 packs draw their words from the foundational, everyday part of that list.
+
+Every word carries two inline SVG scenes, built from a shared set of flat-shape pieces (`artBg`, the `G` glyph library and `artScene`) so all 70 words stay crisp at phone size without external files.
+
+## The environment unit (📸 오늘의 단어장)
 
 The environment unit, in order:
 
@@ -30,7 +38,6 @@ The environment unit, in order:
 10. Waste — To use carelessly or too much
 
 Every word carries two hand-drawn inline SVG scenes.
-
 ## Notes
 
 - Layout targets 360–430 px widths with no horizontal scrolling and large touch targets.
