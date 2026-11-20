@@ -297,6 +297,36 @@
   .pick-status{font-size:12px;color:var(--ink-faint);text-align:center;font-weight:700}
   .pick-status b{color:#2f7a52}
 
+  /* ---------- pack selector ---------- */
+  .pack-select{margin-top:-2px}
+  .pack-select .head{display:flex;align-items:baseline;gap:6px;padding:0 3px 7px}
+  .pack-select .head .t{font-size:12.5px;font-weight:900;color:var(--ink-soft);letter-spacing:-.2px}
+  .pack-select .head .h{margin-left:auto;font-size:10.5px;font-weight:700;color:var(--ink-faint)}
+  .pack-scroll{
+    display:flex;gap:7px;overflow-x:auto;padding:1px 2px 5px;
+    scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .pack-scroll::-webkit-scrollbar{display:none}
+  .pack-pill{
+    flex:0 0 auto;display:flex;align-items:center;gap:6px;
+    padding:8px 12px;border-radius:15px;background:#fff;border:1.5px solid var(--line);
+    box-shadow:var(--shadow-sm);font-size:12.5px;font-weight:800;color:var(--ink-soft);
+    scroll-snap-align:start;white-space:nowrap;line-height:1.15;
+  }
+  .pack-pill .em{font-size:15px;line-height:1}
+  .pack-pill .nm{letter-spacing:-.35px}
+  .pack-pill .ct{font-size:10px;font-weight:900;color:var(--ink-faint);background:#f1f6fa;border-radius:999px;padding:2px 5px}
+  .pack-pill.on{
+    background:linear-gradient(120deg,#e8f9ee,#f6fdf9);border-color:#9fd9b5;color:#2f7a52;
+    box-shadow:0 6px 14px rgba(63,158,99,.16);
+  }
+  .pack-pill.on .ct{background:#d9f2e3;color:#2f7a52}
+  .list-note{
+    font-size:11.5px;line-height:1.45;font-weight:700;color:var(--ink-faint);
+    background:#f6fafd;border:1px dashed #dbe6f0;border-radius:12px;padding:8px 11px;margin-bottom:11px;
+  }
+
   /* ---------- modal ---------- */
   .modal{position:fixed;inset:0;z-index:60;display:none;align-items:flex-end;justify-content:center;padding:0}
   .modal.open{display:flex}
@@ -408,8 +438,13 @@
     <div class="hero">
       <div class="sun"></div><div class="hill"></div>
       <h1>단어 정원</h1>
-      <div class="tag" id="homeTag">오늘의 단어 3개 · 콕콕 눌러서 놀아요</div>
+      <div class="tag" id="homeTag">오늘의 단어 10개 · 콕콕 눌러서 놀아요</div>
       <div class="pack" id="homePack"></div>
+    </div>
+
+    <div class="pack-select">
+      <div class="head"><span class="t">단어 팩 고르기</span><span class="h">좌우로 넘겨 보세요</span></div>
+      <div class="pack-scroll" id="packScroll"></div>
     </div>
 
     <div class="stage-list">
@@ -522,6 +557,7 @@
   <div class="sheet">
     <div class="grab"></div>
     <div class="sheet-head"><h2>➕ 단어 관리</h2><button class="x" data-close>✕</button></div>
+    <div class="list-note" id="wordListNote"></div>
     <div class="word-list" id="wordList"></div>
     <div class="field">
       <label for="inWord">영어 단어</label>
@@ -1446,6 +1482,988 @@
     }
   ];
 
+  /* =========================================================================
+     Illustration kit for the grade packs (초1 ~ 초6)
+     Each picture is composed from small flat-shape pieces on a 320×200 canvas,
+     so all sixty words get a real, readable scene and the file stays light.
+     ========================================================================= */
+  const gWrap = (x, y, s, inner, rot) =>
+    '<g transform="translate(' + x + ' ' + y + ')' + (rot ? ' rotate(' + rot + ')' : '') + ' scale(' + (s == null ? 1 : s) + ')">' + inner + '</g>';
+
+  const BG = {
+    sky:    { top: '#e9f7ff', floor: '#bde3c1', band: 156, sun: true },
+    meadow: { top: '#f2fcf3', floor: '#bfe7ba', band: 150, sun: true },
+    night:  { top: '#e8edfb', floor: '#c6d1e8', band: 156, stars: true },
+    water:  { top: '#e5f7ff', floor: '#a9dbee', band: 138, waves: true },
+    indoor: { top: '#fff8ee', floor: '#eddec7', band: 154 },
+    room:   { top: '#fdf7ff', floor: '#e7dcf1', band: 154 },
+    paper:  { top: '#fdfcf6', floor: '#efe8d4', band: 168 },
+    city:   { top: '#eef5fb', floor: '#d9e4ee', band: 156, sun: true }
+  };
+
+  function artBg(kind) {
+    const b = BG[kind] || BG.meadow;
+    let out = '<rect width="320" height="200" fill="' + b.top + '"/>';
+    if (b.stars) {
+      const stars = [[38, 26], [70, 52], [104, 28], [252, 30], [286, 74], [212, 20], [34, 78], [172, 38]];
+      stars.forEach((p, i) => {
+        out += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="' + (i % 2 ? 2 : 2.8) + '" fill="#ffd166" opacity="' + (i % 3 ? '.5' : '.85') + '"/>';
+      });
+    } else if (b.sun) {
+      out += sunBurst(276, 34, 12, '#ffe27a');
+    }
+    out += '<rect y="' + b.band + '" width="320" height="' + (200 - b.band) + '" fill="' + b.floor + '"/>';
+    out += '<ellipse cx="160" cy="' + (b.band + 3) + '" rx="160" ry="9" fill="#ffffff" opacity=".18"/>';
+    if (b.waves) {
+      out += '<path d="M0 ' + (b.band + 16) + ' q20 -7 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0" fill="none" stroke="#9fd6ee" stroke-width="4" opacity=".5"/>';
+    }
+    return out;
+  }
+
+  const G = {
+    /* ---------- sky ---------- */
+    sun: (x, y, s) => gWrap(x, y, s, sunBurst(0, 0, 15, '#ffdf5c')),
+    moon: (x, y, s) => gWrap(x, y, s,
+      '<path d="M7 -26 A27 27 0 1 0 7 26 A21 21 0 1 1 7 -26 Z" fill="#ffe08a"/>'
+      + '<circle cx="-6" cy="-8" r="4" fill="#ffd166" opacity=".65"/>'
+      + '<circle cx="3" cy="9" r="3" fill="#ffd166" opacity=".65"/>'),
+    star: (x, y, s, c) => gWrap(x, y, s,
+      '<path d="M0 -16 L4.7 -5.2 L16 -4.4 L7.6 3.4 L10.5 14.6 L0 8.4 L-10.5 14.6 L-7.6 3.4 L-16 -4.4 L-4.7 -5.2 Z" fill="' + (c || '#ffd166') + '"/>'),
+    sparkle: (x, y, s, c) => gWrap(x, y, s,
+      '<path d="M0 -12 L3 -3 L12 0 L3 3 L0 12 L-3 3 L-12 0 L-3 -3 Z" fill="' + (c || '#ffd166') + '"/>'),
+    cloud: (x, y, s) => cloud(x, y, s),
+    rain: (x, y, s) => gWrap(x, y, s,
+      cloud(0, 0, 1) + drop(-21, 20, .5) + drop(1, 28, .5) + drop(21, 19, .5)),
+    snowcloud: (x, y, s) => gWrap(x, y, s,
+      cloud(0, 0, 1) + G.snowflake(-22, 24, .55) + G.snowflake(2, 30, .5) + G.snowflake(24, 22, .55)),
+    snowflake: (x, y, s) => {
+      let out = '';
+      for (let i = 0; i < 3; i++) {
+        out += '<g transform="rotate(' + (i * 60) + ')">'
+          + '<path d="M0 -14 L0 14" stroke="#8fb8e0" stroke-width="3" stroke-linecap="round"/>'
+          + '<path d="M0 -9 l4.5 -4.5 M0 -9 l-4.5 -4.5 M0 9 l4.5 4.5 M0 9 l-4.5 4.5" stroke="#8fb8e0" stroke-width="2.2" fill="none" stroke-linecap="round"/>'
+          + '</g>';
+      }
+      return gWrap(x, y, s, out);
+    },
+    wind: (x, y, s) => gWrap(x, y, s,
+      '<path d="M-24 -8 h20 q9 0 9 -7 q0 -7 -9 -7" fill="none" stroke="#9fb4c8" stroke-width="3.4" stroke-linecap="round"/>'
+      + '<path d="M-28 4 h28 q11 0 11 8 q0 8 -11 8" fill="none" stroke="#9fb4c8" stroke-width="3.4" stroke-linecap="round"/>'
+      + '<path d="M-16 18 h12" stroke="#9fb4c8" stroke-width="3.4" stroke-linecap="round"/>'),
+    arc: (x, y, s) => gWrap(x, y, s,
+      '<path d="M-52 22 Q0 -42 52 22" fill="none" stroke="#b9cfe6" stroke-width="3" stroke-dasharray="6 7" stroke-linecap="round"/>'),
+    speed: (x, y, s) => gWrap(x, y, s,
+      '<path d="M-10 -10 h20 M-16 0 h26 M-10 10 h18" stroke="#b9cfe6" stroke-width="3.4" stroke-linecap="round"/>'),
+    trail: (x, y, s) => gWrap(x, y, s,
+      '<path d="M-42 26 Q0 4 42 26" fill="none" stroke="#e4d3b3" stroke-width="7" stroke-dasharray="2 12" stroke-linecap="round"/>'),
+
+    /* ---------- land ---------- */
+    mountains: (x, y, s) => gWrap(x, y, s,
+      '<path d="M-150 40 L-86 -52 L-26 40 Z" fill="#a7cdbd"/>'
+      + '<path d="M-108 -14 L-86 -52 L-64 -14 Z" fill="#ffffff"/>'
+      + '<path d="M-60 40 L10 -76 L82 40 Z" fill="#8dbfa8"/>'
+      + '<path d="M-16 -22 L10 -76 L38 -22 Z" fill="#ffffff"/>'
+      + '<path d="M62 40 L118 -34 L172 40 Z" fill="#a7cdbd"/>'
+      + '<path d="M100 -6 L118 -34 L138 -6 Z" fill="#ffffff"/>'),
+    tree: (x, y, s, leaf) => tree(x, y, s, leaf),
+    pine: (x, y, s, c) => pine(x, y, s, c),
+    flower: (x, y, c) => flower(x, y, c),
+    bush: (x, y, s, c) => gWrap(x, y, s,
+      '<ellipse cx="-10" cy="0" rx="12" ry="9" fill="' + (c || '#8fd4a0') + '"/>'
+      + '<ellipse cx="8" cy="2" rx="13" ry="10" fill="' + (c || '#8fd4a0') + '"/>'
+      + '<ellipse cx="0" cy="-7" rx="12" ry="10" fill="' + (c || '#a5e0b4') + '"/>'),
+    mushroom: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-4" y="-2" width="8" height="14" rx="3" fill="#fdf3e3"/>'
+      + '<path d="M-15 -2 a15 13 0 0 1 30 0 Z" fill="#ff8f8f"/>'
+      + '<circle cx="-6" cy="-7" r="2.4" fill="#ffffff"/><circle cx="6" cy="-9" r="2" fill="#ffffff"/>'),
+    rock: (x, y, s, c) => rock(x, y, s, c),
+    river: (x, y, s) => gWrap(x, y, s,
+      '<path d="M-6 -46 q26 22 0 44 q-26 22 0 44 q26 22 0 44" fill="none" stroke="#bfe6f6" stroke-width="24" stroke-linecap="round"/>'
+      + '<path d="M-6 -46 q26 22 0 44 q-26 22 0 44 q26 22 0 44" fill="none" stroke="#ffffff" stroke-width="3" stroke-dasharray="8 14" opacity=".7" stroke-linecap="round"/>'),
+    puddle: (x, y, s) => gWrap(x, y, s,
+      '<ellipse rx="40" ry="11" fill="#a9dcef"/>'
+      + '<ellipse cx="-8" cy="-3" rx="14" ry="4" fill="#ffffff" opacity=".55"/>'),
+
+    /* ---------- creatures ---------- */
+    bird: (x, y) => bird(x, y),
+    butterfly: (x, y, s) => gWrap(x, y, s,
+      '<ellipse cx="-9" cy="-6" rx="9" ry="7" fill="#ffb3c7" transform="rotate(-20 -9 -6)"/>'
+      + '<ellipse cx="9" cy="-6" rx="9" ry="7" fill="#ffb3c7" transform="rotate(20 9 -6)"/>'
+      + '<ellipse cx="-7" cy="6" rx="6.5" ry="5" fill="#ffd0dc"/>'
+      + '<ellipse cx="7" cy="6" rx="6.5" ry="5" fill="#ffd0dc"/>'
+      + '<rect x="-1.6" y="-10" width="3.2" height="20" rx="1.6" fill="#6b5b4a"/>'
+      + '<path d="M0 -10 q-6 -8 -10 -9 M0 -10 q6 -8 10 -9" stroke="#6b5b4a" stroke-width="1.6" fill="none" stroke-linecap="round"/>'),
+    cat: (x, y, s, c) => {
+      const col = c || '#f0b273';
+      return gWrap(x, y, s,
+        '<path d="M23 20 q22 -6 14 -30" fill="none" stroke="' + col + '" stroke-width="9" stroke-linecap="round"/>'
+        + '<ellipse cx="0" cy="18" rx="24" ry="22" fill="' + col + '"/>'
+        + '<ellipse cx="0" cy="25" rx="12" ry="13" fill="#fff6e8" opacity=".85"/>'
+        + '<circle cx="1" cy="-10" r="21" fill="' + col + '"/>'
+        + '<path d="M-19 -20 L-26 -41 L-7 -29 Z" fill="' + col + '"/>'
+        + '<path d="M20 -20 L27 -41 L8 -29 Z" fill="' + col + '"/>'
+        + '<path d="M-15 -23 L-19 -34 L-9 -28 Z" fill="#ffc2d1"/>'
+        + '<path d="M16 -23 L20 -34 L10 -28 Z" fill="#ffc2d1"/>'
+        + '<circle cx="-7" cy="-12" r="3" fill="#3f4a58"/><circle cx="9" cy="-12" r="3" fill="#3f4a58"/>'
+        + '<path d="M-2 -4 q3 3 6 0" stroke="#e08a63" stroke-width="2" fill="none" stroke-linecap="round"/>'
+        + '<path d="M-10 -3 h-13 M-10 2 h-11 M11 -3 h13 M11 2 h11" stroke="#c98a5c" stroke-width="1.6" stroke-linecap="round"/>'
+        + '<rect x="-10" y="36" width="8" height="8" rx="3.5" fill="' + col + '"/>'
+        + '<rect x="3" y="36" width="8" height="8" rx="3.5" fill="' + col + '"/>');
+    },
+    dog: (x, y, s) => gWrap(x, y, s,
+      '<ellipse cx="-2" cy="16" rx="28" ry="19" fill="#dcae74"/>'
+      + '<path d="M-26 8 q-17 -10 -13 -27" fill="none" stroke="#dcae74" stroke-width="8" stroke-linecap="round"/>'
+      + '<circle cx="20" cy="-8" r="17" fill="#e8c08a"/>'
+      + '<ellipse cx="7" cy="-11" rx="7" ry="13" fill="#c08d55" transform="rotate(-14 7 -11)"/>'
+      + '<ellipse cx="34" cy="-2" rx="7" ry="5" fill="#4a3b34"/>'
+      + '<circle cx="25" cy="-13" r="2.8" fill="#3f4a58"/>'
+      + '<path d="M30 4 q3 7 8 3" stroke="#e8563f" stroke-width="4" fill="none" stroke-linecap="round"/>'
+      + '<rect x="-16" y="28" width="9" height="13" rx="4" fill="#c9985f"/>'
+      + '<rect x="6" y="28" width="9" height="13" rx="4" fill="#c9985f"/>'),
+    fish: (x, y, s, c) => {
+      const col = c || '#7cc4e8';
+      return gWrap(x, y, s,
+        '<ellipse cx="0" cy="0" rx="24" ry="15" fill="' + col + '"/>'
+        + '<path d="M22 0 L41 -13 L41 13 Z" fill="' + col + '"/>'
+        + '<path d="M-4 -13 q6 -9 14 -3" fill="' + col + '" opacity=".7"/>'
+        + '<circle cx="-12" cy="-3" r="3.4" fill="#ffffff"/><circle cx="-12" cy="-3" r="1.8" fill="#3f4a58"/>'
+        + '<path d="M-2 5 q6 6 12 1" stroke="#ffffff" stroke-width="2" fill="none" opacity=".5" stroke-linecap="round"/>');
+    },
+    rabbit: (x, y, s) => gWrap(x, y, s,
+      '<ellipse cx="0" cy="20" rx="20" ry="18" fill="#f6f2ec"/>'
+      + '<circle cx="0" cy="-6" r="16" fill="#fcfaf5"/>'
+      + '<ellipse cx="-7" cy="-30" rx="5" ry="16" fill="#fcfaf5" transform="rotate(-10 -7 -30)"/>'
+      + '<ellipse cx="7" cy="-30" rx="5" ry="16" fill="#fcfaf5" transform="rotate(10 7 -30)"/>'
+      + '<ellipse cx="-7" cy="-30" rx="2.4" ry="11" fill="#ffc2d1" transform="rotate(-10 -7 -30)"/>'
+      + '<ellipse cx="7" cy="-30" rx="2.4" ry="11" fill="#ffc2d1" transform="rotate(10 7 -30)"/>'
+      + '<circle cx="-6" cy="-8" r="2.4" fill="#3f4a58"/><circle cx="6" cy="-8" r="2.4" fill="#3f4a58"/>'
+      + '<path d="M-2 -2 q2 3 4 0" stroke="#e08a63" stroke-width="1.8" fill="none" stroke-linecap="round"/>'
+      + '<circle cx="0" cy="27" r="7" fill="#ffffff" opacity=".9"/>'),
+    mouse: (x, y, s) => gWrap(x, y, s,
+      '<ellipse cx="0" cy="4" rx="14" ry="10" fill="#c9d2dd"/>'
+      + '<circle cx="12" cy="-2" r="8" fill="#d7dfe8"/>'
+      + '<circle cx="6" cy="-9" r="6" fill="#c9d2dd"/><circle cx="6" cy="-9" r="3.4" fill="#ffc2d1"/>'
+      + '<circle cx="16" cy="-4" r="1.6" fill="#3f4a58"/>'
+      + '<path d="M-12 6 q-14 4 -18 -4" stroke="#c9d2dd" stroke-width="2.6" fill="none" stroke-linecap="round"/>'),
+    elephant: (x, y, s) => gWrap(x, y, s,
+      '<ellipse cx="-4" cy="6" rx="34" ry="26" fill="#b9c3d1"/>'
+      + '<circle cx="24" cy="-6" r="20" fill="#c3ccd8"/>'
+      + '<path d="M38 4 q11 15 5 27 q-3 9 -13 6" fill="none" stroke="#c3ccd8" stroke-width="10" stroke-linecap="round"/>'
+      + '<ellipse cx="8" cy="-6" rx="12" ry="16" fill="#a9b4c3"/>'
+      + '<circle cx="26" cy="-14" r="3" fill="#3f4a58"/>'
+      + '<path d="M42 12 q10 4 10 12" stroke="#ffffff" stroke-width="4" fill="none" stroke-linecap="round" opacity=".8"/>'
+      + '<rect x="-22" y="26" width="11" height="16" rx="4" fill="#a9b4c3"/>'
+      + '<rect x="-4" y="26" width="11" height="16" rx="4" fill="#a9b4c3"/>'),
+    swimmer: (x, y, s, shirt) => gWrap(x, y, s,
+      '<path d="M-34 8 q12 -9 22 0 q10 9 20 0 q10 -9 20 0" fill="none" stroke="#8fd4f0" stroke-width="5" stroke-linecap="round"/>'
+      + '<circle cx="0" cy="-8" r="12" fill="#f7c9a3"/>'
+      + '<path d="M-12 -13 a12 12 0 0 1 24 0 q-12 -8 -24 0" fill="' + (shirt || '#4a3728') + '"/>'
+      + '<circle cx="-4" cy="-9" r="2" fill="#4a3728"/><circle cx="4" cy="-9" r="2" fill="#4a3728"/>'
+      + '<path d="M-5 -2 q5 4 10 0" stroke="#4a3728" stroke-width="1.8" fill="none" stroke-linecap="round"/>'
+      + '<path d="M11 -6 q16 -10 26 -2" stroke="#f7c9a3" stroke-width="7" fill="none" stroke-linecap="round"/>'
+      + '<path d="M-12 2 q-15 5 -24 -3" stroke="#f7c9a3" stroke-width="7" fill="none" stroke-linecap="round"/>'),
+
+    /* ---------- people ---------- */
+    kidStand: (x, gy, s, shirt, opts) => kid('translate(' + x + ' ' + (gy - 63 * s) + ') scale(' + s + ')', shirt, opts),
+    kidJump: (x, y, s, shirt) => kid('translate(' + x + ' ' + (y - 40 * s) + ') scale(' + s + ')', shirt, { arms: 'up', eyes: 'closed' }),
+    runner: (x, gy, s, shirt) => gWrap(x, gy, s,
+      '<path d="M-4 2 L-18 28" stroke="#5a6f93" stroke-width="10" stroke-linecap="round"/>'
+      + '<path d="M-20 28 q-8 3 -10 9" stroke="#e8563f" stroke-width="7" stroke-linecap="round"/>'
+      + '<path d="M5 2 L17 24" stroke="#5a6f93" stroke-width="10" stroke-linecap="round"/>'
+      + '<path d="M17 24 q6 7 13 8" stroke="#e8563f" stroke-width="7" stroke-linecap="round"/>'
+      + '<rect x="-13" y="-33" width="26" height="38" rx="12" fill="' + (shirt || '#8fc9ff') + '" transform="rotate(12 0 -14)"/>'
+      + '<path d="M-9 -26 q-15 6 -17 16" stroke="#f7c9a3" stroke-width="8" stroke-linecap="round" fill="none"/>'
+      + '<path d="M10 -22 q14 -2 20 6" stroke="#f7c9a3" stroke-width="8" stroke-linecap="round" fill="none"/>'
+      + '<circle cx="3" cy="-44" r="14" fill="#f7c9a3"/>'
+      + '<path d="M-11 -46 a14 14 0 0 1 28 0 q-14 -9 -28 0" fill="#4a3728"/>'
+      + '<circle cx="-1" cy="-45" r="2" fill="#4a3728"/><circle cx="8" cy="-45" r="2" fill="#4a3728"/>'
+      + '<path d="M1 -38 q5 4 9 0" stroke="#4a3728" stroke-width="1.8" fill="none" stroke-linecap="round"/>'),
+    sleepyhead: (x, y, s) => gWrap(x, y, s,
+      '<circle r="13" fill="#f7c9a3"/>'
+      + '<path d="M-13 -3 a13 13 0 0 1 26 0 q-13 -9 -26 0" fill="#4a3728"/>'
+      + '<path d="M-8 -2 q4 3 8 0 M1 -2 q4 3 8 0" stroke="#4a3728" stroke-width="1.8" fill="none" stroke-linecap="round"/>'
+      + '<path d="M-2 5 q4 3 8 0" stroke="#4a3728" stroke-width="1.8" fill="none" stroke-linecap="round"/>'
+      + '<circle cx="-7" cy="2" r="2.6" fill="#ffb3b3" opacity=".6"/>'),
+    zzz: (x, y, s) => gWrap(x, y, s,
+      '<path d="M-10 -12 h11 l-11 13 h11" stroke="#8fa8c8" stroke-width="2.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'
+      + '<path d="M6 4 h8 l-8 10 h8" stroke="#a9bdd6" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'),
+    smiley: (x, y, s, mood) => {
+      const m = mood || 'happy';
+      const mouth = m === 'sad'
+        ? '<path d="M-11 13 q11 -12 22 0" fill="none" stroke="#4a3728" stroke-width="3.4" stroke-linecap="round"/>'
+        : m === 'wow'
+          ? '<ellipse cx="0" cy="12" rx="7" ry="9" fill="#4a3728"/>'
+          : '<path d="M-12 6 q12 14 24 0" fill="none" stroke="#4a3728" stroke-width="3.6" stroke-linecap="round"/>';
+      return gWrap(x, y, s,
+        '<circle r="30" fill="#ffdf5c"/>'
+        + '<circle cx="-10" cy="-7" r="3.6" fill="#4a3728"/><circle cx="10" cy="-7" r="3.6" fill="#4a3728"/>'
+        + mouth
+        + '<circle cx="-20" cy="4" r="5" fill="#ffb3b3" opacity=".5"/>'
+        + '<circle cx="20" cy="4" r="5" fill="#ffb3b3" opacity=".5"/>');
+    },
+    cape: (x, y, s) => gWrap(x, y, s,
+      '<path d="M-16 -24 q-15 22 -9 46 q11 -6 25 0 q6 -26 -8 -46 Z" fill="#e8563f"/>'),
+    ear: (x, y, s) => gWrap(x, y, s,
+      '<path d="M3 -20 C-11 -22 -17 -7 -14 5 C-12 15 -15 26 -3 29 C8 31 12 21 9 15 C6 9 12 5 12 -3 C12 -13 8 -19 3 -20 Z" fill="#f7c9a3" stroke="#e8b091" stroke-width="2.2"/>'
+      + '<path d="M0 -10 C-6 -10 -8 -2 -5 3 C-2 8 -4 14 2 15" fill="none" stroke="#e8b091" stroke-width="2.2" stroke-linecap="round"/>'),
+    waves: (x, y, s, c) => gWrap(x, y, s,
+      '<path d="M-14 -12 q10 12 0 24" stroke="' + (c || '#7fb2e5') + '" stroke-width="3.4" fill="none" stroke-linecap="round"/>'
+      + '<path d="M-3 -19 q14 19 0 38" stroke="' + (c || '#7fb2e5') + '" stroke-width="3.4" fill="none" stroke-linecap="round" opacity=".75"/>'
+      + '<path d="M8 -25 q18 25 0 50" stroke="' + (c || '#7fb2e5') + '" stroke-width="3.4" fill="none" stroke-linecap="round" opacity=".5"/>'),
+    qmark: (x, y, s, c) => gWrap(x, y, s,
+      '<path d="M-8 -10 q0 -11 10 -11 q10 0 10 9 q0 8 -10 11 v6" fill="none" stroke="' + (c || '#e8a33f') + '" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>'
+      + '<circle cx="2" cy="15" r="3.2" fill="' + (c || '#e8a33f') + '"/>'),
+    check: (x, y, s, c) => gWrap(x, y, s,
+      '<path d="M-10 1 L-3 9 L12 -10" fill="none" stroke="' + (c || '#4fae74') + '" stroke-width="5.4" stroke-linecap="round" stroke-linejoin="round"/>'),
+    heart: (x, y, s, c) => heart(x, y, s, c),
+
+    /* ---------- things ---------- */
+    apple: (x, y, s) => apple(x, y, s),
+    strawberry: (x, y, s) => gWrap(x, y, s,
+      '<path d="M0 -7 C11 -7 17 2 14 10 C11 19 5 24 0 24 C-5 24 -11 19 -14 10 C-17 2 -11 -7 0 -7 Z" fill="#ff6f7d"/>'
+      + '<path d="M-9 -6 L-3 -14 L0 -7 L3 -14 L9 -6 Z" fill="#6cc08b"/>'
+      + '<circle cx="-5" cy="3" r="1.3" fill="#ffffff" opacity=".85"/>'
+      + '<circle cx="4" cy="6" r="1.3" fill="#ffffff" opacity=".85"/>'
+      + '<circle cx="0" cy="14" r="1.3" fill="#ffffff" opacity=".85"/>'),
+    tomato: (x, y, s) => gWrap(x, y, s,
+      '<circle r="14" fill="#ff6f6f"/>'
+      + '<path d="M0 -13 l-5 -6 M0 -13 l5 -6 M0 -13 v-6" stroke="#6cc08b" stroke-width="2.6" stroke-linecap="round"/>'
+      + '<ellipse cx="-5" cy="-4" rx="4" ry="3" fill="#ffffff" opacity=".4"/>'),
+    carrot: (x, y, s, rot) => gWrap(x, y, s,
+      '<path d="M-8 -12 L8 -12 L2 24 Z" fill="#f2a03b"/>'
+      + '<path d="M-6 -6 h9 M-4 4 h8 M-2 14 h6" stroke="#d9822b" stroke-width="2" stroke-linecap="round"/>'
+      + '<path d="M-2 -12 q-9 -10 -15 -6 q7 9 13 9" fill="#6cc08b"/>'
+      + '<path d="M2 -12 q9 -13 15 -9 q-5 11 -13 11" fill="#7fd196"/>', rot),
+    broccoli: (x, y, s) => gWrap(x, y, s,
+      '<path d="M-4 2 h8 v16 a4 4 0 0 1 -8 0 Z" fill="#8fd4a0"/>'
+      + '<circle cx="-10" cy="-4" r="9" fill="#4fae74"/><circle cx="0" cy="-9" r="10" fill="#5cbf83"/><circle cx="10" cy="-4" r="9" fill="#4fae74"/>'
+      + '<circle cx="-4" cy="4" r="8" fill="#5cbf83"/><circle cx="6" cy="4" r="8" fill="#5cbf83"/>'),
+    basket: (x, y, s) => gWrap(x, y, s,
+      '<path d="M-26 -6 h52 l-6 26 a8 8 0 0 1 -8 6 h-24 a8 8 0 0 1 -8 -6 Z" fill="#e0b98a"/>'
+      + '<path d="M-26 -6 h52 l-2 8 h-48 Z" fill="#c9a06b"/>'
+      + '<path d="M-14 -6 q14 -19 28 0" fill="none" stroke="#c9a06b" stroke-width="3.4"/>'
+      + '<path d="M-14 6 v18 M0 6 v20 M14 6 v18" stroke="#c9a06b" stroke-width="2.2" opacity=".65"/>'),
+    swatch: (x, y, s, c) => gWrap(x, y, s,
+      '<rect x="-23" y="-17" width="46" height="34" rx="9" fill="' + (c || '#ff6f6f') + '"/>'
+      + '<path d="M-12 -5 h24" stroke="#ffffff" stroke-width="3.4" opacity=".45" stroke-linecap="round"/>'),
+    crayon: (x, y, s, c, rot) => gWrap(x, y, s,
+      '<rect x="-6" y="-20" width="12" height="34" rx="2" fill="' + (c || '#ff6f6f') + '"/>'
+      + '<path d="M-6 14 L0 26 L6 14 Z" fill="' + (c || '#ff6f6f') + '"/>'
+      + '<path d="M-6 -20 h12 v-6 h-12 Z" fill="#ffffff" opacity=".55"/>', rot),
+    pencil: (x, y, s, c, rot) => gWrap(x, y, s,
+      '<rect x="-5" y="-30" width="10" height="46" rx="2" fill="' + (c || '#f2a93b') + '"/>'
+      + '<path d="M-5 16 L0 28 L5 16 Z" fill="#f7d9a0"/>'
+      + '<rect x="-5" y="-30" width="10" height="8" rx="2" fill="#ffb3c7"/>', rot),
+    balloon: (x, y, s, c) => gWrap(x, y, s,
+      '<ellipse cx="0" cy="0" rx="14" ry="17" fill="' + (c || '#ff8f8f') + '"/>'
+      + '<path d="M0 17 l-3 5 h6 Z" fill="' + (c || '#ff8f8f') + '"/>'
+      + '<path d="M0 22 q7 10 -1 20 q-6 10 1 18" stroke="#b9c6d3" stroke-width="1.8" fill="none" opacity=".85"/>'
+      + '<ellipse cx="-4" cy="-5" rx="4" ry="5" fill="#ffffff" opacity=".45"/>'),
+    ball: (x, y, s, c) => gWrap(x, y, s,
+      '<circle r="15" fill="' + (c || '#8fc9ff') + '"/>'
+      + '<path d="M-13 -5 q13 7 26 0" stroke="#ffffff" stroke-width="3" fill="none" opacity=".7"/>'
+      + '<path d="M0 -15 q7 15 0 30" stroke="#ffffff" stroke-width="3" fill="none" opacity=".6"/>'),
+    openbook: (x, y, s) => gWrap(x, y, s,
+      '<path d="M0 -6 C-8 -14 -22 -16 -32 -13 L-32 14 C-22 11 -8 13 0 20 Z" fill="#ffffff" stroke="#c9d9ea" stroke-width="2.4" stroke-linejoin="round"/>'
+      + '<path d="M0 -6 C8 -14 22 -16 32 -13 L32 14 C22 11 8 13 0 20 Z" fill="#fdfdff" stroke="#c9d9ea" stroke-width="2.4" stroke-linejoin="round"/>'
+      + '<path d="M0 -6 L0 20" stroke="#c9d9ea" stroke-width="2.4"/>'
+      + '<path d="M-25 -7 h16 M-25 0 h16 M-25 7 h11 M9 -7 h16 M9 0 h16 M9 7 h11" stroke="#dce6f0" stroke-width="2.4" stroke-linecap="round"/>'),
+    shelf: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-34" y="-40" width="68" height="80" rx="4" fill="#d7a97c"/>'
+      + '<rect x="-28" y="-34" width="56" height="30" fill="#fdf7ee"/>'
+      + '<rect x="-28" y="2" width="56" height="30" fill="#fdf7ee"/>'
+      + '<rect x="-26" y="-30" width="7" height="26" fill="#ff8f8f"/><rect x="-17" y="-26" width="7" height="22" fill="#7fb2e5"/><rect x="-8" y="-30" width="7" height="26" fill="#ffd166"/><rect x="1" y="-28" width="7" height="24" fill="#8fd4a0"/><rect x="10" y="-30" width="7" height="26" fill="#c9a6e8"/>'
+      + '<rect x="-26" y="6" width="7" height="26" fill="#8fd4a0"/><rect x="-17" y="10" width="7" height="22" fill="#ffd166"/><rect x="-8" y="6" width="7" height="26" fill="#ff8f8f"/><rect x="1" y="8" width="7" height="24" fill="#7fb2e5"/><rect x="10" y="6" width="7" height="26" fill="#ffb3c7"/>'),
+    easel: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-34" y="-30" width="68" height="58" rx="4" fill="#ffffff" stroke="#dfe7ef" stroke-width="3"/>'
+      + '<path d="M-26 -16 q10 11 18 -2 q8 13 18 2" stroke="#8fd4a0" stroke-width="3" fill="none" stroke-linecap="round"/>'
+      + '<circle cx="16" cy="-8" r="6" fill="#ffd166"/>'
+      + '<path d="M-30 28 L-38 46 M30 28 L38 46 M0 28 L0 46" stroke="#c99a6b" stroke-width="4" stroke-linecap="round"/>'),
+    bed: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-40" y="-6" width="80" height="22" rx="6" fill="#cfe0f2"/>'
+      + '<rect x="-46" y="-26" width="10" height="42" rx="4" fill="#b9cfe6"/>'
+      + '<rect x="8" y="-6" width="32" height="18" rx="7" fill="#ffc2d1"/>'
+      + '<ellipse cx="-22" cy="-9" rx="14" ry="8" fill="#ffffff"/>'
+      + '<rect x="-40" y="16" width="8" height="12" rx="3" fill="#a9c1da"/>'
+      + '<rect x="32" y="16" width="8" height="12" rx="3" fill="#a9c1da"/>'),
+    table: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-46" y="-8" width="92" height="9" rx="4" fill="#d9b78c"/>'
+      + '<rect x="-38" y="1" width="7" height="34" rx="3" fill="#c9a67b"/>'
+      + '<rect x="31" y="1" width="7" height="34" rx="3" fill="#c9a67b"/>'),
+    bowl: (x, y, s) => gWrap(x, y, s,
+      '<ellipse cx="0" cy="-2" rx="21" ry="7" fill="#ffd166"/>'
+      + '<path d="M-26 -2 a26 26 0 0 0 52 0 Z" fill="#ffffff" stroke="#dbe6f0" stroke-width="2.5"/>'
+      + '<path d="M-16 -1 q8 6 16 6 q8 0 16 -6" fill="#8fd4a0" opacity=".9"/>'
+      + '<path d="M-12 24 h24" stroke="#dbe6f0" stroke-width="3" stroke-linecap="round"/>'),
+    spoon: (x, y, s, rot) => gWrap(x, y, s,
+      '<ellipse cx="0" cy="-14" rx="8" ry="11" fill="#e4ecf4" stroke="#c4d4e2" stroke-width="2"/>'
+      + '<rect x="-2.5" y="-4" width="5" height="26" rx="2.5" fill="#e4ecf4" stroke="#c4d4e2" stroke-width="1.6"/>', rot),
+    breakfast: (x, y, s) => gWrap(x, y, s,
+      '<ellipse cx="0" cy="0" rx="34" ry="21" fill="#ffffff" stroke="#e2ebf3" stroke-width="3"/>'
+      + '<ellipse cx="-9" cy="-2" rx="15" ry="11" fill="#fffdf6" stroke="#f2e2c4" stroke-width="2"/>'
+      + '<circle cx="-9" cy="-2" r="6" fill="#ffcc48"/>'
+      + '<rect x="6" y="-12" width="18" height="18" rx="4" fill="#e8b873"/>'
+      + '<path d="M10 -6 h10" stroke="#f6dcb4" stroke-width="3" stroke-linecap="round"/>'),
+    cup: (x, y, s, c) => gWrap(x, y, s,
+      '<path d="M-11 -12 h22 l-3 26 a5 5 0 0 1 -5 4 h-6 a5 5 0 0 1 -5 -4 Z" fill="#ffffff" stroke="#dbe6f0" stroke-width="2.5"/>'
+      + '<path d="M-9 -7 h18 l-2 19 h-14 Z" fill="' + (c || '#ffe0b8') + '"/>'
+      + '<path d="M11 -6 q9 3 7 11 q-2 6 -9 4" fill="none" stroke="#dbe6f0" stroke-width="2.5"/>'),
+    clock: (x, y, s) => gWrap(x, y, s,
+      '<circle r="17" fill="#ffffff" stroke="#a9bdd6" stroke-width="3"/>'
+      + '<path d="M0 0 L0 -11" stroke="#5a6f93" stroke-width="2.8" stroke-linecap="round"/>'
+      + '<path d="M0 0 L8 5" stroke="#e8563f" stroke-width="2.6" stroke-linecap="round"/>'
+      + '<circle r="2" fill="#5a6f93"/>'),
+    broom: (x, y, s, rot) => gWrap(x, y, s,
+      '<rect x="-3" y="-40" width="6" height="46" rx="3" fill="#c99a6b"/>'
+      + '<path d="M-16 6 L16 6 L22 40 L-22 40 Z" fill="#f2cf8a"/>'
+      + '<path d="M-10 9 L-14 38 M0 9 L0 38 M10 9 L14 38" stroke="#e0b569" stroke-width="2.4" stroke-linecap="round"/>', rot),
+    bucket: (x, y, s) => gWrap(x, y, s,
+      '<path d="M-18 -6 h36 l-4 24 a5 5 0 0 1 -5 4 h-18 a5 5 0 0 1 -5 -4 Z" fill="#a9d9ee"/>'
+      + '<path d="M-18 -6 h36 l-1 6 h-34 Z" fill="#8fc4dd"/>'
+      + '<path d="M-14 -6 q14 -17 28 0" fill="none" stroke="#8fc4dd" stroke-width="3"/>'),
+    note: (x, y, s, c) => gWrap(x, y, s,
+      '<ellipse cx="-8" cy="11" rx="9" ry="6.5" fill="' + (c || '#8f7ae0') + '" transform="rotate(-20 -8 11)"/>'
+      + '<rect x="-2.5" y="-24" width="5" height="34" rx="2.5" fill="' + (c || '#8f7ae0') + '"/>'
+      + '<path d="M2 -22 q13 4 15 15" stroke="' + (c || '#8f7ae0') + '" stroke-width="5" fill="none" stroke-linecap="round"/>'),
+    drum: (x, y, s) => gWrap(x, y, s,
+      '<ellipse cx="0" cy="-8" rx="24" ry="9" fill="#f8f4ec" stroke="#dccdb6" stroke-width="2.5"/>'
+      + '<path d="M-24 -8 L-20 16 A24 9 0 0 0 20 16 L24 -8" fill="#e88b6a"/>'
+      + '<path d="M-12 -6 L-10 20 M12 -6 L10 20" stroke="#fff0e2" stroke-width="2.4" opacity=".85"/>'),
+    magnifier: (x, y, s) => gWrap(x, y, s,
+      '<circle cx="-4" cy="-6" r="18" fill="#eaf6ff" stroke="#7fa8d6" stroke-width="4"/>'
+      + '<path d="M8 8 L23 25" stroke="#7fa8d6" stroke-width="6" stroke-linecap="round"/>'
+      + '<path d="M-12 -12 q6 -6 12 -4" stroke="#ffffff" stroke-width="3.4" fill="none" opacity=".9" stroke-linecap="round"/>'),
+    scale: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-3" y="-16" width="6" height="44" rx="3" fill="#b9a48c"/>'
+      + '<rect x="-22" y="26" width="44" height="8" rx="4" fill="#b9a48c"/>'
+      + '<rect x="-38" y="-20" width="76" height="6" rx="3" fill="#c9b49a"/>'
+      + '<path d="M-28 -18 L-28 -14 M28 -18 L28 -14" stroke="#a9cfe4" stroke-width="2"/>'
+      + '<path d="M-44 -14 A16 10 0 0 0 -12 -14" fill="#e8f4ff" stroke="#a9cfe4" stroke-width="2.4"/>'
+      + '<path d="M12 -14 A16 10 0 0 0 44 -14" fill="#e8f4ff" stroke="#a9cfe4" stroke-width="2.4"/>'),
+    seesaw: (x, y, s) => gWrap(x, y, s,
+      '<path d="M-15 0 h30 l-15 -24 Z" fill="#c9a67b"/>'
+      + '<rect x="-62" y="-8" width="124" height="9" rx="4" fill="#e0b98a"/>'),
+    bubble: (x, y, s, c, lines) => gWrap(x, y, s,
+      '<rect x="-30" y="-22" width="60" height="36" rx="12" fill="' + (c || '#ffffff') + '" stroke="#dbe6f0" stroke-width="2.4"/>'
+      + '<path d="M-8 13 L-3 25 L7 13 Z" fill="' + (c || '#ffffff') + '" stroke="#dbe6f0" stroke-width="2.4" stroke-linejoin="round"/>'
+      + (lines === false ? '' : '<path d="M-18 -8 h36 M-18 0 h22" stroke="#c9d8e6" stroke-width="3" stroke-linecap="round"/>')),
+    board: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-56" y="-34" width="112" height="66" rx="6" fill="#ffffff" stroke="#d9c3a8" stroke-width="4"/>'
+      + '<path d="M-40 -18 h48 M-40 -6 h60 M-40 6 h36" stroke="#c3d2df" stroke-width="3" stroke-linecap="round"/>'
+      + '<circle cx="34" cy="6" r="10" fill="#bfe3ff"/>'
+      + '<path d="M34 1 v10 M29 6 h10" stroke="#7fb2e5" stroke-width="2.4" stroke-linecap="round"/>'),
+    signpost: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-3" y="-30" width="6" height="78" rx="3" fill="#b9a48c"/>'
+      + '<path d="M-32 -34 h44 l12 10 l-12 10 h-44 Z" fill="#8fc9b0"/>'
+      + '<path d="M32 2 h-44 l-12 10 l12 10 h44 Z" fill="#f2c98a"/>'
+      + '<path d="M-19 -24 h20 M-19 18 h20" stroke="#ffffff" stroke-width="3" opacity=".85" stroke-linecap="round"/>'),
+    bridge: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-62" y="-8" width="124" height="10" rx="5" fill="#f2cf8a"/>'
+      + '<path d="M-56 3 q56 34 112 0" fill="none" stroke="#e0b98a" stroke-width="9" stroke-linecap="round"/>'
+      + '<path d="M-56 3 v-11 M-28 12 v-20 M0 19 v-27 M28 12 v-20 M56 3 v-11" stroke="#e0b98a" stroke-width="3.4" stroke-linecap="round"/>'),
+    house: (x, y, s, c) => gWrap(x, y, s,
+      '<rect x="-34" y="-14" width="68" height="52" rx="4" fill="' + (c || '#fdf3e3') + '"/>'
+      + '<path d="M-42 -12 L0 -48 L42 -12 Z" fill="#e08a63"/>'
+      + '<rect x="-10" y="10" width="20" height="28" rx="3" fill="#c99a6b"/>'
+      + '<rect x="-28" y="-4" width="14" height="14" rx="2" fill="#a9dcf0"/>'
+      + '<rect x="14" y="-4" width="14" height="14" rx="2" fill="#a9dcf0"/>'
+      + '<circle cx="6" cy="24" r="2" fill="#f2cf8a"/>'),
+    school: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-56" y="-20" width="112" height="62" rx="5" fill="#fdf1e0"/>'
+      + '<path d="M-62 -18 L0 -52 L62 -18 Z" fill="#e08a63"/>'
+      + '<rect x="-12" y="14" width="24" height="28" rx="3" fill="#b98a5c"/>'
+      + '<rect x="-46" y="-8" width="20" height="16" rx="2" fill="#a9dcf0"/><rect x="-20" y="-8" width="16" height="16" rx="2" fill="#a9dcf0"/>'
+      + '<rect x="4" y="-8" width="16" height="16" rx="2" fill="#a9dcf0"/><rect x="26" y="-8" width="20" height="16" rx="2" fill="#a9dcf0"/>'
+      + '<circle cx="0" cy="-30" r="7" fill="#ffffff" stroke="#d9c3a8" stroke-width="2"/>'
+      + '<path d="M0 -30 v4 M0 -30 l3 2" stroke="#5a6f93" stroke-width="1.6" stroke-linecap="round"/>'
+      + '<path d="M0 -52 v-14" stroke="#b9a48c" stroke-width="3"/>'
+      + '<path d="M0 -66 h18 l-5 6 l5 6 h-18 Z" fill="#ff8f8f"/>'),
+    bag: (x, y, s, c) => gWrap(x, y, s,
+      '<rect x="-16" y="-14" width="32" height="36" rx="10" fill="' + (c || '#8fc9ff') + '"/>'
+      + '<rect x="-12" y="-2" width="24" height="14" rx="5" fill="#ffffff" opacity=".55"/>'
+      + '<path d="M-8 -14 q8 -13 16 0" fill="none" stroke="#5a8fc0" stroke-width="3"/>'),
+    suitcase: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-26" y="-14" width="52" height="40" rx="6" fill="#f2a93b"/>'
+      + '<rect x="-26" y="-4" width="52" height="8" fill="#d98f2b"/>'
+      + '<path d="M-9 -14 v-9 h18 v9" fill="none" stroke="#b9781f" stroke-width="4"/>'
+      + '<circle cx="-14" cy="11" r="4" fill="#ffe0a8"/><circle cx="14" cy="11" r="4" fill="#ffe0a8"/>'),
+    plane: (x, y, s) => gWrap(x, y, s,
+      '<path d="M-34 2 q18 -11 40 -9 q22 2 30 9 q-8 7 -30 9 q-22 2 -40 -9 Z" fill="#fdfdff" stroke="#b9cfe6" stroke-width="2.4"/>'
+      + '<path d="M-4 0 L-24 -22 L-10 -22 L12 0 Z" fill="#e8f2fb" stroke="#b9cfe6" stroke-width="2"/>'
+      + '<path d="M-4 3 L-22 24 L-8 24 L12 3 Z" fill="#e8f2fb" stroke="#b9cfe6" stroke-width="2"/>'
+      + '<circle cx="20" cy="1" r="2.6" fill="#7fb2e5"/>'),
+    pin: (x, y, s) => gWrap(x, y, s,
+      '<path d="M0 16 C-12 2 -16 -4 -16 -10 A16 16 0 0 1 16 -10 C16 -4 12 2 0 16 Z" fill="#ff8f8f"/>'
+      + '<circle cx="0" cy="-10" r="6" fill="#ffffff"/>'),
+    flag: (x, y, s, c) => gWrap(x, y, s,
+      '<rect x="-2" y="-40" width="4" height="62" rx="2" fill="#b9a48c"/>'
+      + '<path d="M2 -38 h26 l-6 9 l6 9 h-26 Z" fill="' + (c || '#ff8f8f') + '"/>'),
+    trophy: (x, y, s) => gWrap(x, y, s,
+      '<path d="M-16 -26 h32 v14 a16 16 0 0 1 -32 0 Z" fill="#ffcc48"/>'
+      + '<path d="M-16 -22 q-12 2 -10 12 q2 8 12 6" fill="none" stroke="#ffcc48" stroke-width="4"/>'
+      + '<path d="M16 -22 q12 2 10 12 q-2 8 -12 6" fill="none" stroke="#ffcc48" stroke-width="4"/>'
+      + '<rect x="-4" y="-4" width="8" height="12" fill="#e8b73a"/>'
+      + '<rect x="-14" y="8" width="28" height="7" rx="3" fill="#e8b73a"/>'),
+    medal: (x, y, s) => gWrap(x, y, s,
+      '<path d="M-10 -30 L0 -8 L-16 -8 Z" fill="#7fb2e5"/>'
+      + '<path d="M10 -30 L0 -8 L16 -8 Z" fill="#5c92c8"/>'
+      + '<circle cx="0" cy="6" r="14" fill="#ffcc48" stroke="#e8b73a" stroke-width="2.5"/>'
+      + '<path d="M0 -2 l2.4 5.4 l6 .6 l-4.4 4.2 l1.2 6 l-5.2 -3 l-5.2 3 l1.2 -6 l-4.4 -4.2 l6 -.6 Z" fill="#ffffff" opacity=".9"/>'),
+    bolt: (x, y, s, c) => gWrap(x, y, s,
+      '<path d="M3 -27 L-14 2 L-2 2 L-6 27 L15 -4 L2 -4 Z" fill="' + (c || '#ffcc48') + '"/>'),
+    battery: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-26" y="-14" width="52" height="28" rx="6" fill="#ffffff" stroke="#9fb4c8" stroke-width="3"/>'
+      + '<rect x="26" y="-6" width="8" height="12" rx="3" fill="#9fb4c8"/>'
+      + '<rect x="-20" y="-8" width="12" height="16" rx="3" fill="#4fae74"/>'
+      + '<rect x="-4" y="-8" width="12" height="16" rx="3" fill="#8fd4a0"/>'),
+    bulb: (x, y, s) => gWrap(x, y, s,
+      '<path d="M0 -22 a15 15 0 0 1 8 28 v4 h-16 v-4 a15 15 0 0 1 8 -28 Z" fill="#ffe08a" stroke="#f2c94c" stroke-width="2"/>'
+      + '<rect x="-8" y="11" width="16" height="6" rx="2" fill="#c9b49a"/>'
+      + '<path d="M-20 -16 l-6 -5 M20 -16 l6 -5 M0 -27 v-7" stroke="#f2c94c" stroke-width="2.6" stroke-linecap="round"/>'),
+    photo: (x, y, s, c, rot) => gWrap(x, y, s,
+      '<rect x="-20" y="-16" width="40" height="32" rx="3" fill="#ffffff" stroke="#dbe6f0" stroke-width="3"/>'
+      + '<rect x="-15" y="-11" width="30" height="22" rx="2" fill="' + (c || '#bfe3ff') + '"/>'
+      + '<circle cx="-6" cy="-4" r="3.6" fill="#ffd166"/>'
+      + '<path d="M-15 8 l9 -9 l7 6 l5 -4 l9 7 Z" fill="#8fd4a0"/>', rot),
+    target: (x, y, s) => gWrap(x, y, s,
+      '<circle r="22" fill="#ffffff" stroke="#ff8f8f" stroke-width="3"/>'
+      + '<circle r="14" fill="#ffe8ef" stroke="#ff8f8f" stroke-width="2.4"/>'
+      + '<circle r="6" fill="#ff8f8f"/>'
+      + '<path d="M2 0 L23 -14" stroke="#5a6f93" stroke-width="3" stroke-linecap="round"/>'
+      + '<path d="M28 -20 L30 -8 L18 -11 Z" fill="#5a6f93"/>'),
+    toolbox: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-30" y="-6" width="60" height="30" rx="5" fill="#e8563f"/>'
+      + '<rect x="-30" y="-11" width="60" height="11" rx="4" fill="#c94a33"/>'
+      + '<path d="M-10 -11 v-6 h20 v6" fill="none" stroke="#7b8794" stroke-width="3"/>'
+      + '<path d="M0 -5 v14" stroke="#c94a33" stroke-width="2"/>'),
+    hammer: (x, y, s, rot) => gWrap(x, y, s,
+      '<rect x="-14" y="-16" width="28" height="12" rx="3" fill="#9fb4c8"/>'
+      + '<rect x="-3" y="-4" width="6" height="28" rx="3" fill="#c99a6b"/>', rot),
+    chart: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-30" y="-28" width="60" height="52" rx="5" fill="#ffffff" stroke="#dbe6f0" stroke-width="2.5"/>'
+      + '<rect x="-22" y="4" width="10" height="14" rx="2" fill="#bfe3ff"/>'
+      + '<rect x="-8" y="-2" width="10" height="20" rx="2" fill="#8fc9ff"/>'
+      + '<rect x="6" y="-12" width="10" height="30" rx="2" fill="#4fae74"/>'
+      + '<path d="M-22 -14 L-6 -22 L8 -30" stroke="#e8563f" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'
+      + '<path d="M10 -31 L1 -31 L6 -23 Z" fill="#e8563f"/>'),
+    clipboard: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-22" y="-30" width="44" height="56" rx="5" fill="#ffffff" stroke="#dbe6f0" stroke-width="2.5"/>'
+      + '<rect x="-8" y="-35" width="16" height="8" rx="3" fill="#b9c6d3"/>'
+      + '<path d="M-14 -14 L-11 -10 L-5 -17" stroke="#4fae74" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'
+      + '<path d="M-2 -12 h12" stroke="#c3d2df" stroke-width="2.6" stroke-linecap="round"/>'
+      + '<path d="M-14 0 L-11 4 L-5 -3" stroke="#4fae74" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'
+      + '<path d="M-2 2 h12" stroke="#c3d2df" stroke-width="2.6" stroke-linecap="round"/>'
+      + '<path d="M-14 14 h20" stroke="#dbe6f0" stroke-width="2.6" stroke-linecap="round"/>'),
+    ruler: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-46" y="-8" width="92" height="16" rx="3" fill="#ffe9b8" stroke="#e8c883" stroke-width="2"/>'
+      + '<path d="M-32 -8 v6 M-18 -8 v8 M-4 -8 v6 M10 -8 v8 M24 -8 v6 M38 -8 v8" stroke="#c9a45c" stroke-width="2"/>'),
+    cushion: (x, y, s) => gWrap(x, y, s,
+      '<ellipse cx="0" cy="0" rx="40" ry="12" fill="#c9a6e8"/>'
+      + '<ellipse cx="0" cy="-5" rx="36" ry="10" fill="#dec9f2"/>'),
+    bin: (x, y, s, c) => bin(x, y, s, c),
+    noteSmall: (x, y, s, c) => G.note(x, y, s, c),
+    mask: (x, y, s) => gWrap(x, y, s,
+      '<path d="M-18 -12 q18 -10 36 0 q7 15 -5 26 q-13 11 -26 0 q-12 -11 -5 -26 Z" fill="#f2cf8a"/>'
+      + '<path d="M-12 -1 q5 4 9 0 M2 -1 q5 4 9 0" stroke="#8a6a3a" stroke-width="2.4" fill="none" stroke-linecap="round"/>'
+      + '<path d="M-6 9 q6 5 12 0" stroke="#e8563f" stroke-width="2.6" fill="none" stroke-linecap="round"/>'),
+    earth: (x, y, r) => earth(x, y, r)
+  };
+
+  const artScene = (kind, parts, cap) => ({
+    html: svg(artBg(kind) + (parts || []).map(p => {
+      const fn = G[p[0]];
+      return typeof fn === 'function' ? fn.apply(null, p.slice(1)) : '';
+    }).join('')),
+    cap: cap || ''
+  });
+
+  /* =========================================================================
+     Grade packs — 초1 ~ 초6
+     참고: 2022 개정 영어과 교육과정 기본 어휘(초등 800단어)를 학년 수준에 맞게
+     나누었습니다. 교육과정상 영어는 3학년부터 시작하므로 초1·초2 팩은 그 목록의
+     기초·생활 어휘로 구성했습니다.
+     ========================================================================= */
+  const GRADE_PACK_DEFS = [
+    {
+      id: 'g1', label: '초1 기초', emoji: '🐣',
+      words: [
+        {
+          word: 'apple', pos: 'noun', en: 'A round fruit that grows on a tree', ko: '사과',
+          art: [
+            ['meadow', [['tree', 104, 142, 1.25], ['apple', 88, 102, .42], ['apple', 112, 94, .45], ['apple', 96, 120, .38], ['basket', 234, 148, .95], ['apple', 228, 132, .34], ['apple', 243, 134, .32], ['sparkle', 272, 82, .7]], '사과나무에 빨간 사과가 열렸어요'],
+            ['indoor', [['apple', 160, 108, 2.6], ['sparkle', 238, 62, .9], ['sparkle', 86, 70, .6], ['heart', 254, 140, 1.2, '#ffb3c7']], '동글동글 빨간 사과, 달콤해요']
+          ]
+        },
+        {
+          word: 'cat', pos: 'noun', en: 'A small animal with soft fur that says meow', ko: '고양이',
+          art: [
+            ['meadow', [['cat', 132, 122, 1.2], ['butterfly', 244, 78, 1], ['flower', 58, 148, '#ffb3c7'], ['sparkle', 278, 130, .7]], '고양이가 야옹 하고 울어요'],
+            ['room', [['cushion', 152, 146, 1.3], ['cat', 152, 138, .95], ['zzz', 210, 92, 1.1], ['sparkle', 92, 108, .6]], '낮잠 자는 고양이']
+          ]
+        },
+        {
+          word: 'dog', pos: 'noun', en: 'A friendly animal that says woof', ko: '개, 강아지',
+          art: [
+            ['meadow', [['dog', 126, 122, 1.15], ['ball', 250, 148, 1, '#ff8f8f'], ['kidStand', 274, 156, .6, '#8fc9ff', { arms: 'up' }], ['sparkle', 198, 70, .7]], '강아지가 꼬리를 흔들며 반가워해요'],
+            ['indoor', [['dog', 116, 124, 1.05], ['bowl', 236, 148, 1.1], ['heart', 266, 92, 1.1, '#ffb3c7']], '강아지가 밥그릇 앞에 앉았어요']
+          ]
+        },
+        {
+          word: 'red', pos: 'adjective', en: 'The color of a ripe tomato', ko: '빨간색의',
+          art: [
+            ['paper', [['apple', 84, 112, 1.7], ['strawberry', 160, 112, 1.9], ['heart', 236, 110, 2.4, '#ff6f6f'], ['sparkle', 196, 56, .7], ['sparkle', 118, 58, .6]], '빨간 사과, 빨간 딸기, 빨간 하트'],
+            ['paper', [['crayon', 116, 112, 1.7, '#ff6f6f'], ['swatch', 212, 112, 1.7, '#ff6f6f'], ['sparkle', 164, 56, .7]], '빨간 크레용으로 색칠해요']
+          ]
+        },
+        {
+          word: 'blue', pos: 'adjective', en: 'The color of the sky on a clear day', ko: '파란색의',
+          art: [
+            ['paper', [['balloon', 92, 106, 1.7, '#7fb2e5'], ['drop', 168, 108, 2, '#5ca8dd'], ['fish', 246, 110, 1.25, '#5ca8dd'], ['sparkle', 134, 52, .7]], '파란 풍선, 파란 물방울, 파란 물고기'],
+            ['sky', [['cloud', 88, 52, 1.2], ['cloud', 224, 42, 1], ['bird', 158, 84], ['kidStand', 252, 156, .65, '#7fb2e5', { arms: 'up' }]], '맑은 날 하늘은 파래요']
+          ]
+        },
+        {
+          word: 'sun', pos: 'noun', en: 'The bright star that gives us light and heat', ko: '태양, 해',
+          art: [
+            ['sky', [['sun', 158, 82, 2.6], ['cloud', 62, 50, .8], ['bird', 238, 58], ['kidStand', 254, 158, .58, '#ffd166', { arms: 'up' }], ['flower', 54, 150, '#ffb3c7']], '해님이 하늘에서 환하게 비춰요'],
+            ['meadow', [['mountains', 160, 150, 1], ['sun', 160, 54, 1.4], ['bird', 86, 64], ['flower', 210, 150, '#ffffff']], '해가 산 위로 올라와요']
+          ]
+        },
+        {
+          word: 'moon', pos: 'noun', en: 'The round light you see in the night sky', ko: '달',
+          art: [
+            ['night', [['moon', 224, 70, 1.6], ['star', 96, 52, .7], ['star', 140, 32, .5], ['star', 272, 42, .6], ['house', 96, 150, 1], ['tree', 274, 150, .9]], '밤하늘에 달님이 떠 있어요'],
+            ['night', [['moon', 250, 58, 1.2], ['zzz', 198, 104, 1.2], ['sleepyhead', 148, 150, 1.1], ['star', 86, 50, .6]], '달님을 보며 잠이 와요']
+          ]
+        },
+        {
+          word: 'book', pos: 'noun', en: 'Pages with words that you read', ko: '책',
+          art: [
+            ['indoor', [['openbook', 176, 116, 2], ['kidStand', 62, 156, .8, '#ffd166', {}], ['sparkle', 272, 64, .8]], '책을 펼치면 이야기가 시작돼요'],
+            ['room', [['shelf', 108, 118, 1.1], ['openbook', 240, 122, 1.5]], '책장에 책이 가득해요']
+          ]
+        },
+        {
+          word: 'big', pos: 'adjective', en: 'Very large in size', ko: '큰',
+          art: [
+            ['meadow', [['elephant', 110, 130, 1.3], ['mouse', 252, 150, 1.4], ['sparkle', 196, 58, .7]], '코끼리는 아주 커요'],
+            ['meadow', [['tree', 108, 150, 1.7], ['tree', 248, 152, .55], ['flower', 190, 152, '#ffd166']], '큰 나무와 작은 나무']
+          ]
+        },
+        {
+          word: 'happy', pos: 'adjective', en: 'Feeling glad and smiling inside', ko: '행복한, 기쁜',
+          art: [
+            ['meadow', [['kidStand', 150, 156, 1, '#ffb3c7', { arms: 'up' }], ['heart', 92, 64, 1.2], ['heart', 230, 56, 1], ['sparkle', 194, 94, .8], ['sun', 276, 42, 1]], '기분이 좋아 팔짝팔짝 뛰어요'],
+            ['paper', [['smiley', 160, 102, 2.4, 'happy'], ['sparkle', 92, 58, .8], ['sparkle', 230, 60, .9]], '입이 귀에 걸려요']
+          ]
+        }
+      ]
+    },
+    {
+      id: 'g2', label: '초2 일상', emoji: '🌱',
+      words: [
+        {
+          word: 'run', pos: 'verb', en: 'To move fast on your feet', ko: '달리다',
+          art: [
+            ['meadow', [['runner', 140, 156, 1], ['speed', 84, 112, .9], ['flag', 272, 142, 1.1], ['bird', 212, 52]], '발을 빠르게 움직여요'],
+            ['meadow', [['runner', 108, 156, .85], ['runner', 198, 156, .9, '#8fc9ff'], ['speed', 64, 118, .7]], '친구와 함께 달려요']
+          ]
+        },
+        {
+          word: 'jump', pos: 'verb', en: 'To push off the ground with both feet', ko: '뛰어오르다, 점프하다',
+          art: [
+            ['meadow', [['arc', 150, 128, 1], ['kidJump', 150, 110, 1], ['flower', 52, 150, '#ffb3c7'], ['sparkle', 232, 74, .8]], '두 발로 힘껏 뛰어올라요'],
+            ['meadow', [['puddle', 160, 152, 1.2], ['kidJump', 160, 96, 1, '#8fc9ff'], ['sparkle', 94, 70, .7]], '물웅덩이를 넘어 뛰어요']
+          ]
+        },
+        {
+          word: 'swim', pos: 'verb', en: 'To move through water with your arms and legs', ko: '수영하다, 헤엄치다',
+          art: [
+            ['water', [['swimmer', 156, 132, 1.2], ['fish', 56, 166, 1], ['fish', 268, 168, .85]], '팔과 다리를 저어 물을 나아가요'],
+            ['water', [['swimmer', 118, 130, 1], ['swimmer', 216, 140, .9, '#8fc9ff'], ['sparkle', 168, 80, .7]], '친구와 함께 수영해요']
+          ]
+        },
+        {
+          word: 'eat', pos: 'verb', en: 'To put food in your mouth and chew it', ko: '먹다',
+          art: [
+            ['indoor', [['table', 172, 138, 1.15], ['bowl', 172, 126, 1.3], ['spoon', 214, 120, .9, -18], ['kidStand', 68, 156, .75, '#8fc9ff', {}]], '밥을 한 숟가락 먹어요'],
+            ['indoor', [['bowl', 146, 118, 1.8], ['spoon', 212, 110, 1.1], ['heart', 254, 70, 1, '#ffb3c7']], '맛있게 냠냠']
+          ]
+        },
+        {
+          word: 'sleep', pos: 'verb', en: 'To rest with your eyes closed at night', ko: '자다, 잠을 자다',
+          art: [
+            ['night', [['bed', 156, 140, 1.3], ['sleepyhead', 134, 126, 1.1], ['zzz', 236, 82, 1.2], ['moon', 274, 42, 1]], '밤에는 푹 자요'],
+            ['room', [['bed', 150, 132, 1.2], ['sleepyhead', 130, 120, 1], ['zzz', 218, 74, 1], ['star', 264, 48, .7]], '이불을 덮고 잠이 들어요']
+          ]
+        },
+        {
+          word: 'family', pos: 'noun', en: 'The people who live together and care for each other', ko: '가족',
+          art: [
+            ['meadow', [['house', 160, 120, 1], ['kidStand', 84, 156, .72, '#8fc9ff', {}], ['kidStand', 148, 158, .88, '#ffb3c7', {}], ['kidStand', 208, 156, .7, '#ffd166', {}], ['heart', 160, 60, 1.1]], '가족은 서로를 아껴요'],
+            ['indoor', [['heart', 160, 100, 2.8], ['kidStand', 92, 158, .6, '#8fc9ff', { arms: 'up' }], ['kidStand', 220, 158, .6, '#ffb3c7', { arms: 'up' }]], '우리는 한 가족']
+          ]
+        },
+        {
+          word: 'friend', pos: 'noun', en: 'Someone you like to play with', ko: '친구',
+          art: [
+            ['meadow', [['kidStand', 114, 156, .85, '#8fc9ff', {}], ['kidStand', 188, 156, .85, '#ffb3c7', {}], ['heart', 150, 72, 1], ['ball', 252, 148, .9, '#ffd166']], '친구와 손잡고 놀아요'],
+            ['indoor', [['kidStand', 96, 158, .75, '#8fc9ff', {}], ['kidStand', 224, 158, .75, '#ffb3c7', {}], ['openbook', 160, 134, 1.1]], '같이 책을 봐요']
+          ]
+        },
+        {
+          word: 'rain', pos: 'noun', en: 'Water that falls from clouds', ko: '비',
+          art: [
+            ['sky', [['rain', 108, 56, 1.6], ['umbrella', 236, 118, 1.3, '#ff8fae'], ['kidStand', 236, 158, .65, '#ffb3c7', {}], ['puddle', 96, 170, 1]], '비가 주룩주룩 내려요'],
+            ['meadow', [['rain', 160, 52, 1.8], ['tree', 84, 150, 1], ['flower', 240, 152, '#8fc9ff'], ['puddle', 160, 172, 1.1]], '비를 맞은 풀과 나무가 촉촉해요']
+          ]
+        },
+        {
+          word: 'snow', pos: 'noun', en: 'Soft white flakes that fall when it is cold', ko: '눈',
+          art: [
+            ['night', [['snowcloud', 100, 52, 1.2], ['snowman', 244, 140, 1.3], ['snowflake', 58, 118, .8], ['snowflake', 168, 94, .7], ['snowflake', 288, 62, .7]], '눈이 소복소복 내려요'],
+            ['sky', [['pine', 84, 152, 1.2], ['pine', 242, 152, 1], ['snowflake', 150, 58, .7], ['snowflake', 198, 94, .8], ['kidJump', 150, 112, .8, '#8fc9ff']], '눈을 손으로 받아요']
+          ]
+        },
+        {
+          word: 'school', pos: 'noun', en: 'The place where children learn', ko: '학교',
+          art: [
+            ['city', [['school', 160, 128, 1.1], ['kidStand', 56, 158, .68, '#ffb3c7', {}], ['kidStand', 264, 158, .68, '#8fc9ff', {}], ['tree', 300, 152, .7]], '학교에서 친구를 만나요'],
+            ['indoor', [['openbook', 142, 122, 1.8], ['bag', 246, 138, 1.2, '#8fc9ff'], ['sparkle', 84, 70, .7]], '책과 가방을 챙겨요']
+          ]
+        }
+      ]
+    },
+    {
+      id: 'g3', label: '초3 필수', emoji: '🌿',
+      words: [
+        {
+          word: 'animal', pos: 'noun', en: 'A living thing that can move, like a dog or a bird', ko: '동물',
+          art: [
+            ['meadow', [['cat', 76, 128, .95], ['dog', 168, 128, 1], ['rabbit', 254, 130, 1], ['butterfly', 160, 58, .9]], '고양이, 강아지, 토끼는 모두 동물이에요'],
+            ['water', [['fish', 106, 152, 1.2], ['bird', 214, 72], ['butterfly', 256, 118, .9], ['flower', 56, 186, '#ffb3c7']], '물고기와 새도 동물이에요']
+          ]
+        },
+        {
+          word: 'breakfast', pos: 'noun', en: 'The first meal you eat in the morning', ko: '아침 식사',
+          art: [
+            ['indoor', [['breakfast', 126, 128, 1.4], ['cup', 212, 116, 1.1, '#ffe0b8'], ['clock', 254, 54, 1.2]], '아침에 먹는 첫 끼니예요'],
+            ['indoor', [['table', 148, 140, 1.2], ['breakfast', 132, 128, 1.05], ['cup', 208, 122, .95], ['kidStand', 268, 156, .55, '#ffb3c7', {}]], '아침을 맛있게 먹어요']
+          ]
+        },
+        {
+          word: 'clean', pos: 'verb', en: 'To make something neat with no dirt', ko: '청소하다, 깨끗하게 하다',
+          art: [
+            ['indoor', [['broom', 112, 122, 1.2, -18], ['sparkle', 196, 86, .9], ['sparkle', 250, 68, .7], ['bucket', 216, 148, 1]], '빗자루로 바닥을 쓸어요'],
+            ['room', [['sparkle', 112, 84, .9], ['shelf', 152, 118, 1.1], ['heart', 268, 88, 1]], '방이 반짝반짝 깨끗해졌어요']
+          ]
+        },
+        {
+          word: 'draw', pos: 'verb', en: 'To make a picture with a pencil or crayon', ko: '그리다',
+          art: [
+            ['indoor', [['easel', 148, 122, 1.3], ['pencil', 232, 122, 1.2, '#f2a93b', -20], ['crayon', 76, 150, 1, '#ff8f8f']], '연필로 종이에 그림을 그려요'],
+            ['room', [['kidStand', 96, 156, .75, '#ffd166', {}], ['easel', 214, 126, 1.1], ['sun', 258, 60, 1], ['sparkle', 158, 72, .7]], '크레용으로 해를 그렸어요']
+          ]
+        },
+        {
+          word: 'listen', pos: 'verb', en: 'To pay attention with your ears', ko: '듣다, 귀 기울이다',
+          art: [
+            ['indoor', [['ear', 176, 100, 1.9], ['waves', 232, 100, 1.1], ['kidStand', 84, 156, .8, '#8fc9ff', {}]], '귀를 기울여 들어요'],
+            ['room', [['kidStand', 136, 156, .85, '#ffb3c7', {}], ['note', 226, 84, 1.4], ['waves', 264, 84, .9], ['ear', 84, 116, 1.2]], '선생님 말씀을 잘 들어요']
+          ]
+        },
+        {
+          word: 'morning', pos: 'noun', en: 'The early part of the day after the sun rises', ko: '아침',
+          art: [
+            ['sky', [['mountains', 160, 158, .9], ['sun', 160, 62, 1.8], ['bird', 84, 56], ['clock', 266, 50, 1]], '해가 떠오르는 아침이에요'],
+            ['indoor', [['bed', 132, 138, 1.1], ['kidStand', 238, 156, .8, '#ffd166', { arms: 'up' }], ['sun', 62, 50, 1.2], ['zzz', 170, 84, .9]], '아침에 일어나 기지개를 켜요']
+          ]
+        },
+        {
+          word: 'mountain', pos: 'noun', en: 'A very high hill of rock', ko: '산',
+          art: [
+            ['sky', [['mountains', 160, 150, 1], ['cloud', 78, 42, .9], ['flag', 160, 58, .7, '#ff8f8f'], ['snowflake', 240, 38, .5]], '높이 솟은 산이에요'],
+            ['meadow', [['mountains', 160, 146, 1], ['pine', 74, 158, .9], ['pine', 250, 158, .8], ['sun', 266, 42, 1]], '산 아래에는 나무가 자라요']
+          ]
+        },
+        {
+          word: 'music', pos: 'noun', en: 'Sounds made with voices or instruments', ko: '음악',
+          art: [
+            ['room', [['note', 112, 94, 1.6], ['note', 158, 74, 1.2, '#ff8fae'], ['drum', 236, 138, 1.2], ['waves', 196, 94, .9]], '소리와 리듬이 모여 음악이 돼요'],
+            ['room', [['kidStand', 116, 156, .85, '#ffd166', {}], ['note', 208, 78, 1.4], ['waves', 252, 90, .9], ['note', 84, 66, 1]], '노래를 부르면 음악이 흘러요']
+          ]
+        },
+        {
+          word: 'share', pos: 'verb', en: 'To give part of what you have to others', ko: '나누다, 함께 쓰다',
+          art: [
+            ['meadow', [['kidStand', 100, 156, .85, '#8fc9ff', {}], ['kidStand', 220, 156, .85, '#ffb3c7', {}], ['apple', 160, 102, 1.3], ['heart', 160, 56, .9]], '가진 것을 반씩 나눠요'],
+            ['indoor', [['kidStand', 94, 158, .75, '#ffb3c7', {}], ['kidStand', 226, 158, .75, '#8fc9ff', {}], ['openbook', 160, 132, 1.1]], '책도 함께 나눠 봐요']
+          ]
+        },
+        {
+          word: 'smile', pos: 'verb', en: 'To turn your mouth up to show you are glad', ko: '미소 짓다, 웃다',
+          art: [
+            ['paper', [['smiley', 160, 102, 2.6, 'happy'], ['sparkle', 90, 56, .8], ['sparkle', 234, 60, .9]], '입꼬리가 올라가요'],
+            ['meadow', [['kidStand', 150, 158, .95, '#ffd166', {}], ['heart', 92, 76, 1], ['sun', 258, 48, 1.1], ['flower', 58, 150, '#ffb3c7']], '웃는 얼굴이 참 좋아요']
+          ]
+        }
+      ]
+    },
+    {
+      id: 'g4', label: '초4 필수', emoji: '🌳',
+      words: [
+        {
+          word: 'arrive', pos: 'verb', en: 'To get to a place you were going to', ko: '도착하다',
+          art: [
+            ['city', [['house', 216, 128, 1.2], ['trail', 168, 168, 1], ['kidStand', 92, 158, .8, '#8fc9ff', {}], ['bag', 118, 148, .8]], '가고 싶던 곳에 다다라요'],
+            ['city', [['school', 176, 126, 1], ['kidStand', 62, 158, .7, '#ffb3c7', {}], ['flag', 286, 138, .8], ['clock', 288, 50, 1]], '학교에 도착했어요']
+          ]
+        },
+        {
+          word: 'brave', pos: 'adjective', en: 'Not afraid even when something is scary', ko: '용감한',
+          art: [
+            ['meadow', [['cape', 148, 148, 1.2], ['kidStand', 148, 158, 1, '#8fc9ff', { arms: 'up' }], ['star', 240, 70, .9], ['heart', 88, 80, 1]], '무서워도 씩씩하게 해내요'],
+            ['meadow', [['kidStand', 116, 158, .9, '#ffd166', {}], ['cloud', 226, 96, .9], ['smiley', 226, 112, .8, 'happy'], ['star', 178, 56, .8]], '무서운 것도 이겨 내요']
+          ]
+        },
+        {
+          word: 'bridge', pos: 'noun', en: 'A road built over a river or a road', ko: '다리',
+          art: [
+            ['water', [['bridge', 160, 122, 1.2], ['tree', 52, 150, .9], ['fish', 196, 168, 1], ['cloud', 254, 42, .9]], '강 위로 다리가 놓여 있어요'],
+            ['water', [['bridge', 160, 132, 1.4], ['kidStand', 160, 104, .6, '#ffb3c7', {}], ['bird', 90, 48]], '다리를 건너 반대편으로 가요']
+          ]
+        },
+        {
+          word: 'cloud', pos: 'noun', en: 'Soft white shapes that float in the sky', ko: '구름',
+          art: [
+            ['sky', [['cloud', 94, 62, 1.6], ['cloud', 238, 50, 1.1], ['cloud', 176, 108, .8], ['bird', 290, 118], ['sun', 52, 38, 1]], '구름이 하늘에 둥실둥실'],
+            ['sky', [['cloud', 160, 78, 2.6], ['bird', 78, 58], ['bird', 242, 66], ['plane', 252, 142, .9]], '구름 위로 비행기가 지나가요']
+          ]
+        },
+        {
+          word: 'decide', pos: 'verb', en: 'To choose one thing after thinking', ko: '결정하다, 정하다',
+          art: [
+            ['paper', [['signpost', 150, 122, 1.1], ['kidStand', 58, 158, .75, '#ffd166', {}], ['bubble', 244, 86, .9, '#ffffff'], ['qmark', 244, 86, .8]], '두 가지 중에 하나를 골라요'],
+            ['meadow', [['signpost', 160, 130, 1], ['flower', 92, 150, '#ffb3c7'], ['flower', 236, 150, '#8fc9ff'], ['qmark', 256, 68, 1]], '어느 길로 갈지 생각해요']
+          ]
+        },
+        {
+          word: 'healthy', pos: 'adjective', en: 'Strong and well because you eat and play right', ko: '건강한',
+          art: [
+            ['meadow', [['kidStand', 92, 158, .85, '#8fc9ff', { arms: 'up' }], ['carrot', 178, 132, 1.2, -15], ['tomato', 236, 138, 1.1], ['heart', 160, 58, 1.1]], '잘 먹고 많이 움직이면 건강해요'],
+            ['indoor', [['bowl', 114, 130, 1.5], ['broccoli', 198, 126, 1.3], ['apple', 256, 132, 1.1]], '채소와 과일을 골고루 먹어요']
+          ]
+        },
+        {
+          word: 'library', pos: 'noun', en: 'A place with many books you can borrow', ko: '도서관',
+          art: [
+            ['indoor', [['shelf', 92, 116, 1.2], ['shelf', 228, 116, 1.1], ['openbook', 160, 148, 1.1], ['sparkle', 160, 54, .8]], '도서관에는 책이 가득해요'],
+            ['room', [['shelf', 116, 114, 1.3], ['kidStand', 206, 158, .8, '#ffb3c7', {}], ['openbook', 258, 128, .9]], '책을 빌려 읽어요']
+          ]
+        },
+        {
+          word: 'season', pos: 'noun', en: 'One of the four parts of the year', ko: '계절',
+          art: [
+            ['paper', [['tree', 84, 80, .75, '#ffc2d1'], ['tree', 236, 80, .75, '#6cc08b'], ['tree', 84, 154, .75, '#f2a93b'], ['tree', 236, 154, .75, '#cfd8e3'], ['snowflake', 288, 152, .5], ['flower', 26, 154, '#ffb3c7']], '봄, 여름, 가을, 겨울 네 계절이 있어요'],
+            ['sky', [['mountains', 160, 150, 1], ['sun', 264, 42, 1.2], ['snowflake', 66, 56, .6], ['flower', 104, 150, '#ffb3c7'], ['tree', 226, 150, .9, '#f2a93b']], '계절마다 풍경이 달라져요']
+          ]
+        },
+        {
+          word: 'travel', pos: 'verb', en: 'To go to another place far away', ko: '여행하다, 여행 가다',
+          art: [
+            ['sky', [['plane', 148, 82, 1.6], ['cloud', 78, 50, 1], ['cloud', 250, 114, 1.1], ['sun', 266, 40, 1], ['pin', 66, 146, .9]], '비행기를 타고 멀리 가요'],
+            ['city', [['suitcase', 106, 146, 1.3], ['kidStand', 208, 158, .85, '#ffd166', {}], ['plane', 266, 52, 1]], '가방을 챙겨 여행을 떠나요']
+          ]
+        },
+        {
+          word: 'weather', pos: 'noun', en: 'What the sky is like: sunny, rainy or windy', ko: '날씨',
+          art: [
+            ['paper', [['sun', 76, 74, 1.5], ['rain', 236, 74, 1.2], ['snowflake', 76, 156, .9], ['wind', 236, 154, 1.2], ['sparkle', 158, 114, .6]], '맑음, 비, 눈, 바람이 있어요'],
+            ['sky', [['sun', 76, 58, 1.3], ['rain', 204, 66, 1.4], ['cloud', 140, 50, 1.1], ['umbrella', 272, 128, 1, '#8fc9ff']], '하늘 표정이 자주 바뀌어요']
+          ]
+        }
+      ]
+    },
+    {
+      id: 'g5', label: '초5 심화', emoji: '🍃',
+      words: [
+        {
+          word: 'agree', pos: 'verb', en: 'To have the same idea as someone else', ko: '동의하다',
+          art: [
+            ['room', [['kidStand', 92, 158, .85, '#8fc9ff', {}], ['kidStand', 220, 158, .85, '#ffb3c7', {}], ['bubble', 98, 92, .9, '#ffffff'], ['bubble', 214, 92, .9, '#eaf9ee'], ['heart', 156, 52, .9]], '생각이 같아요, 좋아요!'],
+            ['paper', [['bubble', 106, 100, 1.1, '#ffffff', false], ['bubble', 214, 100, 1.1, '#eaf9ee', false], ['check', 106, 100, 1.3], ['check', 214, 100, 1.3]], '두 사람 모두 같은 생각이에요']
+          ]
+        },
+        {
+          word: 'compare', pos: 'verb', en: 'To look at two things to see how they differ', ko: '비교하다',
+          art: [
+            ['paper', [['scale', 160, 112, 1.3], ['apple', 116, 94, .7], ['tomato', 204, 94, .7], ['magnifier', 258, 144, .9]], '두 가지를 나란히 놓고 살펴봐요'],
+            ['meadow', [['tree', 100, 150, 1.5], ['tree', 232, 152, .7], ['ruler', 160, 58, 1], ['magnifier', 288, 88, .7]], '어느 것이 더 큰지 비교해요']
+          ]
+        },
+        {
+          word: 'culture', pos: 'noun', en: 'The food, music and ways of life of a group of people', ko: '문화',
+          art: [
+            ['paper', [['earth', 96, 100, 34], ['note', 194, 82, 1.4, '#8f7ae0'], ['bowl', 244, 140, 1.2], ['sparkle', 152, 150, .7]], '사람들의 음식, 음악, 생활 방식이에요'],
+            ['indoor', [['table', 158, 140, 1.2], ['bowl', 126, 128, 1.1], ['cup', 198, 122, 1], ['earth', 268, 84, 22], ['note', 82, 82, 1.1]], '함께 먹고 함께 즐기는 문화']
+          ]
+        },
+        {
+          word: 'energy', pos: 'noun', en: 'The power that makes things work or move', ko: '에너지, 기운',
+          art: [
+            ['paper', [['bolt', 112, 100, 1.8], ['battery', 214, 108, 1.3], ['bulb', 88, 154, 1]], '무언가를 움직이게 하는 힘이에요'],
+            ['meadow', [['bolt', 92, 82, 1.2], ['runner', 214, 156, .9, '#ffd166'], ['sun', 268, 42, 1.1]], '에너지가 있으면 몸이 움직여요']
+          ]
+        },
+        {
+          word: 'explain', pos: 'verb', en: 'To make something clear so others understand', ko: '설명하다',
+          art: [
+            ['indoor', [['board', 168, 92, 1.3], ['kidStand', 54, 158, .78, '#8fc9ff', {}], ['bubble', 256, 146, .8, '#ffffff', false], ['bulb', 256, 144, .8]], '알기 쉽게 하나씩 알려 줘요'],
+            ['room', [['kidStand', 110, 158, .85, '#ffd166', {}], ['bubble', 216, 88, 1.1, '#ffffff'], ['bulb', 264, 142, 1]], '왜 그런지 말로 풀어 줘요']
+          ]
+        },
+        {
+          word: 'forest', pos: 'noun', en: 'A large place full of trees', ko: '숲',
+          art: [
+            ['meadow', [['tree', 70, 150, 1.1], ['tree', 152, 150, 1.25], ['tree', 232, 152, 1], ['pine', 294, 152, .9], ['mushroom', 108, 152, .9], ['butterfly', 182, 76, .8]], '나무가 빽빽한 숲이에요'],
+            ['meadow', [['tree', 58, 150, 1], ['pine', 130, 152, 1.1], ['tree', 204, 150, 1.1], ['pine', 280, 152, 1], ['rabbit', 168, 152, .9], ['sun', 160, 42, 1.1]], '숲에는 동물 친구가 살아요']
+          ]
+        },
+        {
+          word: 'memory', pos: 'noun', en: 'Something you remember from before', ko: '기억, 기억력',
+          art: [
+            ['paper', [['photo', 108, 92, 1.3, '#bfe3ff'], ['photo', 210, 106, 1.2, '#ffd8e4', 8], ['heart', 158, 154, 1.2], ['sparkle', 262, 58, .8]], '지난 일을 마음속에 담아 두는 힘이에요'],
+            ['room', [['kidStand', 92, 158, .85, '#ffd166', {}], ['bubble', 214, 92, 1.1, '#ffffff', false], ['photo', 214, 90, .8, '#ffd8e4'], ['star', 274, 58, .7]], '그때 그 일이 생각나요']
+          ]
+        },
+        {
+          word: 'practice', pos: 'verb', en: 'To do something many times to get better', ko: '연습하다',
+          art: [
+            ['paper', [['target', 138, 106, 1.4], ['ball', 228, 140, 1], ['loopArrow', 248, 62, 1]], '같은 동작을 여러 번 해요'],
+            ['meadow', [['target', 254, 108, 1], ['kidStand', 116, 158, .85, '#8fc9ff', {}], ['ball', 176, 126, .8, '#ffd166'], ['sparkle', 208, 64, .7]], '던지고 또 던지며 연습해요']
+          ]
+        },
+        {
+          word: 'useful', pos: 'adjective', en: 'Helpful for doing something', ko: '쓸모 있는, 유용한',
+          art: [
+            ['paper', [['toolbox', 128, 130, 1.2], ['hammer', 218, 118, 1.1, 12], ['check', 272, 68, 1.2]], '어떤 일을 할 때 도움이 돼요'],
+            ['room', [['pencil', 96, 122, 1.2, '#f2a93b', -12], ['openbook', 190, 130, 1.2], ['bulb', 268, 78, .9]], '쓰고 읽고 생각할 때 쓸모가 있어요']
+          ]
+        },
+        {
+          word: 'wonder', pos: 'verb', en: 'To think about something you want to know', ko: '궁금해하다',
+          art: [
+            ['night', [['kidStand', 114, 158, .85, '#ffb3c7', {}], ['qmark', 206, 84, 1.4], ['star', 262, 54, .8], ['moon', 274, 116, .9]], '왜 그럴까 궁금해져요'],
+            ['paper', [['qmark', 108, 98, 1.6], ['qmark', 188, 86, 1.2], ['magnifier', 246, 138, 1], ['bulb', 76, 152, .9]], '궁금한 것을 계속 생각해요']
+          ]
+        }
+      ]
+    },
+    {
+      id: 'g6', label: '초6 심화', emoji: '🌲',
+      words: [
+        {
+          word: 'achieve', pos: 'verb', en: 'To reach a goal after working hard', ko: '이루다, 성취하다',
+          art: [
+            ['sky', [['mountains', 160, 150, 1], ['flag', 160, 56, .8, '#ffd166'], ['kidStand', 160, 146, .78, '#ffb3c7', { arms: 'up' }], ['sparkle', 94, 66, .8], ['sparkle', 238, 60, .9]], '목표한 곳에 다다랐어요'],
+            ['paper', [['trophy', 126, 112, 1.6], ['medal', 224, 108, 1.3], ['star', 160, 54, .9], ['sparkle', 86, 64, .7]], '해내고 나면 상을 받아요']
+          ]
+        },
+        {
+          word: 'balance', pos: 'noun', en: 'Keeping steady without falling over', ko: '균형',
+          art: [
+            ['paper', [['scale', 160, 112, 1.4], ['apple', 122, 94, .7], ['apple', 198, 94, .7]], '양쪽 무게가 똑같아요'],
+            ['meadow', [['seesaw', 160, 150, 1.2], ['kidStand', 106, 141, .6, '#8fc9ff', {}], ['kidStand', 214, 141, .6, '#ffb3c7', {}]], '넘어지지 않게 균형을 잡아요']
+          ]
+        },
+        {
+          word: 'challenge', pos: 'noun', en: 'A hard task that tests you', ko: '도전, 힘든 과제',
+          art: [
+            ['sky', [['mountains', 160, 150, 1], ['flag', 160, 54, .7, '#ff8f8f'], ['kidStand', 112, 140, .65, '#8fc9ff', {}], ['trail', 156, 170, 1]], '어려운 일에 맞서 도전해요'],
+            ['sky', [['mountains', 160, 150, 1], ['flag', 160, 54, .7, '#ffd166'], ['kidStand', 92, 144, .7, '#ffb3c7', {}], ['kidStand', 216, 138, .7, '#8fc9ff', {}]], '한 걸음씩 올라가면 해낼 수 있어요']
+          ]
+        },
+        {
+          word: 'curious', pos: 'adjective', en: 'Wanting to know more about something', ko: '호기심 많은',
+          art: [
+            ['meadow', [['kidStand', 108, 158, .85, '#ffd166', {}], ['magnifier', 196, 116, 1.2], ['butterfly', 248, 82, .9], ['qmark', 158, 54, 1]], '자세히 들여다보고 싶어요'],
+            ['room', [['kidStand', 96, 158, .8, '#8fc9ff', {}], ['magnifier', 194, 114, 1], ['openbook', 254, 138, .9], ['qmark', 252, 68, 1]], '왜 그런지 알고 싶어요']
+          ]
+        },
+        {
+          word: 'describe', pos: 'verb', en: 'To tell what something is like in words', ko: '묘사하다, 설명하다',
+          art: [
+            ['room', [['kidStand', 92, 158, .85, '#8fc9ff', {}], ['bubble', 212, 88, 1.1, '#ffffff', false], ['photo', 212, 86, .75, '#ffd8e4'], ['pencil', 262, 138, 1]], '보이는 것을 말로 풀어 놓아요'],
+            ['paper', [['photo', 106, 102, 1.4, '#bfe3ff'], ['bubble', 232, 84, 1.1, '#ffffff'], ['sparkle', 160, 152, .8]], '그림을 보고 설명해요']
+          ]
+        },
+        {
+          word: 'express', pos: 'verb', en: 'To show your feelings or ideas', ko: '표현하다',
+          art: [
+            ['paper', [['smiley', 72, 102, 1.5, 'happy'], ['smiley', 160, 102, 1.5, 'sad'], ['smiley', 248, 102, 1.5, 'wow']], '기쁨, 슬픔, 놀람을 얼굴로 나타내요'],
+            ['room', [['kidStand', 106, 158, .85, '#ffb3c7', {}], ['bubble', 212, 88, 1.1, '#ffffff', false], ['heart', 212, 86, 1], ['note', 272, 136, 1]], '마음을 말과 몸짓으로 표현해요']
+          ]
+        },
+        {
+          word: 'improve', pos: 'verb', en: 'To become better than before', ko: '향상되다, 나아지다',
+          art: [
+            ['paper', [['chart', 140, 106, 1.6], ['star', 250, 66, .9]], '전보다 더 좋아졌어요'],
+            ['meadow', [['runner', 152, 156, .95, '#8fc9ff'], ['chart', 264, 108, .9], ['speed', 96, 112, .8]], '연습할수록 빨라져요']
+          ]
+        },
+        {
+          word: 'nature', pos: 'noun', en: 'Trees, rivers, animals and all things not made by people', ko: '자연',
+          art: [
+            ['meadow', [['tree', 76, 150, 1.1], ['river', 190, 108, 1.2], ['butterfly', 122, 76, .8], ['flower', 52, 150, '#ffb3c7'], ['sun', 276, 42, 1]], '나무, 강, 꽃은 사람이 만들지 않았어요'],
+            ['sky', [['mountains', 160, 150, 1], ['bird', 100, 56], ['fish', 84, 168, .8], ['butterfly', 240, 94, .9], ['cloud', 250, 46, .8]], '산과 강, 동물이 모두 자연이에요']
+          ]
+        },
+        {
+          word: 'respect', pos: 'verb', en: 'To treat someone with care and honor', ko: '존중하다',
+          art: [
+            ['meadow', [['kidStand', 104, 156, .85, '#8fc9ff', {}], ['kidStand', 216, 156, .85, '#ffb3c7', {}], ['heart', 160, 58, 1.1], ['sparkle', 160, 104, .7]], '서로를 소중히 여겨요'],
+            ['indoor', [['kidStand', 108, 158, .8, '#ffd166', {}], ['heart', 206, 86, 1.4], ['bubble', 214, 146, .8, '#ffffff', false], ['check', 214, 146, 1]], '고맙다고 인사해요']
+          ]
+        },
+        {
+          word: 'responsible', pos: 'adjective', en: 'Doing your jobs well and thinking of others', ko: '책임감 있는',
+          art: [
+            ['room', [['kidStand', 104, 158, .85, '#8fc9ff', {}], ['clipboard', 204, 116, 1.2], ['check', 258, 82, 1], ['clock', 276, 48, .9]], '맡은 일을 스스로 해요'],
+            ['indoor', [['bin', 108, 140, 1.1, '#6cc08b'], ['ball', 92, 106, .7, '#ffd166'], ['kidStand', 202, 158, .85, '#ffb3c7', {}], ['check', 262, 86, 1]], '장난감을 스스로 정리했어요']
+          ]
+        }
+      ]
+    }
+  ];
+
+  function buildGradePack(def) {
+    return {
+      id: def.id,
+      label: def.label,
+      emoji: def.emoji,
+      words: def.words.map((w, i) => ({
+        id: def.id + '-' + w.word.replace(/[^a-z0-9]+/gi, '-').toLowerCase(),
+        builtin: true,
+        pack: def.id,
+        order: i + 1,
+        word: w.word,
+        pos: w.pos,
+        en: w.en,
+        ko: w.ko,
+        fruit: FRUITS[i % FRUITS.length],
+        scenes: w.art.map(a => artScene(a[0], a[1], a[2]))
+      }))
+    };
+  }
+
+  const PACKS = [{ id: 'photo', label: '오늘의 단어장', emoji: '📸', words: BUILTIN }]
+    .concat(GRADE_PACK_DEFS.map(buildGradePack));
+
+  function packById(id) {
+    for (let i = 0; i < PACKS.length; i++) if (PACKS[i].id === id) return PACKS[i];
+    return null;
+  }
+
   const CUSTOM_EMOJI = ['✏️','📚','🍎','🐶','🚗','⭐','☀️','🌳','🏠','🎈','🍰','🐱','🚌','🌸','⚽','🦋','🐟','🎵'];
 
   function emojiSceneHTML(emoji) {
@@ -1453,7 +2471,10 @@
   }
 
   /* ------------------------- state ------------------------- */
+  const K_PACK = 'wg_pack_v1';
+
   const state = {
+    packId: 'photo',         // the pack picked on Home
     custom: [],              // custom word records
     stickers: {},            // { wordId: {word, fruit, at, count} }
     score: 0,
@@ -1472,6 +2493,8 @@
   };
 
   function loadState() {
+    const savedPack = store.get(K_PACK, 'photo');
+    state.packId = packById(savedPack) ? savedPack : 'photo';
     const c = store.get(K_WORDS, []);
     state.custom = Array.isArray(c) ? c.filter(w => w && w.word) : [];
     const s = store.get(K_STICKERS, {});
@@ -1482,9 +2505,14 @@
   function saveCustom() { store.set(K_WORDS, state.custom); }
   function saveStickers() { store.set(K_STICKERS, state.stickers); }
   function saveScore() { store.set(K_SCORE, state.score); }
+  function savePack() { store.set(K_PACK, state.packId); }
 
-  function allWords() {
-    const custom = state.custom.map(w => ({
+  function currentPack() {
+    return packById(state.packId) || PACKS[0];
+  }
+
+  function customWords() {
+    return state.custom.map(w => ({
       id: w.id,
       builtin: false,
       word: w.word,
@@ -1495,7 +2523,18 @@
       emoji: w.emoji || '✏️',
       scenes: [{ html: emojiSceneHTML(w.emoji || '✏️'), cap: '' }]
     }));
-    return BUILTIN.concat(custom);
+  }
+
+  /* every word in the file, for lookups by id */
+  function allWords() {
+    let out = [];
+    PACKS.forEach(p => { out = out.concat(p.words); });
+    return out.concat(customWords());
+  }
+
+  /* what the child is studying now: the picked pack, plus their own words */
+  function activeWords() {
+    return currentPack().words.concat(customWords());
   }
 
   function freeFruit(word, used) {
@@ -1528,9 +2567,43 @@
     $('#stickerVal').textContent = n;
   }
 
+  function renderPackPicker() {
+    const box = $('#packScroll');
+    if (!box) return;
+    box.innerHTML = '';
+    PACKS.forEach(p => {
+      const b = el('button', 'pack-pill' + (p.id === state.packId ? ' on' : ''));
+      b.type = 'button';
+      b.dataset.pack = p.id;
+      b.setAttribute('aria-pressed', p.id === state.packId ? 'true' : 'false');
+      b.innerHTML = '<span class="em">' + p.emoji + '</span>'
+        + '<span class="nm">' + escapeHTML(p.label) + '</span>'
+        + '<span class="ct">' + p.words.length + '</span>';
+      box.appendChild(b);
+    });
+  }
+
+  function selectPack(id) {
+    if (!packById(id) || id === state.packId) return;
+    state.packId = id;
+    savePack();
+    state.learnIndex = 0;
+    state.learnFlipped = false;
+    state.sceneIndex = 0;
+    state.testGroup = 0;
+    state.testRandom = false;
+    sfx.pick();
+    renderHome();
+    const on = $('.pack-pill.on');
+    if (on && on.scrollIntoView) {
+      try { on.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' }); } catch (e) {}
+    }
+  }
+
   function renderHome() {
     refreshChrome();
-    const words = allWords();
+    const words = activeWords();
+    const cur = currentPack();
     const pack = $('#homePack');
     pack.innerHTML = '';
     words.slice(0, 8).forEach(w => {
@@ -1543,15 +2616,16 @@
       c.textContent = '+' + (words.length - 8);
       pack.appendChild(c);
     }
-    $('#homeTag').textContent = '오늘의 단어 ' + words.length + '개 · 콕콕 눌러서 놀아요';
+    $('#homeTag').textContent = cur.emoji + ' ' + cur.label + ' · 단어 ' + words.length + '개';
     $('#homeStickerDesc').textContent = '모은 과일 ' + Object.keys(state.stickers).length + '개';
+    renderPackPicker();
   }
 
   /* ------------------------- LEARN ------------------------- */
   let learnWords = [];
 
   function renderLearn(reset) {
-    learnWords = allWords();
+    learnWords = activeWords();
     if (reset) { state.learnIndex = clamp(state.learnIndex, 0, learnWords.length - 1); }
     if (state.learnIndex >= learnWords.length) state.learnIndex = 0;
     const w = learnWords[state.learnIndex];
@@ -1564,7 +2638,7 @@
 
     $('#learnPos').textContent = w.pos;
     $('#learnWord').textContent = w.word;
-    $('#learnSub').textContent = w.pos + ' · ' + (state.learnIndex + 1) + ' / ' + learnWords.length;
+    $('#learnSub').textContent = currentPack().emoji + ' ' + currentPack().label + ' · ' + (state.learnIndex + 1) + '/' + learnWords.length;
     $('#learnEn').textContent = w.en || '(영어 뜻을 넣어 주세요)';
     $('#learnKo').textContent = w.ko || '(한글 뜻을 넣어 주세요)';
     $('#learnKo').hidden = true;
@@ -1632,7 +2706,7 @@
 
   /* ------------------------- TEST ------------------------- */
   function testGroups() {
-    const words = allWords();
+    const words = activeWords();
     const groups = [];
     for (let i = 0; i < words.length; i += 3) {
       let chunk = words.slice(i, i + 3);
@@ -1648,7 +2722,7 @@
   }
 
   function randomRound() {
-    return shuffle(allWords()).slice(0, 3);
+    return shuffle(activeWords()).slice(0, 3);
   }
 
   const CARD_ROWS = [
@@ -1659,7 +2733,7 @@
 
   function startTest(resetGroup) {
     const groups = testGroups();
-    const total = allWords().length;
+    const total = activeWords().length;
     if (resetGroup) { state.testGroup = 0; state.testRandom = false; }
     state.testGroup = clamp(state.testGroup, 0, groups.length - 1);
     const words = state.testRandom ? randomRound() : (groups[state.testGroup] || []);
@@ -1945,9 +3019,9 @@
     $('#sbCount').textContent = Object.keys(state.stickers).length;
     const grid = $('#stickerGrid');
     grid.innerHTML = '';
-    const words = allWords();
+    const words = activeWords();
     const got = state.stickers;
-    // collected first, then locked slots for the rest of the pack
+    // collected first, then locked slots for the rest of the picked pack
     words.forEach(w => {
       const st = got[w.id];
       const d = el('div', 'stick-item' + (st ? '' : ' locked'));
@@ -1977,7 +3051,13 @@
   function renderWordList() {
     const list = $('#wordList');
     list.innerHTML = '';
-    const words = allWords();
+    const cur = currentPack();
+    const note = $('#wordListNote');
+    if (note) {
+      note.textContent = '지금 고른 팩: ' + cur.emoji + ' ' + cur.label + ' (' + cur.words.length + '개). '
+        + '여기서 넣은 내 단어는 어느 팩에서든 함께 나와요.';
+    }
+    const words = cur.words.concat(customWords());
     words.forEach(w => {
       const row = el('div', 'word-row');
       row.innerHTML = '<span class="emoji">' + (w.fruit || '🍎') + '</span>'
@@ -2057,6 +3137,16 @@
     $('#btnTopStickers').addEventListener('click', openStickers);
     $('#btnStickerBook').addEventListener('click', openStickers);
     $('#btnManage').addEventListener('click', openWords);
+
+    // pack selector
+    const packScroll = $('#packScroll');
+    if (packScroll) {
+      packScroll.addEventListener('click', (ev) => {
+        const b = ev.target.closest('.pack-pill');
+        if (!b || !b.dataset.pack) return;
+        selectPack(b.dataset.pack);
+      });
+    }
 
     // learn
     const card = $('#flashcard');
