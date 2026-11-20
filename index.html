@@ -1501,9 +1501,27 @@
     city:   { top: '#eef5fb', floor: '#d9e4ee', band: 156, sun: true }
   };
 
+  /* the grade pictures are drawn on a taller canvas than the photo pack's,
+     so they fill the flashcard and the square picture card instead of floating
+     in a letterbox */
+  const artSvg = (inner) =>
+    '<svg viewBox="0 -45 320 315" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">' + inner + '</svg>';
+
+  const FG = {
+    sky: ['#a9daa2', '#98cf90'],
+    meadow: ['#a9daa2', '#98cf90'],
+    city: ['#c2d5e8', '#b0c8de'],
+    night: ['#b2c0dc', '#a3b3d3'],
+    water: ['#8ecbe8', '#7cc0e0'],
+    indoor: ['#e0cbab', '#d4bd99'],
+    room: ['#d8c7e5', '#cbb7db'],
+    paper: ['#e6d9ba', '#dbcca8']
+  };
+
   function artBg(kind) {
     const b = BG[kind] || BG.meadow;
-    let out = '<rect width="320" height="200" fill="' + b.top + '"/>';
+    const fg = FG[kind] || FG.meadow;
+    let out = '<rect x="0" y="-45" width="320" height="315" fill="' + b.top + '"/>';
     if (b.stars) {
       const stars = [[38, 26], [70, 52], [104, 28], [252, 30], [286, 74], [212, 20], [34, 78], [172, 38]];
       stars.forEach((p, i) => {
@@ -1512,8 +1530,11 @@
     } else if (b.sun) {
       out += sunBurst(276, 34, 12, '#ffe27a');
     }
-    out += '<rect y="' + b.band + '" width="320" height="' + (200 - b.band) + '" fill="' + b.floor + '"/>';
+    out += '<rect y="' + b.band + '" width="320" height="' + (270 - b.band) + '" fill="' + b.floor + '"/>';
     out += '<ellipse cx="160" cy="' + (b.band + 3) + '" rx="160" ry="9" fill="#ffffff" opacity=".18"/>';
+    // soft foreground so the lower part of the tall picture has depth
+    out += '<ellipse cx="40" cy="' + (b.band + 112) + '" rx="132" ry="62" fill="' + fg[0] + '" opacity=".85"/>';
+    out += '<ellipse cx="278" cy="' + (b.band + 126) + '" rx="120" ry="58" fill="' + fg[1] + '" opacity=".8"/>';
     if (b.waves) {
       out += '<path d="M0 ' + (b.band + 16) + ' q20 -7 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0" fill="none" stroke="#9fd6ee" stroke-width="4" opacity=".5"/>';
     }
@@ -2000,7 +2021,7 @@
   };
 
   const artScene = (kind, parts, cap) => ({
-    html: svg(artBg(kind) + (parts || []).map(p => {
+    html: artSvg(artBg(kind) + (parts || []).map(p => {
       const fn = G[p[0]];
       return typeof fn === 'function' ? fn.apply(null, p.slice(1)) : '';
     }).join('')),
