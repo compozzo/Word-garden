@@ -226,9 +226,9 @@
   .hintbar.shake{animation:shake .4s}
   @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(5px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
 
-  .grid{display:flex;flex-direction:column;gap:7px;flex:0 0 auto}
+  .grid{display:flex;flex-direction:column;gap:6px;flex:0 0 auto}
   .card-row{
-    display:flex;flex-direction:column;gap:5px;padding:5px 6px 7px;border-radius:16px;
+    display:flex;flex-direction:column;gap:4px;padding:4px 6px 6px;border-radius:16px;
     border:1px solid var(--line);background:#fff;box-shadow:var(--shadow-sm);
   }
   .card-row[data-type="spell"]{background:linear-gradient(180deg,#f1fbf4,#fff 62%);border-color:#d6eede}
@@ -243,9 +243,9 @@
   .card-row[data-type="spell"] .row-label{color:#2f7a52;background:#dcf2e4}
   .card-row[data-type="picture"] .row-label{color:#2b6c96;background:#dcefff}
   .card-row[data-type="meaning"] .row-label{color:#a5622a;background:#fdeecf}
-  .row-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+  .row-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
   .card{position:relative;aspect-ratio:1/1.2;perspective:900px}
-  .card-row .card{aspect-ratio:1/1.02}
+  .card-row .card{aspect-ratio:1/0.97}
   .card-inner{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.3,.85,.3,1)}
   .card.flipped .card-inner{transform:rotateY(180deg)}
   .card-face{
