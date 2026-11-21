@@ -12,17 +12,27 @@ Open `index.html` (or the GitHub Pages URL) on a phone or tablet.
 
 **Sticker book** — collected fruits and total score are kept in `localStorage` on the device.
 
-**단어 팩 고르기** — the Home screen has a horizontal strip of word packs. The pick is kept in `localStorage` (`wg_pack_v1`), and the hero chips, Learn Stage and Test Stage all follow the picked pack. Words added with 단어 관리 ride along in whichever pack is picked.
+**두 단계로 고르기** — Home first shows the six big categories (숙제단어 · 초등단어 · 중등단어 · 고등단어 · 토익단어 · 여행단어) as a 3×2 grid, then the packs inside the picked category as a horizontal strip. The category is kept in `localStorage` (`wg_cat_v1`) and the pack in `wg_pack_v1`; the hero chips, Learn Stage and Test Stage follow the picked pack. Words added with 단어 관리 ride along in whichever pack is picked. A category with no packs yet (토익·여행) shows a "준비 중" notice and greys out Learn/Test instead of opening an empty round. Devices that saved an old pack key still work: `today`/`photo` map to `261120` and `nov23` to `261123`.
 
 **단어 관리** — a parent can add a word (English, Korean meaning, English definition, part of speech, and a picture emoji). Words added there are stored on the device only; for illustrated multi-scene pictures, update the word list in the file.
 
 ## The word packs
 
-`📝 11월 23일 테스트` is the Jupiter Class November theme quiz (test date 11월 23일): Volcano, Magma, Lava, Ozone, Evaporation, Pollution, Oxygen, Conserve, Carbon Dioxide, Greenhouse Gas, in sheet order. It sits first in the pack strip and is the pack a device shows until another one is picked. Its twenty pictures are drawn by their own set of helpers (`sciSvg`, `sciBack`, `sciSmoke`, `sciSub`, `sciMol`, `sciTag`, plus the `SCI` scene table) because the science words that look alike on paper — magma/lava, ozone/oxygen, carbon dioxide/greenhouse gas — need two clearly different situations each. Gas formulas (`O₃`, `O₂`, `CO₂`) are drawn as separate `text` runs with an explicit subscript, not as a translatable word.
+`📝 숙제단어` holds the homework spelling lists, named by test date:
+
+- `261126` — 7-3 Spelling List, test date November 26th, 2026 (12 words: ugliness ~ litter), the default pack on a fresh device. Twelve words divide into four clean rounds in Test Stage (1–3, 4–6, 7–9, 10–12).
+- `261123` — the Jupiter Class November quiz (11월 23일 테스트).
+- `261120` — the environment unit (오늘의 단어장).
+
+`📝 261123` is the Jupiter Class November theme quiz (test date 11월 23일): Volcano, Magma, Lava, Ozone, Evaporation, Pollution, Oxygen, Conserve, Carbon Dioxide, Greenhouse Gas, in sheet order. It sits first in the pack strip and is the pack a device shows until another one is picked. Its twenty pictures are drawn by their own set of helpers (`sciSvg`, `sciBack`, `sciSmoke`, `sciSub`, `sciMol`, `sciTag`, plus the `SCI` scene table) because the science words that look alike on paper — magma/lava, ozone/oxygen, carbon dioxide/greenhouse gas — need two clearly different situations each. Gas formulas (`O₃`, `O₂`, `CO₂`) are drawn as separate `text` runs with an explicit subscript, not as a translatable word.
 
 `📸 오늘의 단어장` is the environment unit (Reduce ~ Waste). The six grade packs follow the 2022 revised curriculum elementary vocabulary, ten words each: 초1 기초 (apple ~ happy), 초2 일상 (run ~ school), 초3 필수 (animal ~ smile), 초4 필수 (arrive ~ weather), 초5 심화 (agree ~ wonder), 초6 심화 (achieve ~ responsible). English starts in grade 3 in the curriculum, so the 초1·초2 packs draw their words from the foundational, everyday part of that list.
 
-Every word carries two inline SVG scenes, built from a shared set of flat-shape pieces (`artBg`, the `G` glyph library and `artScene`) so all 70 grade-pack words stay crisp at phone size without external files.
+`📘 중등단어` (중1·중2·중3) and `🎓 고등단어` (고1·고2·고3) add thirty words each, ten per grade, drawn from the 2022 revised English curriculum vocabulary range for middle and high school and ordered by difficulty (adventure ~ prepare, achieve ~ honest, analyze ~ perspective, anticipate ~ verify, ambiguous ~ prevalent, alleviate ~ skeptical). Each grade pack is labelled with its short name in the strip (`중1`) and its theme in the hero (`중1 필수`).
+
+`💼 토익단어` and `✈️ 여행단어` are placeholders: the category shows a "준비 중" note and Learn/Test stay disabled until a pack is added to its `packs` list in `CATEGORIES`.
+
+Every word carries two inline SVG scenes, built from a shared set of flat-shape pieces (`artBg`, the `G` glyph library and `artScene`) so all 152 words stay crisp at phone size without external files.
 
 ## The environment unit (📸 오늘의 단어장)
 
