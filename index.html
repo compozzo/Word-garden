@@ -475,6 +475,164 @@
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
   .emoji-scene{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:clamp(52px,17vw,86px)}
+
+  /* ---------- 🎮 놀이 마당 (home) ---------- */
+  .play-yard{margin-top:1px}
+  .play-yard .head{display:flex;align-items:baseline;gap:6px;padding:0 3px 7px}
+  .play-yard .head .t{font-size:12.5px;font-weight:900;color:var(--ink-soft);letter-spacing:-.2px}
+  .play-yard .head .h{margin-left:auto;font-size:10.5px;font-weight:700;color:var(--ink-faint)}
+  .play-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .play-card{
+    display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;
+    padding:11px 11px 10px;border-radius:var(--r-md);box-shadow:var(--shadow-sm);
+    border:1px solid rgba(47,58,74,.06);min-width:0;
+  }
+  .play-card .ico{
+    width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    font-size:20px;background:rgba(255,255,255,.85);margin-bottom:3px;box-shadow:inset 0 -2px 0 rgba(0,0,0,.03);
+  }
+  .play-card .name{font-size:13.5px;font-weight:900;letter-spacing:-.35px;line-height:1.2;white-space:nowrap}
+  .play-card .desc{font-size:10.5px;font-weight:700;color:var(--ink-soft);line-height:1.3}
+  .play-card.srs{background:linear-gradient(140deg,#eaf7ff,#f7fcff)}
+  .play-card.story{background:linear-gradient(140deg,#fff6e5,#fffdf6)}
+  .play-card.draw{background:linear-gradient(140deg,#ffeef3,#fff9fb)}
+  .play-card.hang{background:linear-gradient(140deg,#eef9ef,#f8fdf9)}
+
+  /* ---------- shared game pieces ---------- */
+  /* an author display:flex would otherwise beat the [hidden] attribute */
+  #scr-srs [hidden], #scr-story [hidden], #scr-draw [hidden], #scr-hangman [hidden],
+  .play-yard [hidden]{display:none !important}
+  .guess-box{display:flex;flex-direction:column;gap:9px}
+  .game-card{
+    background:#fff;border:1px solid rgba(47,58,74,.08);border-radius:var(--r-lg);
+    box-shadow:var(--shadow);padding:14px;display:flex;flex-direction:column;gap:10px;
+  }
+  .game-note{font-size:11px;color:var(--ink-faint);font-weight:700;text-align:center;line-height:1.5;padding:0 4px}
+  .game-scene{
+    border-radius:var(--r-md);overflow:hidden;background:#f2f9ff;height:168px;
+    display:flex;align-items:center;justify-content:center;flex:0 0 auto;
+  }
+  .game-scene svg{width:100%;height:100%;display:block}
+  .game-scene .emoji-scene{font-size:62px}
+  .game-scene-emoji{font-size:62px;line-height:1}
+  .game-ko{font-size:16px;font-weight:900;color:#2f7a52;text-align:center;letter-spacing:-.3px}
+  .game-ask{font-size:12.5px;font-weight:800;color:var(--ink-soft);text-align:center;line-height:1.4}
+  .game-input{
+    font:inherit;font-size:16px;font-weight:800;padding:12px 13px;border-radius:13px;
+    border:1.5px solid #e2e9f0;background:#fff;width:100%;min-height:46px;text-align:center;
+    color:var(--ink);letter-spacing:.2px;
+  }
+  .game-input:focus{outline:none;border-color:#8fd6a6;box-shadow:0 0 0 3px rgba(143,214,166,.25)}
+  .game-input:disabled{background:#f7f9fb;color:#8a97a6}
+  .seg{display:flex;gap:5px;background:#eef3f8;padding:4px;border-radius:999px}
+  .seg button{
+    flex:1;padding:8px 4px;border-radius:999px;font-size:11.5px;font-weight:900;
+    color:var(--ink-soft);letter-spacing:-.3px;white-space:nowrap;
+  }
+  .seg button.on{background:#fff;color:#2f7a52;box-shadow:var(--shadow-sm)}
+  .btn-row{display:flex;gap:8px}
+  .btn{flex:1;padding:12px 8px;border-radius:14px;font-size:13.5px;font-weight:900;letter-spacing:-.2px}
+  .btn.go{background:linear-gradient(120deg,#5cbf83,#3f9e63);color:#fff;box-shadow:0 6px 14px rgba(63,158,99,.26)}
+  .btn.ghost{background:#fff;color:#3f9e63;border:1.5px solid #cfe9db}
+  .btn.dim{background:#f1f5f9;color:#55637a}
+  .res-banner{
+    display:none;padding:10px 12px;border-radius:var(--r-sm);font-size:13px;font-weight:900;
+    line-height:1.4;text-align:center;
+  }
+  .res-banner.show{display:block;animation:pop .22s ease}
+  .res-banner.good{background:#eaf9ee;color:#2f7a52;border:1px solid #bfe6cf}
+  .res-banner.bad{background:#fff1f3;color:#c4527a;border:1px solid #ffd0da}
+  .res-banner.plain{background:#f3f7fb;color:#4b5b6e;border:1px solid #e2e9f0}
+
+  /* ---------- story blank ---------- */
+  .story-text{
+    font-size:16px;line-height:1.7;font-weight:700;color:#33414f;
+    padding:2px 2px 0;min-height:56px;letter-spacing:-.1px;
+  }
+  .story-text .blank{
+    display:inline-block;min-width:80px;border-bottom:2.5px solid #9ecfe8;
+    color:#2f7a52;font-weight:900;text-align:center;line-height:1.3;
+  }
+  .choices{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .choice{
+    padding:12px 6px;border-radius:14px;background:#fff;border:1.5px solid #e2e9f0;
+    font-size:14px;font-weight:900;color:#33414f;box-shadow:var(--shadow-sm);
+    word-break:break-word;line-height:1.25;
+  }
+  .choice.correct{background:#eaf9ee;border-color:#8fd6a6;color:#2f7a52}
+  .choice.wrong{background:#fff1f3;border-color:#ffc0cc;color:#c4527a}
+  .hint-ko{
+    font-size:12px;font-weight:700;color:#a5622a;background:var(--yellow-soft);
+    border-radius:12px;padding:9px 11px;line-height:1.45;text-align:center;
+  }
+
+  /* ---------- draw & guess ---------- */
+  .draw-top{display:flex;align-items:center;gap:8px}
+  .draw-who{font-size:12.5px;font-weight:900;color:var(--ink-soft);letter-spacing:-.2px}
+  .draw-top .chip-btn{margin-left:auto}
+  .draw-secret{
+    font-size:22px;font-weight:900;letter-spacing:.5px;color:#2f7a52;text-align:center;
+    background:#eef9f1;border:1.5px dashed #9fd9b5;border-radius:14px;padding:9px 12px;
+  }
+  .draw-stage{border-radius:var(--r-md);overflow:hidden;border:1.5px solid #e2e9f0;background:#fff}
+  #drawCanvas{display:block;width:100%;height:auto;touch-action:none;background:#fff}
+  .draw-tools{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .swatch{width:25px;height:25px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1.5px #e2e9f0}
+  .swatch.on{box-shadow:0 0 0 2.5px #4fae74}
+  .size-btn{width:29px;height:29px;border-radius:10px;border:1.5px solid #e2e9f0;background:#fff;display:flex;align-items:center;justify-content:center}
+  .size-btn i{display:block;border-radius:50%;background:#3d4b5c}
+  .size-btn.on{border-color:#4fae74;background:#eef9ef}
+  .tool-btn{font-size:11.5px;font-weight:800;padding:6px 9px;border-radius:10px;background:#fff;border:1.5px solid #e2e9f0;color:var(--ink-soft)}
+  .tool-btn.on{background:#eef9ef;border-color:#8fd6a6;color:#2f7a52}
+  .room-code{
+    font-size:26px;font-weight:900;letter-spacing:5px;color:#2f7a52;text-align:center;
+    background:#eef9f1;border-radius:14px;padding:9px 12px 9px 17px;
+  }
+  .ol-status{font-size:11.5px;font-weight:800;color:var(--ink-soft);text-align:center;line-height:1.45;min-height:16px}
+  .ol-status.err{color:#c4527a}
+  .draw-score{font-size:11.5px;font-weight:900;color:var(--ink-faint);text-align:center}
+
+  /* ---------- hangman ---------- */
+  .hang-riddle{
+    background:#f6fafd;border:1px dashed #dbe6f0;border-radius:14px;padding:10px 12px;
+    font-size:13px;font-weight:800;line-height:1.55;color:#40506a;
+  }
+  .hang-blanks{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;padding:4px 0 2px}
+  .hang-blanks .b{
+    min-width:25px;height:34px;border-bottom:3px solid #b9c9d8;display:flex;align-items:center;
+    justify-content:center;font-size:20px;font-weight:900;color:#2f7a52;padding:0 2px;
+  }
+  .hang-blanks .b.space{border:0;min-width:8px;width:8px}
+  .hang-blanks .b.dash{border-bottom:0;color:#93a0b1}
+  .hang-blanks .b.done{color:#2f7a52}
+  .hang-keys{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+  .hang-keys button{
+    padding:8px 0;border-radius:10px;background:#fff;border:1.5px solid #e2e9f0;
+    font-size:14px;font-weight:900;color:#3d4b5c;
+  }
+  .hang-keys button.hit{background:#eaf9ee;border-color:#8fd6a6;color:#2f7a52}
+  .hang-keys button.miss{background:#f7f9fb;color:#b6c0cc;border-style:dashed;border-color:#e8eef4}
+  .hang-log{display:flex;flex-direction:column;gap:6px;max-height:170px;overflow-y:auto;padding:1px}
+  .hang-log .m{
+    font-size:12.5px;font-weight:700;line-height:1.45;padding:8px 11px;border-radius:12px;
+    background:#f3f7fb;color:#3d4b5c;align-self:flex-start;max-width:90%;word-break:break-word;
+  }
+  .hang-log .m.me{background:#e6f4ff;color:#2b6c96;align-self:flex-end}
+  .hang-log .m.ok{background:#eaf9ee;color:#2f7a52}
+  .hang-log .m.no{background:#fff1f3;color:#c4527a}
+  .chances{
+    font-size:11.5px;font-weight:900;color:#b4632f;background:var(--yellow-soft);
+    border-radius:999px;padding:5px 10px;margin-left:auto;white-space:nowrap;
+  }
+  .hang-guess-row{display:flex;gap:6px}
+  .hang-guess-row .game-input{text-align:left}
+  .hang-guess-row .btn{flex:0 0 auto;padding:12px 14px;font-size:12.5px}
+  .hang-hintbox{
+    display:flex;align-items:center;gap:10px;background:#f8fbfd;border:1px dashed #dbe6f0;
+    border-radius:12px;padding:8px;font-size:12px;font-weight:800;color:#4b5b6e;
+  }
+  .hang-hintbox .pic{width:88px;height:66px;flex:0 0 auto;border-radius:10px;overflow:hidden;background:#eef8ff}
+  .hang-hintbox .pic svg{width:100%;height:100%}
   @media (prefers-reduced-motion: reduce){
     *{animation-duration:.001s!important;transition-duration:.001s!important}
   }
@@ -537,6 +695,31 @@
         <button class="stage-card manage" id="btnManage">
           <span class="ico">➕</span>
           <span class="txt"><span class="name">단어 관리</span><span class="desc">단어를 넣고 빼요</span></span>
+        </button>
+      </div>
+    </div>
+    <div class="play-yard">
+      <div class="head"><span class="t">🎮 놀이 마당</span><span class="h">놀면서 저절로 익혀요</span></div>
+      <div class="play-grid">
+        <button class="play-card srs" data-go="srs">
+          <span class="ico">🔁</span>
+          <span class="name">자동 복습미션</span>
+          <span class="desc" id="playSrs">틀린 단어 다시 만나기</span>
+        </button>
+        <button class="play-card story" data-go="story">
+          <span class="ico">📖</span>
+          <span class="name">이야기 빈칸</span>
+          <span class="desc">이야기 속 빈칸 채우기</span>
+        </button>
+        <button class="play-card draw" data-go="draw">
+          <span class="ico">🎨</span>
+          <span class="name">그림으로 말해요</span>
+          <span class="desc">그리고 맞히는 놀이</span>
+        </button>
+        <button class="play-card hang" data-go="hangman">
+          <span class="ico">🕵️</span>
+          <span class="name">단어 추리</span>
+          <span class="desc">스무고개 행맨 놀이</span>
         </button>
       </div>
     </div>
@@ -603,6 +786,147 @@
 
     <div class="test-foot">
       <div class="pick-status" id="pickStatus">단어·그림·뜻 줄에서 <b>1장씩</b> 골라 보세요</div>
+    </div>
+  </section>
+
+  <!-- ===== 🔁 SRS REVIEW ===== -->
+  <section class="screen" id="scr-srs">
+    <div class="screen-head">
+      <button class="round-btn" data-go="home">‹</button>
+      <div><div class="title">🔁 자동 복습미션</div><div class="sub" id="srsSub">오늘의 복습</div></div>
+      <span class="chances" id="srsProg">0 / 0</span>
+    </div>
+
+    <div class="game-card">
+      <div class="game-scene" id="srsScene"></div>
+      <div class="game-ask" id="srsAsk">이 단어를 영어로 써 보세요</div>
+      <div class="game-ko" id="srsKo"></div>
+      <input class="game-input game-en notranslate" id="srsInput" type="text" placeholder="영어로 쓰기" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" translate="no">
+      <div class="btn-row" id="srsAskBtns">
+        <button class="btn ghost" id="btnSrsShow">정답 보기</button>
+        <button class="btn go" id="btnSrsCheck">확인</button>
+      </div>
+      <div class="res-banner" id="srsBanner"></div>
+      <div class="btn-row" id="srsSelf" hidden>
+        <button class="btn dim" id="btnSrsMiss">몰랐어요</button>
+        <button class="btn go" id="btnSrsHit">알았어요</button>
+      </div>
+      <button class="primary" id="btnSrsNext" hidden>다음 단어 →</button>
+    </div>
+    <div class="game-note" id="srsNote">맞히면 1일 → 3일 → 7일 → 21일 뒤에 다시 만나요</div>
+  </section>
+
+  <!-- ===== 📖 STORY BLANK ===== -->
+  <section class="screen" id="scr-story">
+    <div class="screen-head">
+      <button class="round-btn" data-go="home">‹</button>
+      <div><div class="title">📖 이야기 빈칸</div><div class="sub" id="storySub">짧은 이야기 속 빈칸을 채워요</div></div>
+      <span class="chances" id="storyProg">0 / 0</span>
+    </div>
+
+    <div class="seg" id="storyMode">
+      <button type="button" data-mode="choice" class="on">객관식 (4지선다)</button>
+      <button type="button" data-mode="type">주관식 (직접 입력)</button>
+    </div>
+
+    <div class="game-card">
+      <div class="story-text game-en notranslate" id="storyText" translate="no"></div>
+      <div class="choices game-en" id="storyChoices" translate="no"></div>
+      <input class="game-input game-en notranslate" id="storyInput" type="text" placeholder="빈칸에 들어갈 단어" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" translate="no" hidden>
+      <div class="btn-row">
+        <button class="btn ghost" id="btnStoryHint">한글 힌트</button>
+        <button class="btn go" id="btnStoryCheck" hidden>확인</button>
+      </div>
+      <div class="hint-ko" id="storyHintBox" hidden></div>
+      <div class="res-banner" id="storyBanner"></div>
+      <button class="primary" id="btnStoryNext" hidden>다음 이야기 →</button>
+    </div>
+  </section>
+
+  <!-- ===== 🎨 DRAW & GUESS ===== -->
+  <section class="screen" id="scr-draw">
+    <div class="screen-head">
+      <button class="round-btn" data-go="home">‹</button>
+      <div><div class="title">🎨 그림으로 말해요</div><div class="sub" id="drawSub">그림을 그리고 단어를 맞혀요</div></div>
+    </div>
+
+    <div class="seg" id="drawTabs">
+      <button type="button" data-tab="local" class="on">📱 같은 기기 2인</button>
+      <button type="button" data-tab="online">🌐 온라인 방</button>
+    </div>
+
+    <div class="game-card" id="drawRoom" hidden>
+      <div class="seg" id="drawRoomMode">
+        <button type="button" data-room="host">방 만들기</button>
+        <button type="button" data-room="guest">코드로 들어가기</button>
+      </div>
+      <div class="room-code" id="drawCode" hidden></div>
+      <input class="game-input" id="drawCodeIn" type="text" inputmode="numeric" maxlength="4" placeholder="방 코드 4자리" autocomplete="off" hidden>
+      <button class="btn go" id="btnDrawJoin" hidden>방에 들어가기</button>
+      <div class="ol-status" id="drawStatus">방을 만들거나, 친구가 알려 준 코드로 들어가요.</div>
+    </div>
+
+    <div class="game-card">
+      <div class="draw-top">
+        <span class="draw-who" id="drawWho">1번 친구가 그려요</span>
+        <button class="chip-btn" id="btnDrawPeek">🔒 단어 보기</button>
+      </div>
+      <div class="draw-secret game-en notranslate" id="drawSecret" translate="no" hidden></div>
+      <div class="draw-stage"><canvas id="drawCanvas" width="1080" height="810"></canvas></div>
+      <div class="draw-tools" id="drawTools"></div>
+      <button class="btn go" id="btnDrawDone">다 그렸어요 · 친구가 맞히기</button>
+
+      <div class="guess-box" id="drawGuess" hidden>
+        <div class="game-ask" id="drawGuessAsk">그림을 보고 단어를 맞혀 보세요</div>
+        <div class="choices game-en" id="drawChoices" translate="no"></div>
+        <input class="game-input game-en notranslate" id="drawGuessIn" type="text" placeholder="영어 단어" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" translate="no">
+        <div class="btn-row">
+          <button class="btn ghost" id="btnDrawSkip">정답 보기</button>
+          <button class="btn go" id="btnDrawGuess">확인</button>
+        </div>
+        <div class="res-banner" id="drawBanner"></div>
+        <button class="primary" id="btnDrawNext" hidden>다음 라운드 →</button>
+      </div>
+      <div class="draw-score" id="drawScore">1번 0 · 2번 0</div>
+    </div>
+    <div class="game-note" id="drawNote">그리는 사람만 단어를 보고, 맞히는 사람은 그림만 봐요</div>
+  </section>
+
+  <!-- ===== 🕵️ HANGMAN RIDDLE ===== -->
+  <section class="screen" id="scr-hangman">
+    <div class="screen-head">
+      <button class="round-btn" data-go="home">‹</button>
+      <div><div class="title">🕵️ 단어 추리</div><div class="sub" id="hangSub">스무고개 행맨 놀이</div></div>
+      <span class="chances" id="hangChances">기회 20</span>
+    </div>
+
+    <div class="seg" id="hangMode">
+      <button type="button" data-hmode="ai" class="on">🤖 자동 출제</button>
+      <button type="button" data-hmode="two">👥 2인 대결</button>
+    </div>
+
+    <div class="game-card" id="hangSetup" hidden>
+      <div class="game-ask">출제할 단어와 힌트를 넣고, 기기를 풀이자에게 넘겨 주세요</div>
+      <input class="game-input game-en notranslate" id="hangInWord" type="text" placeholder="출제할 영어 단어" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" translate="no">
+      <input class="game-input" id="hangInHint" type="text" placeholder="힌트 (예: 과일)">
+      <button class="btn go" id="btnHangSet">문제 내기</button>
+    </div>
+
+    <div class="game-card" id="hangPlay">
+      <div class="hang-riddle" id="hangRiddle"></div>
+      <div class="hang-blanks game-en" id="hangBlanks" translate="no"></div>
+      <div class="btn-row">
+        <button class="chip-btn" id="btnHangPic">🖼 그림 힌트</button>
+        <button class="chip-btn" id="btnHangKo">💡 뜻 힌트</button>
+      </div>
+      <div class="hang-hintbox" id="hangHintBox" hidden></div>
+      <div class="hang-keys" id="hangKeys"></div>
+      <div class="hang-guess-row">
+        <input class="game-input game-en notranslate" id="hangGuessIn" type="text" placeholder="단어 전체로 맞히기" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" translate="no">
+        <button class="btn go" id="btnHangGuess">확인</button>
+      </div>
+      <div class="hang-log" id="hangLog"></div>
+      <button class="primary" id="btnHangNext" hidden>다음 문제 →</button>
     </div>
   </section>
 </div>
@@ -714,7 +1038,8 @@
     '.tl-spell', '.tl-meaning',
     '.word-chip',
     '.word-row .w', '.word-row .m',
-    '.stick-item .w'
+    '.stick-item .w',
+    '.game-en', '.story-text', '.choice', '.hang-blanks .b'
   ].join(',');
   function markEnglish(root) {
     $$(ENGLISH_SELECTORS, root || document).forEach(n => {
@@ -5825,7 +6150,8 @@
      Screens
      ========================================================================= */
   function go(name) {
-    if ((name === 'learn' || name === 'test') && !activeWords().length) {
+    if (name !== 'draw') leaveDraw();
+    if (['learn', 'test', 'srs', 'story', 'draw', 'hangman'].indexOf(name) !== -1 && !activeWords().length) {
       const cat = currentCategory();
       const bucket = catBucket(cat);
       if (bucket && bucket.state !== 'ready') {
@@ -5842,6 +6168,10 @@
     if (name === 'home') renderHome();
     if (name === 'learn') renderLearn(true);
     if (name === 'test') startTest(true);
+    if (name === 'srs') startSrs();
+    if (name === 'story') startStory();
+    if (name === 'draw') startDraw();
+    if (name === 'hangman') startHang();
   }
 
   function refreshChrome() {
@@ -6032,6 +6362,7 @@
       card.classList.toggle('off', empty);
       card.setAttribute('aria-disabled', empty ? 'true' : 'false');
     });
+    renderPlayModes();
     markEnglish($('#scr-home'));
   }
 
@@ -6731,11 +7062,1595 @@
     });
   }
 
+  /* =========================================================================
+     🎮 놀이 마당 — 네 가지 놀이
+       1) 🔁 자동 복습미션 (간격 반복)   2) 📖 이야기 빈칸
+       3) 🎨 그림으로 말해요              4) 🕵️ 단어 추리 (스무고개 행맨)
+     ========================================================================= */
+
+  /* ---------- 손으로 쓴 이야기 문장 (word → [문장, 주제 힌트]) ---------- */
+  const STORY_BANK = {
+    /* 📸 오늘의 단어장 — 환경 */
+    'reduce': ['Our class wants to save water, so we try to [____] how much we use.', '환경'],
+    'reuse': ['Instead of throwing the jar away, Mina will [____] it as a pen holder.', '환경'],
+    'recycle': ['Old newspapers go into a special bin, and a factory will [____] them into new paper.', '환경'],
+    'natural resource': ['Clean water and sunlight are a [____] that comes from the Earth.', '환경'],
+    'protect': ['A big umbrella can [____] you from the rain and the hot sun.', '환경'],
+    'harmful': ['Too much sugar is [____] for your teeth, so eat sweets only sometimes.', '환경'],
+    'less': ['This small cup holds [____] water than the big one, so it is lighter.', '환경'],
+    'light': ['My school bag is very [____], so even a small child can carry it.', '환경'],
+    'environment': ['A clean [____] gives animals fresh water, green trees and fresh air.', '환경'],
+    'waste': ['Do not [____] food; put what is left into a box and eat it later.', '환경'],
+
+    /* 📝 숙제단어 261126 */
+    'ugliness': ['The little duck thinks its [____] is a problem, but it grows into a beautiful swan.', '모습'],
+    'butcher': ['We buy fresh meat from the [____] at the market on Saturday.', '직업'],
+    'forage': ['In autumn the squirrels [____] for nuts under the tall trees.', '동물'],
+    'physician': ['When her baby has a high fever, the mother takes him to a [____].', '직업'],
+    'crochet': ['Grandma likes to [____] warm hats for her grandchildren in winter.', '만들기'],
+    'stitch': ['The tailor sews one small [____] at a time to repair the coat.', '바느질'],
+    'internal': ['The X-ray picture shows the [____] organs inside his body.', '몸'],
+    'mythology': ['He borrowed a book about Greek [____] and read the story of Zeus.', '책'],
+    'sore': ['After the long hike his legs felt [____], so he sat down to rest.', '몸'],
+    'remarkable': ['Her drawing of the ocean was so [____] that the whole class clapped.', '느낌'],
+    'volunteer': ['A [____] gives warm food to old people every Saturday and is not paid.', '사람'],
+    'litter': ['Please put the [____] in the bin, not on the green grass.', '환경'],
+
+    /* 📝 261123 — 과학 */
+    'volcano': ['In the science book, a big [____] threw red smoke into the sky.', '과학'],
+    'magma': ['Deep under the ground, hot [____] moves slowly in the dark.', '과학'],
+    'lava': ['Hot [____] flowed down the side of the mountain and burned the trees.', '과학'],
+    'ozone': ["High in the sky, the [____] layer keeps the sun's strong light away from us.", '과학'],
+    'evaporation': ['After the sun shines on the puddle, [____] turns the water into gas.', '과학'],
+    'pollution': ['Too many cars make [____] in the air, so the city sky looks grey.', '과학'],
+    'oxygen': ['The plant in the fish tank gives [____] to the small fish.', '과학'],
+    'conserve': ['We turn off the lights to [____] electricity at school.', '과학'],
+    'carbon dioxide': ['Trees take in [____] from the air and give us oxygen back.', '과학'],
+    'greenhouse gas': ['A [____] like carbon dioxide keeps heat around the Earth.', '과학'],
+
+    /* 🌱 초1 */
+    'apple': ['A hungry girl picks a red [____] from the tree and eats it.', '과일'],
+    'cat': ['The little [____] sleeps on the warm cushion all afternoon.', '동물'],
+    'dog': ['Our [____] runs to the door and wags its tail when we come home.', '동물'],
+    'red': ['Her new hat is [____], the same colour as a strawberry.', '색깔'],
+    'blue': ['When the sky is clear, it looks bright [____].', '색깔'],
+    'sun': ['The [____] comes up in the morning and makes the garden warm.', '하늘'],
+    'moon': ['At night the [____] is round and white in the dark sky.', '하늘'],
+    'book': ['He opens a picture [____] and reads the story to his sister.', '물건'],
+    'big': ['An elephant is very [____], much larger than a cat.', '크기'],
+    'happy': ['She got a sticker from her teacher, so she felt [____] all day.', '기분'],
+    'ball': ['The boys kick the [____] across the grass and laugh.', '놀이'],
+    'bird': ['A small [____] sits on the branch and sings in the morning.', '동물'],
+
+    /* 🌱 초2 */
+    'run': ['Every morning he likes to [____] around the park before breakfast.', '움직임'],
+    'jump': ['The rabbit can [____] over the small stone easily.', '움직임'],
+    'swim': ['In summer we [____] in the cool water at the pool.', '움직임'],
+    'eat': ['We [____] breakfast together at seven every morning.', '생활'],
+    'sleep': ['Babies [____] a lot during the day.', '생활'],
+    'family': ['My [____] has four people: mum, dad, my sister and me.', '사람'],
+    'friend': ['A good [____] shares an umbrella with you in the rain.', '사람'],
+    'rain': ['Dark clouds came, and cold [____] fell all afternoon.', '날씨'],
+    'snow': ['White [____] covered the garden and the roof last winter.', '날씨'],
+    'school': ['She walks to [____] with her bag every morning.', '장소'],
+    'bike': ['He rides his [____] to the park on Sunday.', '교통'],
+    'sea': ['In summer we swim in the blue [____] near the beach.', '자연'],
+
+    /* 🌱 초3 */
+    'animal': ['A fox is a wild [____] that lives in the forest.', '동물'],
+    'breakfast': ['I eat bread and milk for [____] before school.', '음식'],
+    'clean': ['Please [____] your room before your friend comes.', '생활'],
+    'draw': ['She likes to [____] flowers with a pencil.', '놀이'],
+    'listen': ['Please [____] to the teacher carefully in class.', '학교'],
+    'morning': ['The sun rises and the birds sing in the [____].', '시간'],
+    'mountain': ['A high [____] stands behind the village, covered with trees.', '자연'],
+    'music': ['We danced to happy [____] at the birthday party.', '취미'],
+    'share': ['Please [____] your crayons with your little brother.', '생활'],
+    'smile': ['She gave a warm [____] when she saw her friend.', '표정'],
+    'city': ['The [____] is full of tall buildings and busy streets.', '장소'],
+    'country': ['Korea is a [____] in Asia with four seasons.', '장소'],
+
+    /* 🌱 초4 */
+    'arrive': ['We will [____] at the station at nine o\'clock.', '여행'],
+    'brave': ['The [____] boy told the truth even though he was afraid.', '성격'],
+    'bridge': ['We walked across the [____] over the river.', '장소'],
+    'cloud': ['A white [____] moved slowly across the sky.', '날씨'],
+    'decide': ['I could not [____] which ice cream to buy.', '생활'],
+    'healthy': ['Eating vegetables and walking every day keeps you [____].', '건강'],
+    'library': ['She borrowed three books from the [____] near her house.', '장소'],
+    'season': ['Autumn is my favourite [____] because the leaves turn red.', '자연'],
+    'travel': ['They want to [____] around the world by train.', '여행'],
+    'weather': ['The [____] is cold and windy today, so wear a coat.', '날씨'],
+    'act': ['He likes to [____] in the school play.', '놀이'],
+    'add': ['Please [____] two and three to get five.', '수학'],
+
+    /* 🌱 초5 */
+    'agree': ['We [____] with each other, so the game was easy to plan.', '생각'],
+    'compare': ["Let's [____] the two pictures and see what is different.", '생각'],
+    'culture': ['Korean [____] includes kimchi, hanbok and Chuseok.', '사회'],
+    'energy': ['The sun gives us light and [____] every day.', '과학'],
+    'explain': ['Can you [____] the rule again a little more slowly?', '생각'],
+    'forest': ['Many tall trees grow in the dark green [____].', '자연'],
+    'memory': ['She has a good [____] for names and faces.', '생각'],
+    'practice': ['You must [____] the piano every day to get better.', '학교'],
+    'useful': ['A small map is [____] when you visit a new city.', '성격'],
+    'wonder': ['I [____] what is inside that big box.', '생각'],
+    'age': ['At the [____] of six, she started school.', '시간'],
+    'area': ['This [____] of the park has a small pond and many flowers.', '장소'],
+
+    /* 🌱 초6 */
+    'achieve': ['With enough practice you can [____] your goal and win a medal.', '생각'],
+    'balance': ['The child kept her [____] on the narrow beam.', '몸'],
+    'challenge': ['Learning to swim was a big [____] for him, but he did it.', '생각'],
+    'curious': ['A [____] child asks questions about everything.', '성격'],
+    'describe': ['Please [____] the picture in two sentences.', '생각'],
+    'express': ['She drew a picture to [____] her happy feelings.', '생각'],
+    'improve': ['Reading one book a week will [____] your English.', '학교'],
+    'nature': ['We walked in [____], with trees, birds and a small river.', '자연'],
+    'respect': ['We should [____] other people and listen to their ideas.', '생활'],
+    'responsible': ['He is [____] for feeding the class fish every morning.', '성격'],
+    'a': ['I saw [____] small cat sleeping on the wall.', '문법'],
+    'about': ['The story is [____] a brave little rabbit who finds a friend.', '문법'],
+
+    /* 💼 토익 베이직 Day 1 */
+    'schedule': ['The manager sent me the training [____] for next week.', '업무'],
+    'office': ['She works in a small [____] near the station.', '업무'],
+    'meeting': ['The team has a short [____] every Monday morning.', '업무'],
+    'email': ['Please send the report by [____] before Friday.', '업무'],
+    'document': ['I need to sign the [____] and return it today.', '업무'],
+    'confirm': ['Please [____] your flight time one day before you leave.', '업무'],
+    'attend': ['All new staff must [____] the safety training.', '업무'],
+    'submit': ['You must [____] your timesheet by Friday afternoon.', '업무'],
+    'deadline': ['The [____] for the application is 30 November.', '업무'],
+    'request': ['I sent a [____] for a new printer to the office manager.', '업무'],
+    'desk': ['Her [____] is next to the window on the third floor.', '사무실'],
+    'printer': ['The [____] in the office is out of paper again.', '사무실'],
+
+    /* 💼 토익 600 Day 1 */
+    'applicant': ['Each [____] must send a resume and a cover letter.', '업무'],
+    'interview': ['She has a job [____] at ten o\'clock on Thursday.', '업무'],
+    'qualified': ['Only [____] candidates will be invited to the next round.', '업무'],
+    'colleague': ['My [____] helped me finish the report last night.', '업무'],
+    'branch': ['The bank will open a new [____] in Busan next month.', '업무'],
+    'reserve': ['Please [____] a meeting room for Friday afternoon.', '업무'],
+    'notify': ['We will [____] all customers by email.', '업무'],
+    'available': ['The manager is not [____] this afternoon, so call tomorrow.', '업무'],
+    'reschedule': ['We had to [____] the meeting for next week.', '업무'],
+    'procedure': ['Please follow the safety [____] in the factory.', '업무'],
+    'position': ['She applied for a [____] in the sales team.', '업무'],
+    'salary': ['The [____] is paid on the last day of every month.', '업무'],
+
+    /* 📘 중등단어 */
+    'adventure': ['The children went on an [____] and found a cave in the woods.', '모험'],
+    'borrow': ['Can I [____] your pencil for a moment?', '생활'],
+    'celebrate': ['We will [____] her birthday with a cake and candles.', '생활'],
+    'collect': ['He likes to [____] stamps from many countries.', '취미'],
+    'courage': ['It took [____] to speak in front of the whole school.', '성격'],
+    'discover': ['Scientists [____] a new kind of fish in the deep sea.', '과학'],
+    'effort': ['She made a real [____] to finish the project on time.', '생각'],
+    'grateful': ['I am [____] to my friend for helping me study.', '기분'],
+    'imagine': ['Close your eyes and [____] you are on a warm beach.', '생각'],
+    'prepare': ['We must [____] for the test before Friday.', '생각'],
+    'confuse': ['Two words that look the same can [____] a new learner.', '생각'],
+    'consequence': ['Every choice has a [____], so think before you act.', '생각'],
+    'cooperate': ['The two teams [____] to clean up the beach.', '생활'],
+    'encourage': ['Her teacher said, "You can do it!" to [____] her.', '생각'],
+    'honest': ['An [____] person tells the truth even when it is hard.', '성격'],
+    'analyze': ['We will [____] the data and write a short report.', '생각'],
+    'approach': ['The cat slowly began to [____] the sleeping bird.', '움직임'],
+    'conflict': ['There was a small [____] between the two brothers.', '사회'],
+    'contribute': ['Everyone can [____] ideas to the class project.', '사회'],
+    'convince': ['He tried to [____] his parents to let him go camping.', '생각'],
+    'crucial': ['Getting enough sleep is [____] before a big test.', '생각'],
+    'distinguish': ['A young child may not [____] a big cat from a dog.', '생각'],
+    'efficient': ['This new machine is more [____] and uses less power.', '과학'],
+    'essential': ['Clean water is [____] for every living thing.', '과학'],
+    'perspective': ['Try to see the problem from your friend\'s [____].', '생각'],
+
+    /* 🎓 고등단어 */
+    'anticipate': ['We [____] a busy week, so we hired extra staff.', '업무'],
+    'coherent': ['She gave a clear, [____] answer that everyone understood.', '생각'],
+    'comprehensive': ['The report gives a [____] picture of the whole market.', '업무'],
+    'demonstrate': ['The teacher will [____] the experiment before we try it.', '과학'],
+    'emphasize': ['The doctor wanted to [____] the importance of rest.', '생각'],
+    'inevitable': ['Some delay was [____] after the heavy snow.', '생각'],
+    'interpret': ['It is not easy to [____] the result of the survey.', '생각'],
+    'maintain': ['It costs a lot to [____] an old building.', '생활'],
+    'perceive': ['People [____] colours in slightly different ways.', '생각'],
+    'verify': ['Please [____] the numbers before you send the report.', '업무'],
+    'ambiguous': ['His answer was so [____] that nobody knew what he meant.', '생각'],
+    'advocate': ['Many doctors [____] walking as the best daily exercise.', '생각'],
+    'constrain': ['A small budget will [____] what we can do this year.', '업무'],
+    'deteriorate': ['Without repairs, the old bridge will [____] quickly.', '변화'],
+    'elaborate': ['Could you [____] on that point a little more?', '생각'],
+    'fluctuate': ['Prices [____] with the season, so buy early.', '변화'],
+    'hypothesis': ['The team tested a [____] about how the virus spreads.', '과학'],
+    'integrate': ['The new system will [____] all our sales data in one place.', '업무'],
+    'manipulate': ['It is not fair to [____] the numbers to look better.', '생각'],
+    'prevalent': ['This habit is [____] among young office workers.', '사회'],
+    'alleviate': ['A short walk can [____] the pain in your back.', '건강'],
+    'arbitrary': ['The rule felt [____] because nobody explained the reason.', '생각'],
+    'compelling': ['She made a [____] argument for changing the plan.', '생각'],
+    'contemplate': ['He sat by the window and began to [____] his next step.', '생각'],
+    'discrepancy': ['We found a [____] between the two reports.', '업무'],
+    'feasible': ['Is it [____] to finish the work by Friday?', '생각'],
+    'inherent': ['Some risk is [____] in every new business.', '생각'],
+    'profound': ['The book had a [____] effect on the way she saw life.', '생각'],
+    'resilience': ['The town showed great [____] after the flood.', '성격'],
+    'skeptical': ['The engineer was [____] about the new design at first.', '생각']
+  };
+
+  /* ---------- shared helpers ---------- */
+  function wgNorm(s) {
+    return String(s == null ? '' : s).toLowerCase()
+      .replace(/[\u2018\u2019`]/g, "'")
+      .replace(/[^a-z'\- ]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+  function wgSquash(s) { return wgNorm(s).replace(/[\s'\-]/g, ''); }
+  function wgSame(guess, answer) {
+    const g = wgNorm(guess), a = wgNorm(answer);
+    if (!g || !a) return false;
+    if (g === a || wgSquash(g) === wgSquash(a)) return true;
+    if (a.length > 3 && (g === a + 's' || g === a + 'es')) return true;
+    return false;
+  }
+  function wgPos(p) {
+    return ({ noun: '명사', verb: '동사', adjective: '형용사' })[p] || '낱말';
+  }
+  function wgScene(w) {
+    if (!w) return '';
+    if (w.scenes && w.scenes[0] && w.scenes[0].html) return w.scenes[0].html;
+    return emojiSceneHTML(w.emoji || '✏️');
+  }
+  function wgFruit(w) { return (w && w.fruit) || '🍓'; }
+  function wgWordy(w) {   /* 한 글자 낱말(a)은 이야기·그림 놀이에서 뺍니다 */
+    const k = wgNorm(w && w.word);
+    return k.replace(/[^a-z]/g, '').length >= 2;
+  }
+  function wgPickWord() {
+    const pool = activeWords().filter(w => w && w.word && wgWordy(w));
+    if (!pool.length) return null;
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+  function awardWord(word, points, withSticker) {
+    if (!word) return;
+    if (points) { state.score += points; saveScore(); }
+    if (withSticker !== false && word.id) {
+      const prev = state.stickers[word.id];
+      state.stickers[word.id] = {
+        word: word.word, fruit: wgFruit(word), at: Date.now(),
+        count: prev ? (prev.count || 1) + 1 : 1
+      };
+      saveStickers();
+    }
+    refreshChrome();
+  }
+  function bannerShow(sel, cls, text) {
+    const n = $(sel);
+    if (!n) return;
+    n.className = 'res-banner' + (text ? ' show' : '') + (cls ? ' ' + cls : '');
+    n.textContent = text || '';
+  }
+  function guardWords() {
+    if (activeWords().length) return true;
+    const cat = currentCategory();
+    const bucket = catBucket(cat);
+    if (bucket && bucket.state !== 'ready') {
+      toast(cat.label + (bucket.state === 'error' ? '를 불러오지 못했어요' : '를 불러오는 중이에요'));
+    } else {
+      toast('이 팩에는 아직 단어가 없어요');
+    }
+    return false;
+  }
+
+  /* =========================================================================
+     1) 🔁 자동 복습미션 — 간격 반복
+     ========================================================================= */
+  const K_SRS = 'wg_srs_v1';
+  const SRS_STEPS = [1, 3, 7, 21];          /* 맞힌 뒤 다시 만나는 날 */
+  const SRS = { list: [], i: 0, ok: 0, state: 'ask' };
+
+  function srsLoad() {
+    const o = store.get(K_SRS, {});
+    return (o && typeof o === 'object' && !Array.isArray(o)) ? o : {};
+  }
+  function srsRecord(word, ok) {
+    if (!word || !word.id) return;
+    const db = srsLoad(), DAY = 86400000;
+    const rec = (db[word.id] && typeof db[word.id] === 'object') ? db[word.id] : {};
+    const box = clamp(Number(rec.b) || 0, 0, SRS_STEPS.length);
+    if (ok) {
+      const next = clamp(box + 1, 1, SRS_STEPS.length);
+      rec.b = next;
+      rec.ok = (Number(rec.ok) || 0) + 1;
+      rec.due = Date.now() + SRS_STEPS[next - 1] * DAY;
+    } else {
+      rec.b = 0;
+      rec.miss = (Number(rec.miss) || 0) + 1;
+      rec.due = Date.now() + 10 * 60000;     /* 조금 있다 오늘 다시 만나요 */
+    }
+    rec.last = Date.now();
+    db[word.id] = rec;
+    store.set(K_SRS, db);
+  }
+  function srsDueCount() {
+    const pool = activeWords();
+    if (!pool.length) return 0;
+    const db = srsLoad(), now = Date.now();
+    let due = 0, fresh = 0;
+    pool.forEach(w => {
+      const r = db[w.id];
+      if (!r) fresh++;
+      else if (Number(r.due) <= now) due++;
+    });
+    return due + Math.min(fresh, 6);
+  }
+  function srsBuild() {
+    const pool = activeWords();
+    if (!pool.length) return [];
+    const db = srsLoad(), now = Date.now();
+    const due = [], fresh = [], later = [];
+    pool.forEach(w => {
+      const r = db[w.id];
+      if (!r) fresh.push(w);
+      else if (Number(r.due) <= now) due.push(w);
+      else later.push(w);
+    });
+    due.sort((a, b) => Number(db[a.id].due) - Number(db[b.id].due));
+    const cap = pool.length > 20 ? 8 : 6;
+    let list = due.concat(shuffle(fresh));
+    if (!list.length) list = shuffle(later);
+    return list.slice(0, Math.max(1, Math.min(cap, list.length)));
+  }
+
+  function startSrs() {
+    if (!guardWords()) { go('home'); return; }
+    SRS.list = srsBuild();
+    SRS.i = 0; SRS.ok = 0; SRS.state = 'ask';
+    const pack = currentPack();
+    const days = hasDays(pack) ? ' · Day ' + state.day : '';
+    $('#srsSub').textContent = (pack ? (pack.short || pack.label) : '') + days + ' · 오늘의 복습';
+    renderSrs();
+  }
+
+  function renderSrs() {
+    const w = SRS.list[SRS.i];
+    if (!w) { srsFinish(); return; }
+    SRS.state = 'ask';
+    $('#srsProg').textContent = (SRS.i + 1) + ' / ' + SRS.list.length;
+    $('#srsScene').innerHTML = wgScene(w);
+    $('#srsAsk').textContent = wgPos(w.pos) + ' · 이 단어를 영어로 써 보세요';
+    $('#srsKo').textContent = w.ko || '';
+    const inp = $('#srsInput');
+    inp.value = ''; inp.disabled = false;
+    $('#srsAskBtns').hidden = false;
+    $('#srsSelf').hidden = true;
+    const nextBtn = $('#btnSrsNext');
+    nextBtn.hidden = true;
+    nextBtn.textContent = '다음 단어 →';
+    bannerShow('#srsBanner', '', '');
+    markEnglish($('#scr-srs'));
+    setTimeout(() => { try { inp.focus(); } catch (e) {} }, 80);
+  }
+
+  function srsCheck() {
+    if (SRS.state !== 'ask') return;
+    const w = SRS.list[SRS.i];
+    if (!w) return;
+    const val = $('#srsInput').value;
+    if (!wgNorm(val)) { toast('단어를 적어 주세요'); return; }
+    if (wgSame(val, w.word)) {
+      SRS.ok++;
+      SRS.state = 'done';
+      srsRecord(w, true);
+      awardWord(w, 10);
+      sfx.good();
+      bannerShow('#srsBanner', 'good', '정답! ⭐ +10 · ' + w.word);
+      $('#srsInput').disabled = true;
+      $('#srsAskBtns').hidden = true;
+      setTimeout(() => { if (SRS.state === 'done') srsNext(); }, 1000);
+    } else {
+      SRS.state = 'miss';
+      srsRecord(w, false);
+      sfx.nope();
+      bannerShow('#srsBanner', 'bad', '아쉬워요! 정답은 "' + w.word + '"예요');
+      $('#srsInput').disabled = true;
+      $('#srsAskBtns').hidden = true;
+      $('#btnSrsNext').hidden = false;
+    }
+  }
+
+  function srsReveal() {
+    if (SRS.state !== 'ask') return;
+    const w = SRS.list[SRS.i];
+    if (!w) return;
+    SRS.state = 'revealed';
+    $('#srsInput').disabled = true;
+    $('#srsAskBtns').hidden = true;
+    $('#srsSelf').hidden = false;
+    bannerShow('#srsBanner', 'plain', '정답은 "' + w.word + '"예요. 기억났나요?');
+    speak(w.word);
+  }
+
+  function srsSelf(ok) {
+    if (SRS.state !== 'revealed') return;
+    const w = SRS.list[SRS.i];
+    if (!w) return;
+    SRS.state = 'done';
+    srsRecord(w, ok);
+    if (ok) { SRS.ok++; awardWord(w, 10); sfx.good(); }
+    else sfx.nope();
+    $('#srsSelf').hidden = true;
+    srsNext();
+  }
+
+  function srsNext() {
+    SRS.i++;
+    if (SRS.i >= SRS.list.length) srsFinish();
+    else renderSrs();
+  }
+
+  function srsFinish() {
+    SRS.state = 'finish';
+    $('#srsProg').textContent = '완료';
+    $('#srsScene').innerHTML = '<div class="game-scene-emoji">🌻</div>';
+    $('#srsAsk').textContent = '오늘의 복습을 마쳤어요!';
+    $('#srsKo').textContent = SRS.list.length + '개 중 ' + SRS.ok + '개를 맞혔어요';
+    $('#srsInput').disabled = true;
+    $('#srsInput').value = '';
+    $('#srsAskBtns').hidden = true;
+    $('#srsSelf').hidden = true;
+    bannerShow('#srsBanner', 'good', '맞힌 단어는 더 늦게, 틀린 단어는 내일 다시 만나요 🌱');
+    const next = $('#btnSrsNext');
+    next.hidden = false;
+    next.textContent = '한 번 더 복습 →';
+    sfx.win();
+  }
+
+  /* =========================================================================
+     2) 📖 이야기 빈칸 — 객관식 / 주관식
+     ========================================================================= */
+  const STORY = { list: [], i: 0, mode: 'choice', ok: 0, state: 'ask', picked: '' };
+
+  function cleanDef(en) {
+    let d = String(en || '').trim();
+    if (!d) return '';
+    d = d.charAt(0).toLowerCase() + d.slice(1);
+    if (d.charAt(d.length - 1) === '.') d = d.slice(0, -1);
+    return d;
+  }
+  function fallbackStory(w) {
+    const key = wgNorm(w.word);
+    let d = cleanDef(w.en);
+    if (d && key.length > 3 && d.indexOf(key) !== -1) d = '';   /* 뜻 안에 답이 있으면 빼요 */
+    const tail = d ? ' It means "' + d + '".' : '';
+    if (w.pos === 'verb') return 'In the picture, someone is about to [____].' + tail;
+    if (w.pos === 'adjective') return 'Look at the picture. The thing looks [____].' + tail;
+    return 'The picture shows one thing. The word for it is [____].' + tail;
+  }
+  function storyEntry(w) {
+    const row = STORY_BANK[wgNorm(w.word)];
+    if (row && row[0]) return { text: row[0], topic: row[1] || '' };
+    return { text: fallbackStory(w), topic: '' };
+  }
+
+  function startStory() {
+    if (!guardWords()) { go('home'); return; }
+    const pool = shuffle(activeWords().filter(w => w && w.word && wgWordy(w)));
+    STORY.list = pool.slice(0, Math.min(8, pool.length));
+    STORY.i = 0; STORY.ok = 0; STORY.state = 'ask';
+    const pack = currentPack();
+    const days = hasDays(pack) ? ' · Day ' + state.day : '';
+    $('#storySub').textContent = (pack ? (pack.short || pack.label) : '') + days + ' · 이야기 속 빈칸';
+    renderStory();
+  }
+
+  function renderStory() {
+    const w = STORY.list[STORY.i];
+    if (!w) { storyFinish(); return; }
+    STORY.state = 'ask'; STORY.picked = '';
+    $('#storyProg').textContent = (STORY.i + 1) + ' / ' + STORY.list.length;
+    const entry = storyEntry(w);
+    const html = escapeHTML(entry.text).replace('[____]', '<span class="blank" id="storyBlank">____</span>');
+    $('#storyText').innerHTML = html.indexOf('id="storyBlank"') !== -1 ? html
+      : escapeHTML(entry.text) + ' <span class="blank" id="storyBlank">____</span>';
+    bannerShow('#storyBanner', '', '');
+    const nextBtn = $('#btnStoryNext');
+    nextBtn.hidden = true;
+    nextBtn.textContent = '다음 이야기 →';
+    $('#btnStoryHint').hidden = false;
+    $('#storyHintBox').hidden = true;
+    const cap = (w.scenes && w.scenes[0] && w.scenes[0].cap) ? w.scenes[0].cap : '';
+    $('#storyHintBox').textContent = (w.ko ? '뜻: ' + w.ko : '') + (cap ? (w.ko ? ' · ' : '') + cap : '');
+
+    const wrap = $('#storyChoices');
+    const input = $('#storyInput');
+    const checkBtn = $('#btnStoryCheck');
+    if (STORY.mode === 'choice') {
+      const others = activeWords().filter(x => x.id !== w.id && wgNorm(x.word) !== wgNorm(w.word) && wgWordy(x));
+      const spare = others.length >= 3 ? others : STORY.list.filter(x => x.id !== w.id);
+      const opts = shuffle([w].concat(shuffle(spare).slice(0, 3)));
+      wrap.innerHTML = '';
+      opts.forEach(o => {
+        const b = el('button', 'choice');
+        b.type = 'button';
+        b.dataset.id = o.id;
+        b.textContent = o.word;
+        b.setAttribute('translate', 'no');
+        wrap.appendChild(b);
+      });
+      wrap.hidden = opts.length < 2;
+      input.hidden = true;
+      checkBtn.hidden = true;
+    } else {
+      wrap.innerHTML = '';
+      wrap.hidden = true;
+      input.hidden = false;
+      input.value = '';
+      input.disabled = false;
+      checkBtn.hidden = false;
+      setTimeout(() => { try { input.focus(); } catch (e) {} }, 80);
+    }
+    markEnglish($('#scr-story'));
+    $('#storyChoices').classList.add('game-en');
+  }
+
+  function storyPick(id) {
+    if (STORY.state !== 'ask') return;
+    const w = STORY.list[STORY.i];
+    if (!w) return;
+    STORY.picked = id;
+    storyJudge(w, id === w.id);
+  }
+
+  function storySubmit() {
+    if (STORY.state !== 'ask') return;
+    const w = STORY.list[STORY.i];
+    if (!w) return;
+    const val = $('#storyInput').value;
+    if (!wgNorm(val)) { toast('빈칸에 들어갈 단어를 적어 주세요'); return; }
+    storyJudge(w, wgSame(val, w.word));
+  }
+
+  function storyJudge(w, ok) {
+    STORY.state = 'done';
+    if (ok) {
+      STORY.ok++;
+      srsRecord(w, true);
+      awardWord(w, 20);
+      sfx.good();
+      bannerShow('#storyBanner', 'good', '정답! ⭐ +20 · ' + w.word);
+    } else {
+      srsRecord(w, false);
+      sfx.nope();
+      bannerShow('#storyBanner', 'bad', '아쉬워요! 정답은 "' + w.word + '"예요');
+    }
+    const blank = $('#storyBlank');
+    if (blank) { blank.textContent = w.word; blank.style.borderBottomColor = ok ? '#8fd6a6' : '#ffb3c1'; }
+    $$('#storyChoices .choice').forEach(b => {
+      if (b.dataset.id === w.id) b.classList.add('correct');
+      else if (b.dataset.id === STORY.picked) b.classList.add('wrong');
+    });
+    const inp = $('#storyInput');
+    inp.disabled = true;
+    $('#btnStoryCheck').hidden = true;
+    $('#storyHintBox').hidden = false;
+    $('#btnStoryNext').hidden = false;
+  }
+
+  function storyNext() {
+    if (STORY.state === 'finish') { startStory(); return; }
+    STORY.i++;
+    if (STORY.i >= STORY.list.length) storyFinish();
+    else renderStory();
+  }
+
+  function storyFinish() {
+    STORY.state = 'finish';
+    $('#storyProg').textContent = '완료';
+    $('#storyText').innerHTML = '이야기를 모두 마쳤어요!<br>' + STORY.list.length + '개 중 <b>' + STORY.ok + '</b>개를 맞혔어요.';
+    $('#storyChoices').innerHTML = '';
+    $('#storyChoices').hidden = true;
+    $('#storyInput').hidden = true;
+    $('#btnStoryCheck').hidden = true;
+    $('#btnStoryHint').hidden = true;
+    bannerShow('#storyBanner', 'good', '정답을 맞힌 단어는 복습미션에서도 다시 만나요 🌱');
+    const next = $('#btnStoryNext');
+    next.hidden = false;
+    next.textContent = '한 번 더 →';
+    sfx.win();
+  }
+
+  function storySetMode(mode) {
+    if (mode !== 'choice' && mode !== 'type') return;
+    if (STORY.mode === mode) return;
+    STORY.mode = mode;
+    $$('#storyMode button').forEach(b => b.classList.toggle('on', b.dataset.mode === mode));
+    if (STORY.state === 'finish') { startStory(); return; }
+    if (STORY.list.length) renderStory();
+  }
+  /* =========================================================================
+     3) 🎨 그림으로 말해요 — 같은 기기 2인 · 온라인 방(PeerJS/WebRTC)
+     ========================================================================= */
+  const DRAW_COLORS = ['#2f3a4a', '#e8542f', '#f2b705', '#4fae74', '#3d8bd9', '#a462d6', '#ff8fae', '#8a6642'];
+  const DRAW_SIZES = [3, 6, 12, 22];
+  const PEER_ICE = { config: { iceServers: [
+    { urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'] },
+    { urls: ['stun:global.stun.twilio.com:3478'] }
+  ] } };
+
+  const DRAW = {
+    tab: 'local', roomMode: 'host',
+    strokes: [], cur: null, curId: '', remoteCur: null, pending: [], lastSend: 0,
+    color: '#2f3a4a', size: 6, eraser: false,
+    turn: 1, lscore: [0, 0], score: { host: 0, guest: 0 },
+    secret: null, choices: [], phase: 'draw', answered: false, choicesShown: false,
+    peeked: false, peekTimer: null,
+    net: null, wired: false
+  };
+
+  function dc() { return $('#drawCanvas'); }
+  function dctx() { const c = dc(); return c ? c.getContext('2d') : null; }
+  function drawClearCanvas() {
+    const c = dc(), g = dctx();
+    if (!c || !g) return;
+    g.save(); g.globalCompositeOperation = 'source-over';
+    g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height);
+    g.restore();
+  }
+  function paintStroke(s) {
+    const c = dc(), g = dctx();
+    if (!c || !g || !s || !s.pts || !s.pts.length) return;
+    const k = c.width / 720;
+    g.save();
+    g.lineCap = 'round'; g.lineJoin = 'round';
+    if (s.eraser) { g.globalCompositeOperation = 'destination-out'; g.strokeStyle = '#000'; g.fillStyle = '#000'; }
+    else { g.globalCompositeOperation = 'source-over'; g.strokeStyle = s.color || '#2f3a4a'; g.fillStyle = s.color || '#2f3a4a'; }
+    g.lineWidth = (s.w || 6) * k;
+    if (s.pts.length === 1) {
+      const p = s.pts[0];
+      g.beginPath();
+      g.arc(p[0] * c.width, p[1] * c.height, ((s.w || 6) * k) / 2, 0, Math.PI * 2);
+      g.fill();
+    } else {
+      g.beginPath();
+      g.moveTo(s.pts[0][0] * c.width, s.pts[0][1] * c.height);
+      for (let i = 1; i < s.pts.length; i++) g.lineTo(s.pts[i][0] * c.width, s.pts[i][1] * c.height);
+      g.stroke();
+    }
+    g.restore();
+  }
+  function drawRepaint() {
+    drawClearCanvas();
+    DRAW.strokes.forEach(paintStroke);
+    if (DRAW.remoteCur) paintStroke(DRAW.remoteCur);
+  }
+  function drawPos(ev) {
+    const c = dc(), r = c.getBoundingClientRect();
+    return [clamp((ev.clientX - r.left) / r.width, 0, 1), clamp((ev.clientY - r.top) / r.height, 0, 1)];
+  }
+  function canDrawNow() {
+    if (DRAW.phase !== 'draw') return false;
+    if (DRAW.tab === 'online') {
+      const n = DRAW.net;
+      return !!(n && n.connected && n.iAmDrawer);
+    }
+    return true;
+  }
+  function drawDown(ev) {
+    if (!canDrawNow()) return;
+    ev.preventDefault();
+    const c = dc();
+    try { c.setPointerCapture(ev.pointerId); } catch (e) {}
+    const id = 's' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+    DRAW.curId = id;
+    DRAW.cur = { id: id, color: DRAW.color, w: DRAW.size, eraser: DRAW.eraser, pts: [drawPos(ev)] };
+    DRAW.strokes.push(DRAW.cur);
+    paintStroke(DRAW.cur);
+    if (DRAW.tab === 'online') netSend({ t: 's0', s: { id: id, color: DRAW.cur.color, w: DRAW.cur.w, eraser: DRAW.cur.eraser, pts: DRAW.cur.pts } });
+  }
+  function drawMove(ev) {
+    if (!DRAW.cur) return;
+    ev.preventDefault();
+    const p = drawPos(ev);
+    const last = DRAW.cur.pts[DRAW.cur.pts.length - 1];
+    if (Math.abs(p[0] - last[0]) < 0.0015 && Math.abs(p[1] - last[1]) < 0.0015) return;
+    DRAW.cur.pts.push(p);
+    paintStroke({ color: DRAW.cur.color, w: DRAW.cur.w, eraser: DRAW.cur.eraser, pts: [last, p] });
+    if (DRAW.tab === 'online') { DRAW.pending.push(p); flushPending(false); }
+  }
+  function drawUp() {
+    if (!DRAW.cur) return;
+    if (DRAW.tab === 'online') {
+      flushPending(true);
+      netSend({ t: 's1', id: DRAW.curId });
+    }
+    DRAW.cur = null;
+    DRAW.curId = '';
+  }
+  function flushPending(force) {
+    if (!DRAW.pending.length || !DRAW.curId) return;
+    const now = Date.now();
+    if (!force && now - DRAW.lastSend < 70) return;
+    DRAW.lastSend = now;
+    netSend({ t: 'sp', id: DRAW.curId, pts: DRAW.pending.splice(0, DRAW.pending.length) });
+  }
+  function drawUndo() {
+    if (!canDrawNow()) return;
+    DRAW.strokes.pop();
+    drawRepaint();
+    netSync();
+  }
+  function drawClearBoard() {
+    if (!canDrawNow()) return;
+    DRAW.strokes = [];
+    DRAW.remoteCur = null;
+    drawRepaint();
+    netSync();
+  }
+  function syncToolUI() {
+    $$('#drawTools .swatch').forEach(b => b.classList.toggle('on', !DRAW.eraser && b.dataset.color === DRAW.color));
+    $$('#drawTools .size-btn').forEach(b => b.classList.toggle('on', Number(b.dataset.size) === DRAW.size));
+    const er = $('#btnDrawEraser');
+    if (er) er.classList.toggle('on', DRAW.eraser);
+  }
+  function buildDrawTools() {
+    const box = $('#drawTools');
+    if (!box || box.dataset.built) return;
+    box.dataset.built = '1';
+    box.innerHTML = '';
+    DRAW_COLORS.forEach((col, i) => {
+      const b = el('button', 'swatch' + (i === 0 ? ' on' : ''));
+      b.type = 'button';
+      b.style.background = col;
+      b.dataset.color = col;
+      b.setAttribute('aria-label', '색 ' + col);
+      box.appendChild(b);
+    });
+    DRAW_SIZES.forEach(s => {
+      const b = el('button', 'size-btn' + (s === DRAW.size ? ' on' : ''));
+      b.type = 'button';
+      b.dataset.size = String(s);
+      const dot = Math.min(18, 4 + s);
+      b.innerHTML = '<i style="width:' + dot + 'px;height:' + dot + 'px"></i>';
+      box.appendChild(b);
+    });
+    const er = el('button', 'tool-btn', '🧽 지우개'); er.type = 'button'; er.id = 'btnDrawEraser';
+    const un = el('button', 'tool-btn', '↩ 되돌리기'); un.type = 'button'; un.id = 'btnDrawUndo';
+    const cl = el('button', 'tool-btn', '🗑 전체'); cl.type = 'button'; cl.id = 'btnDrawClear';
+    box.appendChild(er); box.appendChild(un); box.appendChild(cl);
+  }
+
+  function drawMakeChoices(w) {
+    if (!w) return [];
+    const others = activeWords().filter(x => x.id !== w.id && wgNorm(x.word) !== wgNorm(w.word) && wgWordy(x));
+    return shuffle([w].concat(shuffle(others).slice(0, 3)));
+  }
+  function startDraw() {
+    if (!guardWords()) { go('home'); return; }
+    buildDrawTools();
+    if (!DRAW.wired) {
+      DRAW.wired = true;
+      const c = dc();
+      if (c) {
+        c.addEventListener('pointerdown', drawDown);
+        c.addEventListener('pointermove', drawMove);
+        c.addEventListener('pointerup', drawUp);
+        c.addEventListener('pointercancel', drawUp);
+      }
+    }
+    if (DRAW.tab === 'local') drawLocalNew();
+    else updateDraw();
+  }
+  function drawLocalNew() {
+    DRAW.secret = wgPickWord();
+    DRAW.choices = drawMakeChoices(DRAW.secret).map(x => ({ id: x.id, word: x.word }));
+    DRAW.phase = 'draw'; DRAW.answered = false; DRAW.choicesShown = false;
+    DRAW.strokes = []; DRAW.remoteCur = null; DRAW.cur = null;
+    clearPeek();
+    drawRepaint();
+    $('#drawGuess').hidden = true;
+    updateDraw();
+  }
+  function updateDraw() {
+    const online = DRAW.tab === 'online';
+    const n = DRAW.net;
+    const connected = !!(n && n.connected);
+    const iAmDrawer = online ? !!(connected && n.iAmDrawer) : true;
+    const showGuess = online ? (connected && (DRAW.phase === 'guess' || DRAW.phase === 'done') && !n.iAmDrawer)
+                             : (DRAW.phase === 'guess' || DRAW.phase === 'done');
+    $('#drawRoom').hidden = !online;
+
+    let who;
+    if (!online) {
+      const p = DRAW.turn === 1 ? '1번' : '2번';
+      who = DRAW.phase === 'draw' ? p + ' 친구가 그려요' : (DRAW.phase === 'done' ? '라운드 끝!' : p + ' 친구가 맞혀요');
+    } else if (!connected) {
+      who = '친구를 기다리는 중';
+    } else {
+      who = n.iAmDrawer ? (DRAW.phase === 'draw' ? '내가 그려요' : '친구가 맞히는 중…') : (DRAW.phase === 'draw' ? '친구가 그려요' : '내가 맞혀요');
+    }
+    $('#drawWho').textContent = who;
+
+    const drawing = iAmDrawer && DRAW.phase === 'draw';
+    const tools = $('#drawTools');
+    if (tools) tools.hidden = !drawing;
+    $('#btnDrawPeek').hidden = !drawing;
+    $('#btnDrawDone').hidden = !drawing;
+    if (!drawing) clearPeek();
+    $('#drawGuess').hidden = !showGuess;
+    if (showGuess && !DRAW.choicesShown) openGuessPanel();
+
+    const myScore = online ? (n && n.role === 'host' ? DRAW.score.host : DRAW.score.guest) : 0;
+    const otherScore = online ? (n && n.role === 'host' ? DRAW.score.guest : DRAW.score.host) : 0;
+    $('#drawScore').textContent = online
+      ? ('나 ' + myScore + ' · 친구 ' + otherScore)
+      : ('1번 ' + DRAW.lscore[0] + ' · 2번 ' + DRAW.lscore[1]);
+    $('#drawSub').textContent = online ? '친구와 실시간으로 그림 퀴즈' : '같은 폰으로 번갈아 놀아요';
+    if (online && connected && !n.iAmDrawer) $('#btnDrawNext').hidden = true;
+    $('#drawNote').textContent = online
+      ? '방 코드는 친구에게만 알려 주세요 · 두 기기가 같은 와이파이면 가장 잘 연결돼요'
+      : '그리는 사람만 단어를 보고, 맞히는 사람은 그림만 봐요';
+  }
+  function openGuessPanel() {
+    const wrap = $('#drawChoices');
+    wrap.innerHTML = '';
+    (DRAW.choices || []).forEach(c => {
+      const b = el('button', 'choice');
+      b.type = 'button';
+      b.dataset.word = c.word;
+      b.textContent = c.word;
+      b.setAttribute('translate', 'no');
+      wrap.appendChild(b);
+    });
+    wrap.hidden = (DRAW.choices || []).length < 2;
+    const inp = $('#drawGuessIn');
+    inp.value = ''; inp.disabled = false;
+    $('#btnDrawGuess').hidden = false;
+    $('#btnDrawSkip').hidden = false;
+    $('#btnDrawNext').hidden = true;
+    bannerShow('#drawBanner', '', '');
+    DRAW.choicesShown = true;
+    DRAW.answered = false;
+    markEnglish($('#scr-draw'));
+    setTimeout(() => { if (!$('#drawGuess').hidden) { try { inp.focus(); } catch (e) {} } }, 100);
+  }
+  function drawPeekToggle() {
+    const w = DRAW.secret;
+    if (!w) { toast('지금은 단어를 볼 수 없어요'); return; }
+    const box = $('#drawSecret');
+    if (DRAW.peeked) { clearPeek(); return; }
+    DRAW.peeked = true;
+    box.hidden = false;
+    box.textContent = w.word;
+    $('#btnDrawPeek').textContent = '🙈 단어 숨기기';
+    clearTimeout(DRAW.peekTimer);
+    DRAW.peekTimer = setTimeout(clearPeek, 4000);
+    sfx.pick();
+  }
+  function clearPeek() {
+    clearTimeout(DRAW.peekTimer);
+    DRAW.peeked = false;
+    const box = $('#drawSecret');
+    if (box) { box.hidden = true; box.textContent = ''; }
+    const btn = $('#btnDrawPeek');
+    if (btn) btn.textContent = '🔒 단어 보기';
+  }
+  function drawDone() {
+    if (!canDrawNow()) return;
+    DRAW.phase = 'guess';
+    DRAW.choicesShown = false;
+    clearPeek();
+    if (DRAW.tab === 'online') netSend({ t: 'phase', phase: 'guess' });
+    updateDraw();
+  }
+  function drawTry(text) {
+    const val = String(text == null ? '' : text);
+    if (!wgNorm(val)) { toast('단어를 적어 주세요'); return; }
+    if (DRAW.tab === 'online') {
+      const n = DRAW.net;
+      if (!n || !n.connected) { toast('친구와 연결되지 않았어요'); return; }
+      netSend({ t: 'guess', text: val });
+      $('#drawGuessIn').value = '';
+      return;
+    }
+    if (DRAW.phase !== 'guess' || DRAW.answered) return;
+    const w = DRAW.secret;
+    if (!w) return;
+    if (wgSame(val, w.word)) {
+      DRAW.answered = true;
+      DRAW.phase = 'done';
+      DRAW.lscore[DRAW.turn === 1 ? 1 : 0]++;
+      awardWord(w, 20);
+      srsRecord(w, true);
+      sfx.good();
+      bannerShow('#drawBanner', 'good', '정답! "' + w.word + '" ⭐ +20');
+      $$('#drawChoices .choice').forEach(b => { if (wgSame(b.dataset.word, w.word)) b.classList.add('correct'); });
+      $('#drawGuessIn').disabled = true;
+      $('#btnDrawGuess').hidden = true;
+      $('#btnDrawSkip').hidden = true;
+      $('#btnDrawNext').hidden = false;
+      updateDraw();
+    } else {
+      sfx.nope();
+      bannerShow('#drawBanner', 'bad', '"' + val + '" 아니에요. 다시 맞혀 보세요!');
+      $('#drawGuessIn').value = '';
+    }
+  }
+  function drawReveal() {
+    if (DRAW.tab === 'online') {
+      const n = DRAW.net;
+      if (n && n.connected) netSend({ t: 'skip' });
+      return;
+    }
+    if (DRAW.phase !== 'guess') return;
+    const w = DRAW.secret;
+    if (!w) return;
+    DRAW.answered = true;
+    DRAW.phase = 'done';
+    srsRecord(w, false);
+    bannerShow('#drawBanner', 'plain', '정답은 "' + w.word + '"였어요');
+    $$('#drawChoices .choice').forEach(b => { if (wgSame(b.dataset.word, w.word)) b.classList.add('correct'); });
+    $('#drawGuessIn').disabled = true;
+    $('#btnDrawGuess').hidden = true;
+    $('#btnDrawSkip').hidden = true;
+    $('#btnDrawNext').hidden = false;
+    updateDraw();
+  }
+  function drawNextRound() {
+    if (DRAW.tab === 'online') {
+      const n = DRAW.net;
+      if (!n || !n.connected) { toast('친구와 연결되지 않았어요'); return; }
+      if (!n.iAmDrawer) { toast('그리는 친구가 다음 라운드를 시작해요'); return; }
+      const other = n.role === 'host' ? 'guest' : 'host';
+      netSend({ t: 'next', drawer: other });
+      onlineBegin(other);
+      return;
+    }
+    DRAW.turn = DRAW.turn === 1 ? 2 : 1;
+    drawLocalNew();
+  }
+
+  /* ---------- online room (PeerJS) ---------- */
+  let peerLoader = null;
+  function loadPeerLib() {
+    if (window.Peer) return Promise.resolve(window.Peer);
+    if (peerLoader) return peerLoader;
+    const urls = [
+      'https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js',
+      'https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js'
+    ];
+    peerLoader = new Promise((resolve, reject) => {
+      let i = 0;
+      const tryNext = () => {
+        if (i >= urls.length) { reject(new Error('peer-load')); return; }
+        const s = document.createElement('script');
+        s.src = urls[i++];
+        s.async = true;
+        s.onload = () => { if (window.Peer) resolve(window.Peer); else tryNext(); };
+        s.onerror = () => { s.remove(); tryNext(); };
+        document.head.appendChild(s);
+      };
+      tryNext();
+    });
+    return peerLoader;
+  }
+  function olStatus(text, isErr) {
+    const n = $('#drawStatus');
+    if (!n) return;
+    n.textContent = text;
+    n.classList.toggle('err', !!isErr);
+  }
+  function netSend(obj) {
+    const n = DRAW.net;
+    if (!n || !n.conn || !n.conn.open) return;
+    try { n.conn.send(obj); } catch (e) {}
+  }
+  function netSync() {
+    if (DRAW.tab !== 'online') return;
+    netSend({ t: 'sync', strokes: DRAW.strokes });
+  }
+  function closeNet() {
+    const n = DRAW.net;
+    DRAW.net = null;
+    if (!n) return;
+    try { if (n.conn) n.conn.close(); } catch (e) {}
+    try { if (n.peer) n.peer.destroy(); } catch (e) {}
+    const code = $('#drawCode');
+    if (code) code.hidden = true;
+  }
+  function leaveDraw() {
+    closeNet();
+    clearPeek();
+  }
+  function peerError(err) {
+    const t = (err && err.type) || '';
+    let msg = '연결에 문제가 생겼어요. 다시 시도해 주세요.';
+    if (t === 'peer-unavailable') msg = '그 코드의 방을 찾을 수 없어요. 코드를 다시 확인해 주세요.';
+    else if (t === 'unavailable-id') msg = '방 코드가 겹쳤어요. 방을 다시 만들어 주세요.';
+    else if (t === 'network' || t === 'server-error') msg = '연결 서버에 닿지 못했어요. 잠시 뒤 다시 시도해 주세요.';
+    else if (t === 'browser-incompatible') msg = '이 브라우저에서는 실시간 방을 쓸 수 없어요. 같은 기기 2인 모드로 놀아 주세요.';
+    else if (t === 'webrtc') msg = '두 기기 사이 연결에 실패했어요. 같은 와이파이에서 다시 해 보세요.';
+    else if (err && err.message) msg = '연결 오류: ' + err.message;
+    olStatus(msg, true);
+  }
+  function bindConn(c) {
+    const n = DRAW.net;
+    if (!n) { try { c.close(); } catch (e) {} return; }
+    n.conn = c;
+    c.on('open', () => {
+      const cur = DRAW.net;
+      if (!cur) return;
+      cur.connected = true;
+      olStatus('친구와 연결됐어요!');
+      if (cur.role === 'host') {
+        netSend({ t: 'hello' });
+        onlineBegin('host');
+      }
+    });
+    c.on('data', netOnData);
+    c.on('close', () => {
+      const cur = DRAW.net;
+      if (!cur) return;
+      cur.connected = false;
+      olStatus('친구와의 연결이 끊겼어요. 코드로 다시 들어와 주세요.', true);
+      updateDraw();
+    });
+    c.on('error', () => {
+      const cur = DRAW.net;
+      if (cur) cur.connected = false;
+      olStatus('연결에 문제가 생겼어요. 다시 시도해 주세요.', true);
+    });
+  }
+  async function onlineHost() {
+    olStatus('방을 만드는 중…');
+    let Peer;
+    try { Peer = await loadPeerLib(); }
+    catch (e) { olStatus('연결 도구를 불러오지 못했어요. 인터넷 연결을 확인해 주세요.', true); return; }
+    closeNet();
+    const code = String(Math.floor(1000 + Math.random() * 9000));
+    let peer;
+    try { peer = new Peer('wordgarden-' + code, PEER_ICE); }
+    catch (e) { olStatus('방을 만들지 못했어요. 다시 시도해 주세요.', true); return; }
+    DRAW.net = { peer: peer, conn: null, code: code, role: 'host', connected: false, iAmDrawer: true, drawerRole: 'host' };
+    $('#drawCode').hidden = false;
+    $('#drawCode').textContent = code;
+    olStatus('방 코드를 만드는 중…');
+    peer.on('open', () => {
+      olStatus('방 코드 ' + code + ' · 친구가 이 코드로 들어와요');
+    });
+    peer.on('connection', (c) => {
+      const n = DRAW.net;
+      if (!n) { try { c.close(); } catch (e) {} return; }
+      if (n.conn && n.conn.open) { try { c.close(); } catch (e) {} return; }
+      bindConn(c);
+    });
+    peer.on('error', peerError);
+    peer.on('disconnected', () => {
+      olStatus('연결이 잠시 끊겼어요. 다시 연결하는 중…');
+      try { peer.reconnect(); } catch (e) {}
+    });
+  }
+  async function onlineJoin() {
+    const raw = ($('#drawCodeIn') ? $('#drawCodeIn').value : '') || '';
+    const code = raw.replace(/[^0-9]/g, '').slice(0, 4);
+    if (code.length !== 4) { toast('방 코드 4자리를 넣어 주세요'); return; }
+    olStatus('방에 들어가는 중…');
+    let Peer;
+    try { Peer = await loadPeerLib(); }
+    catch (e) { olStatus('연결 도구를 불러오지 못했어요. 인터넷 연결을 확인해 주세요.', true); return; }
+    closeNet();
+    let peer;
+    try { peer = new Peer(undefined, PEER_ICE); }
+    catch (e) { olStatus('연결을 시작하지 못했어요. 다시 시도해 주세요.', true); return; }
+    DRAW.net = { peer: peer, conn: null, code: code, role: 'guest', connected: false, iAmDrawer: false, drawerRole: 'host' };
+    peer.on('open', () => {
+      const c = peer.connect('wordgarden-' + code, { reliable: true });
+      bindConn(c);
+      setTimeout(() => {
+        const n = DRAW.net;
+        if (n && n.peer === peer && !n.connected) {
+          olStatus('연결되지 않았어요. 코드를 확인해 주세요. (회사·학교 와이파이는 연결이 막힐 수 있어요)', true);
+        }
+      }, 12000);
+    });
+    peer.on('error', peerError);
+  }
+  function onlineBegin(drawer) {
+    const n = DRAW.net;
+    if (!n) return;
+    n.drawerRole = drawer;
+    n.iAmDrawer = (n.role === drawer);
+    DRAW.phase = 'draw';
+    DRAW.answered = false;
+    DRAW.choicesShown = false;
+    DRAW.strokes = [];
+    DRAW.remoteCur = null;
+    DRAW.cur = null;
+    DRAW.choices = [];
+    clearPeek();
+    drawRepaint();
+    $('#drawGuess').hidden = true;
+    if (n.iAmDrawer) {
+      DRAW.secret = wgPickWord();
+      const cs = drawMakeChoices(DRAW.secret).map(x => ({ id: x.id, word: x.word }));
+      DRAW.choices = cs;
+      netSend({ t: 'start', drawer: drawer, choices: cs.map(c => c.word) });
+    } else {
+      DRAW.secret = null;
+    }
+    updateDraw();
+  }
+  function netOnData(m) {
+    if (!m || !m.t) return;
+    const n = DRAW.net;
+    if (!n) return;
+    switch (m.t) {
+      case 'hello':
+        n.connected = true;
+        break;
+      case 'start':
+        n.connected = true;
+        if (m.drawer) { n.drawerRole = m.drawer; n.iAmDrawer = (n.role === m.drawer); }
+        DRAW.choices = (m.choices || []).map(w => ({ id: '', word: w }));
+        DRAW.secret = null;
+        DRAW.phase = 'draw';
+        DRAW.answered = false;
+        DRAW.choicesShown = false;
+        DRAW.strokes = [];
+        DRAW.remoteCur = null;
+        drawRepaint();
+        olStatus(n.iAmDrawer ? '내가 그릴 차례예요!' : '친구가 그리는 중…');
+        updateDraw();
+        break;
+      case 's0':
+        if (m.s) {
+          DRAW.remoteCur = { id: m.s.id, color: m.s.color, w: m.s.w, eraser: m.s.eraser, pts: (m.s.pts || []).slice() };
+          paintStroke(DRAW.remoteCur);
+        }
+        break;
+      case 'sp': {
+        const rc = DRAW.remoteCur;
+        if (!rc || rc.id !== m.id) {
+          DRAW.remoteCur = { id: m.id, color: '#2f3a4a', w: 6, pts: (m.pts || []).slice() };
+          paintStroke(DRAW.remoteCur);
+        } else {
+          const from = rc.pts[rc.pts.length - 1];
+          (m.pts || []).forEach(p => rc.pts.push(p));
+          paintStroke({ color: rc.color, w: rc.w, eraser: rc.eraser, pts: [from].concat(m.pts || []) });
+        }
+        break;
+      }
+      case 's1':
+        if (DRAW.remoteCur && DRAW.remoteCur.id === m.id) {
+          DRAW.strokes.push(DRAW.remoteCur);
+          DRAW.remoteCur = null;
+        }
+        break;
+      case 'sync':
+        DRAW.strokes = Array.isArray(m.strokes) ? m.strokes : [];
+        DRAW.remoteCur = null;
+        drawRepaint();
+        break;
+      case 'phase':
+        if (m.phase === 'guess') {
+          DRAW.phase = 'guess';
+          DRAW.choicesShown = false;
+          updateDraw();
+        }
+        break;
+      case 'guess': {
+        if (!n.iAmDrawer) break;
+        const w = DRAW.secret;
+        if (!w) break;
+        if (wgSame(m.text, w.word)) {
+          DRAW.phase = 'done';
+          DRAW.answered = true;
+          const other = n.role === 'host' ? 'guest' : 'host';
+          DRAW.score[other] = (DRAW.score[other] || 0) + 1;
+          awardWord(w, 20);
+          srsRecord(w, true);
+          sfx.good();
+          netSend({ t: 'result', ok: true, answer: w.word, score: DRAW.score });
+          bannerShow('#drawBanner', 'good', '정답! "' + w.word + '" ⭐ +20');
+          $('#btnDrawNext').hidden = false;
+          updateDraw();
+        } else {
+          netSend({ t: 'no', text: m.text });
+          olStatus('"' + m.text + '" 아니래요. 친구가 다시 맞혀 봐요');
+        }
+        break;
+      }
+      case 'no':
+        bannerShow('#drawBanner', 'bad', '"' + (m.text || '') + '" 아니래요. 다시 맞혀 보세요!');
+        break;
+      case 'skip':
+        if (n.iAmDrawer && DRAW.secret) {
+          DRAW.phase = 'done';
+          DRAW.answered = true;
+          srsRecord(DRAW.secret, false);
+          netSend({ t: 'result', ok: false, answer: DRAW.secret.word, score: DRAW.score });
+          bannerShow('#drawBanner', 'plain', '정답은 "' + DRAW.secret.word + '"였어요');
+          $('#btnDrawNext').hidden = false;
+          updateDraw();
+        }
+        break;
+      case 'result':
+        if (m.score) DRAW.score = m.score;
+        DRAW.phase = 'done';
+        DRAW.answered = true;
+        bannerShow('#drawBanner', m.ok ? 'good' : 'plain', m.ok ? '정답! "' + m.answer + '" ⭐ +20' : '정답은 "' + m.answer + '"였어요');
+        $('#drawGuessIn').disabled = true;
+        $('#btnDrawGuess').hidden = true;
+        $('#btnDrawSkip').hidden = true;
+        $('#btnDrawNext').hidden = false;
+        updateDraw();
+        break;
+      case 'next':
+        onlineBegin(m.drawer || 'host');
+        break;
+      case 'bye':
+        n.connected = false;
+        olStatus('친구가 방을 나갔어요.', true);
+        updateDraw();
+        break;
+    }
+  }
+  /* =========================================================================
+     4) 🕵️ 단어 추리 — 스무고개 행맨
+     ========================================================================= */
+  const HANG = {
+    mode: 'ai', word: '', topic: '', hint: '', riddle: '',
+    letters: {}, chances: 20, over: false, log: [], w: null
+  };
+
+  function hangLetters(word) { return (String(word).match(/[a-zA-Z]/g) || []).length; }
+  function hangCount(word, ch) {
+    const hits = String(word).toLowerCase().match(new RegExp(ch, 'g'));
+    return hits ? hits.length : 0;
+  }
+  function hangHas(ch) { return Object.prototype.hasOwnProperty.call(HANG.letters, ch); }
+  function hangPickPool() {
+    return activeWords().filter(w => {
+      const k = wgNorm(w.word);
+      return k.replace(/[^a-z]/g, '').length >= 3 && /^[a-z' -]+$/.test(k);
+    });
+  }
+  function startHang() {
+    if (HANG.mode === 'two') { renderHangSetup(); return; }
+    hangNewAi();
+  }
+  function hangNewAi() {
+    if (!guardWords()) { go('home'); return; }
+    const pool = hangPickPool();
+    if (!pool.length) { toast('추리할 수 있는 단어가 이 팩에 없어요'); go('home'); return; }
+    const w = pool[Math.floor(Math.random() * pool.length)];
+    const row = STORY_BANK[wgNorm(w.word)];
+    const topic = (row && row[1]) || wgPos(w.pos);
+    $('#hangSub').textContent = '자동 출제 · 20번의 기회';
+    hangBegin(w.word, topic, w, '');
+  }
+  function renderHangSetup() {
+    $('#hangSetup').hidden = false;
+    $('#hangPlay').hidden = true;
+    $('#hangSub').textContent = '2인 대결 · 출제자와 풀이자';
+    const w = $('#hangInWord'), h = $('#hangInHint');
+    if (w) w.value = '';
+    if (h) h.value = '';
+    setTimeout(() => { try { if (w) w.focus(); } catch (e) {} }, 80);
+  }
+  function hangSetupStart() {
+    const word = ($('#hangInWord') ? $('#hangInWord').value : '').trim();
+    const hint = ($('#hangInHint') ? $('#hangInHint').value : '').trim();
+    if (!/[a-zA-Z]{2,}/.test(word)) { toast('영어 단어를 두 글자 이상 넣어 주세요'); return; }
+    $('#hangSub').textContent = '2인 대결 · 풀이자 차례';
+    hangBegin(word, hint || '낱말', null, hint);
+  }
+  function hangBegin(word, topic, w, hint) {
+    HANG.word = String(word);
+    HANG.topic = topic || '낱말';
+    HANG.hint = hint || '';
+    HANG.letters = {};
+    HANG.chances = 20;
+    HANG.over = false;
+    HANG.log = [];
+    HANG.w = w || null;
+    const n = hangLetters(HANG.word);
+    HANG.riddle = '저는 ' + HANG.topic + '입니다. ' + n + '개의 알파벳으로 되어 있어요. 기회는 20번 주어집니다.';
+    $('#hangSetup').hidden = true;
+    $('#hangPlay').hidden = false;
+    $('#hangHintBox').hidden = true;
+    $('#hangHintBox').innerHTML = '';
+    const log = $('#hangLog');
+    if (log) log.innerHTML = '';
+    const gi = $('#hangGuessIn');
+    if (gi) { gi.value = ''; gi.disabled = false; }
+    const bg = $('#btnHangGuess');
+    if (bg) bg.disabled = false;
+    $('#btnHangNext').hidden = true;
+    hangLogAdd({ k: 'sys', t: HANG.riddle });
+    renderHang();
+  }
+  function renderHang() {
+    $('#hangRiddle').textContent = HANG.riddle || '';
+    $('#hangChances').textContent = '기회 ' + Math.max(0, HANG.chances);
+    renderHangBlanks();
+    const keys = $('#hangKeys');
+    if (keys && !keys.dataset.built) {
+      keys.dataset.built = '1';
+      keys.innerHTML = '';
+      'abcdefghijklmnopqrstuvwxyz'.split('').forEach(ch => {
+        const b = el('button', '', ch);
+        b.type = 'button';
+        b.dataset.ch = ch;
+        keys.appendChild(b);
+      });
+    }
+    $$('#hangKeys button').forEach(b => {
+      const ch = b.dataset.ch;
+      const asked = hangHas(ch);
+      b.classList.toggle('hit', asked && HANG.letters[ch] > 0);
+      b.classList.toggle('miss', asked && HANG.letters[ch] === 0);
+      b.disabled = asked || HANG.over;
+    });
+  }
+  function renderHangBlanks() {
+    const box = $('#hangBlanks');
+    if (!box) return;
+    box.innerHTML = '';
+    String(HANG.word).split('').forEach(ch => {
+      const b = document.createElement('span');
+      b.className = 'b';
+      if (ch === ' ') { b.className += ' space'; }
+      else if (!/[a-zA-Z]/.test(ch)) { b.className += ' dash'; b.textContent = ch; }
+      else {
+        const low = ch.toLowerCase();
+        const known = hangHas(low) && HANG.letters[low] > 0;
+        b.textContent = known ? low : '';
+        if (known) b.className += ' done';
+      }
+      box.appendChild(b);
+    });
+  }
+  function hangLogAdd(m) {
+    HANG.log.push(m);
+    const box = $('#hangLog');
+    if (!box) return;
+    const n = el('div', 'm' + (m.k === 'me' ? ' me' : m.k === 'ok' ? ' ok' : m.k === 'no' ? ' no' : ''));
+    n.textContent = m.t;
+    box.appendChild(n);
+    box.scrollTop = box.scrollHeight;
+  }
+  function hangSolved() {
+    return String(HANG.word).split('').every(ch => {
+      if (!/[a-zA-Z]/.test(ch)) return true;
+      const low = ch.toLowerCase();
+      return hangHas(low) && HANG.letters[low] > 0;
+    });
+  }
+  function hangAsk(ch) {
+    if (HANG.over) return;
+    ch = String(ch || '').toLowerCase().slice(0, 1);
+    if (!/[a-z]/.test(ch)) return;
+    if (hangHas(ch)) {
+      hangLogAdd({ k: 'me', t: ch });
+      hangLogAdd({ k: 'sys', t: ch + '는 이미 물어봤어요.' });
+      return;
+    }
+    const n = hangCount(HANG.word, ch);
+    HANG.letters[ch] = n;
+    hangLogAdd({ k: 'me', t: ch });
+    if (n > 0) {
+      hangLogAdd({ k: 'ok', t: ch + ' — ' + n + '개 있습니다!' });
+      sfx.pick();
+    } else {
+      HANG.chances--;
+      hangLogAdd({ k: 'no', t: ch + '는 없어요 (남은 기회 ' + Math.max(0, HANG.chances) + '번)' });
+      sfx.nope();
+    }
+    renderHang();
+    if (hangSolved()) hangWin();
+    else if (HANG.chances <= 0) hangLose();
+  }
+  function hangGuessWhole() {
+    if (HANG.over) return;
+    const val = $('#hangGuessIn') ? $('#hangGuessIn').value : '';
+    if (!wgNorm(val)) { toast('단어를 적어 주세요'); return; }
+    hangLogAdd({ k: 'me', t: val });
+    if ($('#hangGuessIn')) $('#hangGuessIn').value = '';
+    if (wgSame(val, HANG.word)) { hangWin(); return; }
+    HANG.chances--;
+    hangLogAdd({ k: 'no', t: '"' + val + '" 아니에요. 남은 기회 ' + Math.max(0, HANG.chances) + '번' });
+    renderHang();
+    if (HANG.chances <= 0) hangLose();
+  }
+  function hangWin() {
+    HANG.over = true;
+    hangLogAdd({ k: 'ok', t: '정답이에요! 🎉 ' + String(HANG.word).toLowerCase() });
+    sfx.win();
+    if (HANG.w) { awardWord(HANG.w, 30); srsRecord(HANG.w, true); }
+    else { state.score += 30; saveScore(); refreshChrome(); }
+    $('#btnHangNext').hidden = false;
+    if ($('#hangGuessIn')) $('#hangGuessIn').disabled = true;
+    if ($('#btnHangGuess')) $('#btnHangGuess').disabled = true;
+    renderHang();
+  }
+  function hangLose() {
+    HANG.over = true;
+    hangLogAdd({ k: 'no', t: '기회를 다 썼어요. 정답은 "' + String(HANG.word).toLowerCase() + '"이었어요.' });
+    sfx.nope();
+    if (HANG.w) srsRecord(HANG.w, false);
+    $('#btnHangNext').hidden = false;
+    if ($('#hangGuessIn')) $('#hangGuessIn').disabled = true;
+    if ($('#btnHangGuess')) $('#btnHangGuess').disabled = true;
+    renderHang();
+  }
+  function hangNextQ() {
+    if (HANG.mode === 'two') { renderHangSetup(); return; }
+    hangNewAi();
+  }
+  function hangShowPic() {
+    const box = $('#hangHintBox');
+    if (!box) return;
+    if (HANG.w) {
+      box.innerHTML = '<div class="pic">' + wgScene(HANG.w) + '</div><span>그림을 보고 떠올려 보세요</span>';
+    } else {
+      box.innerHTML = '<span>이번 문제는 그림 힌트가 없어요</span>';
+    }
+    box.hidden = false;
+  }
+  function hangShowKo() {
+    const box = $('#hangHintBox');
+    if (!box) return;
+    const ko = HANG.w && HANG.w.ko ? HANG.w.ko : '';
+    const bits = [];
+    if (ko) bits.push('뜻: ' + escapeHTML(ko));
+    if (HANG.hint && HANG.hint !== HANG.topic) bits.push('힌트: ' + escapeHTML(HANG.hint));
+    box.innerHTML = '<span>' + (bits.length ? bits.join(' · ') : '이번 문제는 뜻 힌트가 없어요') + '</span>';
+    box.hidden = false;
+  }
+
+  /* ---------- home cards ---------- */
+  function renderPlayModes() {
+    const n = srsDueCount();
+    const t = $('#playSrs');
+    if (t) t.textContent = n ? ('오늘 복습 ' + n + '개 준비됐어요') : '틀린 단어 다시 만나기';
+  }
+
+  /* ---------- wiring ---------- */
+  function initGames() {
+    $('#btnSrsCheck').addEventListener('click', srsCheck);
+    $('#btnSrsShow').addEventListener('click', srsReveal);
+    $('#btnSrsHit').addEventListener('click', () => srsSelf(true));
+    $('#btnSrsMiss').addEventListener('click', () => srsSelf(false));
+    $('#btnSrsNext').addEventListener('click', () => {
+      if (SRS.state === 'finish') startSrs();
+      else srsNext();
+    });
+    $('#srsInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); srsCheck(); }
+    });
+
+    $('#storyMode').addEventListener('click', (ev) => {
+      const b = ev.target.closest('button[data-mode]');
+      if (b) storySetMode(b.dataset.mode);
+    });
+    $('#storyChoices').addEventListener('click', (ev) => {
+      const b = ev.target.closest('.choice');
+      if (b && b.dataset.id) storyPick(b.dataset.id);
+    });
+    $('#btnStoryCheck').addEventListener('click', storySubmit);
+    $('#storyInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); storySubmit(); }
+    });
+    $('#btnStoryHint').addEventListener('click', () => {
+      const box = $('#storyHintBox');
+      box.hidden = !box.hidden;
+    });
+    $('#btnStoryNext').addEventListener('click', storyNext);
+
+    $('#drawTabs').addEventListener('click', (ev) => {
+      const b = ev.target.closest('button[data-tab]');
+      if (!b || b.dataset.tab === DRAW.tab) return;
+      DRAW.tab = b.dataset.tab;
+      $$('#drawTabs button').forEach(x => x.classList.toggle('on', x.dataset.tab === DRAW.tab));
+      $('#drawGuess').hidden = true;
+      $('#drawRoom').hidden = DRAW.tab !== 'online';
+      if (DRAW.tab === 'local') {
+        leaveDraw();
+        DRAW.phase = 'draw';
+        drawLocalNew();
+      } else {
+        DRAW.phase = 'draw';
+        olStatus('방을 만들거나, 친구가 알려 준 코드로 들어가요.');
+        updateDraw();
+      }
+    });
+    $('#drawRoomMode').addEventListener('click', (ev) => {
+      const b = ev.target.closest('button[data-room]');
+      if (!b) return;
+      DRAW.roomMode = b.dataset.room;
+      $$('#drawRoomMode button').forEach(x => x.classList.toggle('on', x.dataset.room === DRAW.roomMode));
+      const isHost = DRAW.roomMode === 'host';
+      $('#drawCodeIn').hidden = isHost;
+      $('#btnDrawJoin').hidden = isHost;
+      if (isHost) {
+        onlineHost();
+      } else {
+        olStatus('친구가 알려 준 4자리 코드를 넣어 주세요.');
+        setTimeout(() => { try { $('#drawCodeIn').focus(); } catch (e) {} }, 60);
+      }
+    });
+    $('#btnDrawJoin').addEventListener('click', onlineJoin);
+    $('#drawCodeIn').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); onlineJoin(); }
+    });
+    $('#btnDrawPeek').addEventListener('click', drawPeekToggle);
+    $('#btnDrawDone').addEventListener('click', drawDone);
+    $('#btnDrawGuess').addEventListener('click', () => drawTry($('#drawGuessIn').value));
+    $('#drawGuessIn').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); drawTry($('#drawGuessIn').value); }
+    });
+    $('#drawChoices').addEventListener('click', (ev) => {
+      const b = ev.target.closest('.choice');
+      if (b) drawTry(b.dataset.word);
+    });
+    $('#btnDrawSkip').addEventListener('click', drawReveal);
+    $('#btnDrawNext').addEventListener('click', drawNextRound);
+    $('#drawTools').addEventListener('click', (ev) => {
+      const sw = ev.target.closest('.swatch');
+      if (sw) { DRAW.color = sw.dataset.color; DRAW.eraser = false; syncToolUI(); return; }
+      const sz = ev.target.closest('.size-btn');
+      if (sz) { DRAW.size = Number(sz.dataset.size) || 6; syncToolUI(); return; }
+      const t = ev.target.closest('.tool-btn');
+      if (!t) return;
+      if (t.id === 'btnDrawEraser') { DRAW.eraser = !DRAW.eraser; syncToolUI(); }
+      else if (t.id === 'btnDrawUndo') drawUndo();
+      else if (t.id === 'btnDrawClear') drawClearBoard();
+    });
+
+    $('#hangMode').addEventListener('click', (ev) => {
+      const b = ev.target.closest('button[data-hmode]');
+      if (!b) return;
+      HANG.mode = b.dataset.hmode;
+      $$('#hangMode button').forEach(x => x.classList.toggle('on', x.dataset.hmode === HANG.mode));
+      if (HANG.mode === 'two') renderHangSetup();
+      else hangNewAi();
+    });
+    $('#hangKeys').addEventListener('click', (ev) => {
+      const b = ev.target.closest('button[data-ch]');
+      if (b) hangAsk(b.dataset.ch);
+    });
+    $('#btnHangGuess').addEventListener('click', hangGuessWhole);
+    $('#hangGuessIn').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); hangGuessWhole(); }
+    });
+    $('#btnHangPic').addEventListener('click', hangShowPic);
+    $('#btnHangKo').addEventListener('click', hangShowKo);
+    $('#btnHangNext').addEventListener('click', hangNextQ);
+    $('#btnHangSet').addEventListener('click', hangSetupStart);
+    $('#hangInHint').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); hangSetupStart(); }
+    });
+
+    /* a physical keyboard on the 추리 screen types letters */
+    document.addEventListener('keydown', (e) => {
+      const scr = $('#scr-hangman');
+      if (!scr || !scr.classList.contains('active')) return;
+      if ($('#hangPlay').hidden || HANG.over) return;
+      const tag = (e.target && e.target.tagName) || '';
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      if (/^[a-zA-Z]$/.test(e.key)) { e.preventDefault(); hangAsk(e.key); }
+    });
+  }
   /* ------------------------- boot ------------------------- */
   function boot() {
     loadState();
     buildEmojiPicker();
     wire();
+    initGames();
     renderHome();
     refreshChrome();
     loadElemPacks();
