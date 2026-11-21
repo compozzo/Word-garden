@@ -5761,7 +5761,7 @@
     if (elemLoad.state !== 'idle') return;
     elemLoad.state = 'loading';
     if (currentCategory().id === 'elem') renderHome();
-    fetch(ELEM_URL, { cache: 'force-cache' })
+    fetch(ELEM_URL)   // default cache mode: revalidate, so a new word list is picked up
       .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(data => {
         const packs = (data.grades || []).map(buildElemPack);
