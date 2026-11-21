@@ -83,7 +83,7 @@ Every word carries two hand-drawn inline SVG scenes.
 
 ## Building the elementary packs
 
-The word data and the pictures are generated, not hand-copied into the page:
+`data/elem.json` is what the page ships. The words and their pictures are generated on the authoring machine by a small set of scripts kept in a `build/` folder beside the page (that folder is listed in `.gitignore`, so it is not published, like the earlier pack generators):
 
 - `build/elem_data.py` — the 816 words (word, part of speech, English meaning, Korean meaning, and a picture recipe of the form `background|piece@x,y,scale,name@…`).
 - `build/04-elem-kit.js` … `build/10-elem-misc.js` — the elementary picture kit, inserted into `index.html` by `build/assemble_elem.py`.
