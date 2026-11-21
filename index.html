@@ -2495,6 +2495,266 @@
   };
 
 
+  /* =========================================================================
+     Office and travel pieces for the 토익단어 · 여행단어 packs
+     Same flat shapes and soft colours as the G kit above, so a business or
+     travel picture sits next to a grade picture without looking different.
+     They are merged into G so one art description can name any piece.
+     ========================================================================= */
+  const BIZ_KIT = {
+    /* a work desk: top surface at y = 0, so small things sit on y = -9 */
+    desk: (x, y, s, c) => gWrap(x, y, s,
+      '<rect x="-54" y="-9" width="108" height="10" rx="4" fill="' + (c || '#d9b78c') + '"/>'
+      + '<rect x="-46" y="1" width="9" height="40" rx="3" fill="#c9a67b"/>'
+      + '<rect x="37" y="1" width="9" height="40" rx="3" fill="#c9a67b"/>'
+      + '<rect x="-34" y="1" width="34" height="22" rx="4" fill="#e0c9a4" stroke="#c9a67b" stroke-width="2"/>'
+      + '<path d="M-24 11 h14" stroke="#a98a63" stroke-width="3" stroke-linecap="round"/>'),
+    laptop: (x, y, s, c) => gWrap(x, y, s,
+      '<path d="M-26 -34 h52 a3 3 0 0 1 3 3 v34 h-58 v-34 a3 3 0 0 1 3 -3 Z" fill="' + (c || '#cfe0f2') + '" stroke="#9fb8cf" stroke-width="2.4"/>'
+      + '<rect x="-21" y="-29" width="42" height="26" rx="2" fill="#8fd0f0"/>'
+      + '<path d="M-14 -22 h28 M-14 -16 h20" stroke="#ffffff" stroke-width="2.4" opacity=".8" stroke-linecap="round"/>'
+      + '<path d="M-32 3 h64 l6 9 h-76 Z" fill="#dbe6f0" stroke="#b9cbdc" stroke-width="2"/>'),
+    docSheet: (x, y, s, c) => gWrap(x, y, s,
+      '<path d="M-22 -30 h30 l14 14 v46 h-44 Z" fill="' + (c || '#ffffff') + '" stroke="#c9d6e2" stroke-width="2.4" stroke-linejoin="round"/>'
+      + '<path d="M8 -30 v14 h14" fill="#eef4f9" stroke="#c9d6e2" stroke-width="2.4" stroke-linejoin="round"/>'
+      + '<path d="M-14 -10 h24 M-14 -1 h28 M-14 8 h24 M-14 17 h16" stroke="#c3d2df" stroke-width="2.6" stroke-linecap="round"/>'),
+    docStack: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-20" y="-18" width="40" height="44" rx="3" fill="#ffffff" stroke="#c9d6e2" stroke-width="2.2" transform="rotate(-9)"/>'
+      + '<rect x="-20" y="-18" width="40" height="44" rx="3" fill="#fdfcf6" stroke="#c9d6e2" stroke-width="2.2" transform="rotate(5)"/>'
+      + '<rect x="-20" y="-20" width="40" height="44" rx="3" fill="#ffffff" stroke="#c9d6e2" stroke-width="2.4"/>'
+      + '<path d="M-12 -10 h24 M-12 -2 h24 M-12 6 h16" stroke="#c3d2df" stroke-width="2.6" stroke-linecap="round"/>'),
+    contract: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-26" y="-32" width="52" height="64" rx="4" fill="#ffffff" stroke="#c9d6e2" stroke-width="2.6"/>'
+      + '<path d="M-18 -22 h36 M-18 -14 h36 M-18 -6 h28" stroke="#c3d2df" stroke-width="2.4" stroke-linecap="round"/>'
+      + '<path d="M-18 6 q6 -7 12 0 q6 7 12 0 q5 -6 10 0" fill="none" stroke="#5a6f93" stroke-width="2.6" stroke-linecap="round"/>'
+      + '<circle cx="12" cy="20" r="9" fill="none" stroke="#e8727f" stroke-width="2.6" opacity=".85"/>'
+      + '<path d="M-18 22 h18" stroke="#c9d6e2" stroke-width="2.4" stroke-linecap="round"/>'),
+    stamp: (x, y, s, c) => gWrap(x, y, s,
+      '<rect x="-16" y="-6" width="32" height="10" rx="3" fill="' + (c || '#e8727f') + '"/>'
+      + '<rect x="-9" y="-16" width="18" height="11" rx="3" fill="#e8cfa8" stroke="#c9a67b" stroke-width="1.8"/>'
+      + '<rect x="-13" y="-30" width="26" height="15" rx="7" fill="' + (c || '#e8727f') + '"/>'),
+    stampMark: (x, y, s, c) => gWrap(x, y, s,
+      '<circle r="18" fill="none" stroke="' + (c || '#e8727f') + '" stroke-width="4" opacity=".85"/>'
+      + '<path d="M-8 0 l6 6 l11 -13" fill="none" stroke="' + (c || '#e8727f') + '" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>'),
+    handshake: (x, y, s) => gWrap(x, y, s,
+      '<path d="M-70 38 L-28 14" stroke="#8fc9ff" stroke-width="20" stroke-linecap="round"/>'
+      + '<path d="M70 38 L28 14" stroke="#c9a6e8" stroke-width="20" stroke-linecap="round"/>'
+      + '<path d="M-30 14 L-4 0" stroke="#f7c9a3" stroke-width="18" stroke-linecap="round"/>'
+      + '<path d="M30 14 L4 0" stroke="#efbd94" stroke-width="18" stroke-linecap="round"/>'
+      + '<rect x="-15" y="-15" width="26" height="23" rx="9" fill="#f7c9a3" stroke="#dfa87f" stroke-width="2"/>'
+      + '<rect x="-4" y="-13" width="24" height="22" rx="9" fill="#efbd94" stroke="#dfa87f" stroke-width="2"/>'
+      + '<path d="M-8 -13 q6 -8 13 -2" fill="#f7c9a3" stroke="#dfa87f" stroke-width="1.8" stroke-linejoin="round"/>'
+      + '<path d="M6 -12 q7 -6 12 1" fill="#efbd94" stroke="#dfa87f" stroke-width="1.8" stroke-linejoin="round"/>'
+      + '<path d="M-10 2 q9 4 17 1 M-2 7 q9 3 16 0" stroke="#d99f72" stroke-width="1.8" fill="none" stroke-linecap="round"/>'
+      + '<path d="M-56 32 q7 4 14 3 M56 32 q-7 4 -14 3" stroke="#ffffff" stroke-width="2" fill="none" opacity=".55"/>'),
+    briefcase: (x, y, s, c) => gWrap(x, y, s,
+      '<rect x="-30" y="-18" width="60" height="38" rx="6" fill="' + (c || '#8a6a4a') + '"/>'
+      + '<path d="M-10 -18 v-8 h20 v8" fill="none" stroke="#6b4f34" stroke-width="4" stroke-linejoin="round"/>'
+      + '<rect x="-30" y="-4" width="60" height="5" fill="#6b4f34" opacity=".55"/>'
+      + '<rect x="-6" y="-6" width="12" height="9" rx="2" fill="#ffd166"/>'),
+    phoneDesk: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-26" y="-12" width="52" height="14" rx="6" fill="#e8eef4" stroke="#c9d6e2" stroke-width="2"/>'
+      + '<rect x="-18" y="-8" width="24" height="8" rx="2" fill="#ffffff" stroke="#dbe6f0" stroke-width="1.4"/>'
+      + '<path d="M10 -12 h10 v14 h-10 Z" fill="#dbe6f0"/>'
+      + '<path d="M-24 -28 q-2 -8 7 -9 h34 q9 1 7 9 q-3 6 -10 5 h-28 q-7 1 -10 -5 Z" fill="#8fc9ff" stroke="#5c92c8" stroke-width="2"/>'
+      + '<path d="M10 -36 q9 5 9 10" fill="none" stroke="#5c92c8" stroke-width="2.4" stroke-linecap="round"/>'
+      + '<circle cx="0" cy="-2" r="2.4" fill="#4fae74"/>'),
+    idBadge: (x, y, s) => gWrap(x, y, s,
+      '<path d="M-14 -46 L0 -22 L14 -46" fill="none" stroke="#7fa8d6" stroke-width="3.4" stroke-linecap="round"/>'
+      + '<rect x="-20" y="-24" width="40" height="52" rx="5" fill="#ffffff" stroke="#c9d6e2" stroke-width="2.4"/>'
+      + '<rect x="-20" y="-24" width="40" height="9" rx="4" fill="#8fc9ff"/>'
+      + '<circle cx="-6" cy="-2" r="8" fill="#eef3f8" stroke="#c9d6e2" stroke-width="2"/>'
+      + '<path d="M2 -6 h12 M2 0 h12" stroke="#c3d2df" stroke-width="2.4" stroke-linecap="round"/>'
+      + '<path d="M-14 12 h28 M-14 20 h20" stroke="#c3d2df" stroke-width="2.4" stroke-linecap="round"/>'),
+    printer: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-30" y="-6" width="60" height="26" rx="5" fill="#dfe9f3" stroke="#c9d6e2" stroke-width="2.4"/>'
+      + '<rect x="-20" y="-22" width="40" height="16" rx="2" fill="#ffffff" stroke="#c9d6e2" stroke-width="2.2"/>'
+      + '<path d="M-12 -16 h24 M-12 -11 h16" stroke="#c3d2df" stroke-width="2.2" stroke-linecap="round"/>'
+      + '<rect x="-16" y="4" width="32" height="16" rx="2" fill="#ffffff" stroke="#c9d6e2" stroke-width="2.2"/>'
+      + '<circle cx="20" cy="6" r="3" fill="#4fae74"/>'),
+    folder: (x, y, s, c) => gWrap(x, y, s,
+      '<path d="M-28 -26 h20 l6 8 h30 v34 a3 3 0 0 1 -3 3 h-53 a3 3 0 0 1 -3 -3 Z" fill="' + (c || '#f2c98a') + '" stroke="#d9a86f" stroke-width="2.4" stroke-linejoin="round"/>'
+      + '<path d="M-28 -10 h56" stroke="#d9a86f" stroke-width="2.4" opacity=".7"/>'
+      + '<rect x="-8" y="-2" width="16" height="7" rx="2" fill="#ffffff" opacity=".85"/>'),
+    signature: (x, y, s) => gWrap(x, y, s,
+      '<path d="M-34 6 q8 -22 16 -2 q6 16 14 -4 q6 -16 14 2 q6 14 16 -6" fill="none" stroke="#5a6f93" stroke-width="3.4" stroke-linecap="round"/>'
+      + '<path d="M-34 16 h64" stroke="#c3d2df" stroke-width="3" stroke-linecap="round"/>'),
+    truck: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-56" y="-40" width="72" height="40" rx="4" fill="#eef3f8" stroke="#c9d6e2" stroke-width="2.4"/>'
+      + '<path d="M-40 -30 h40 M-40 -20 h40" stroke="#dbe6f0" stroke-width="3" stroke-linecap="round"/>'
+      + '<path d="M16 -26 h18 l14 16 v10 h-32 Z" fill="#8fc9ff" stroke="#5c92c8" stroke-width="2.4" stroke-linejoin="round"/>'
+      + '<rect x="22" y="-22" width="14" height="10" rx="2" fill="#e6f4ff"/>'
+      + '<circle cx="-34" cy="3" r="10" fill="#5a6f93"/><circle cx="-34" cy="3" r="4" fill="#dbe6f0"/>'
+      + '<circle cx="30" cy="3" r="10" fill="#5a6f93"/><circle cx="30" cy="3" r="4" fill="#dbe6f0"/>'),
+    cargoShip: (x, y, s) => gWrap(x, y, s,
+      '<path d="M-66 -8 h132 l-12 20 h-108 Z" fill="#5a6f93"/>'
+      + '<rect x="-52" y="-24" width="30" height="16" rx="2" fill="#f2a93b"/>'
+      + '<rect x="-18" y="-24" width="26" height="16" rx="2" fill="#8fd4a0"/>'
+      + '<rect x="12" y="-24" width="30" height="16" rx="2" fill="#8fc9ff"/>'
+      + '<rect x="8" y="-42" width="34" height="18" rx="3" fill="#eef3f8" stroke="#c9d6e2" stroke-width="2"/>'
+      + '<path d="M-70 14 q18 -8 36 0 q18 8 36 0 q18 -8 36 0" fill="none" stroke="#9fd6ee" stroke-width="4" stroke-linecap="round" opacity=".8"/>'),
+    warehouse: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-62" y="-44" width="124" height="44" rx="3" fill="#dfe9f3"/>'
+      + '<path d="M-68 -44 L0 -62 L68 -44 Z" fill="#a9c4d8"/>'
+      + '<rect x="-22" y="-32" width="44" height="32" rx="2" fill="#c9a67b"/>'
+      + '<path d="M-22 -26 h44 M-22 -19 h44 M-22 -12 h44 M-22 -5 h44" stroke="#b98f5c" stroke-width="2"/>'
+      + '<rect x="-56" y="-30" width="24" height="18" rx="2" fill="#eef3f8" stroke="#c9d6e2" stroke-width="2"/>'
+      + '<rect x="34" y="-30" width="22" height="18" rx="2" fill="#eef3f8" stroke="#c9d6e2" stroke-width="2"/>'),
+    crate: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-24" y="-30" width="48" height="30" rx="3" fill="#e0b98a" stroke="#c9a67b" stroke-width="2.4"/>'
+      + '<path d="M-24 -20 h48 M-24 -10 h48 M-14 -30 v30 M10 -30 v30" stroke="#c9a67b" stroke-width="2.4"/>'
+      + '<path d="M-24 -30 L24 0 M24 -30 L-24 0" stroke="#d9a86f" stroke-width="2" opacity=".5"/>'),
+    percent: (x, y, s, c) => gWrap(x, y, s,
+      '<circle r="24" fill="#ffffff" stroke="' + (c || '#4fae74') + '" stroke-width="4"/>'
+      + '<circle cx="-7" cy="-8" r="5" fill="none" stroke="' + (c || '#4fae74') + '" stroke-width="3.4"/>'
+      + '<circle cx="8" cy="8" r="5" fill="none" stroke="' + (c || '#4fae74') + '" stroke-width="3.4"/>'
+      + '<path d="M10 -12 L-10 12" stroke="' + (c || '#4fae74') + '" stroke-width="3.4" stroke-linecap="round"/>'),
+    shieldCheck: (x, y, s, c) => gWrap(x, y, s,
+      '<path d="M0 -30 L24 -20 V4 Q24 22 0 32 Q-24 22 -24 4 V-20 Z" fill="' + (c || '#8fc9ff') + '" stroke="#5c92c8" stroke-width="2.4" stroke-linejoin="round"/>'
+      + '<path d="M-11 0 l7 8 l13 -16" fill="none" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>'),
+    gavel: (x, y, s, rot) => gWrap(x, y, s,
+      '<g transform="rotate(-24)">'
+      + '<rect x="0" y="-14" width="40" height="9" rx="4.5" fill="#c9a67b"/>'
+      + '<rect x="-26" y="-19" width="26" height="30" rx="5" fill="#a98a63"/>'
+      + '<path d="M-20 -19 v30" stroke="#8a6a4a" stroke-width="2" opacity=".5"/>'
+      + '</g>'
+      + '<rect x="-26" y="22" width="52" height="9" rx="4" fill="#c9b291"/>', rot)
+  };
+
+  const TRAVEL_KIT = {
+    passport: (x, y, s, c) => gWrap(x, y, s,
+      '<rect x="-24" y="-32" width="48" height="64" rx="5" fill="' + (c || '#4a7fb5') + '"/>'
+      + '<rect x="-24" y="-32" width="9" height="64" rx="4" fill="#3d6b9c"/>'
+      + '<circle cx="0" cy="-8" r="12" fill="none" stroke="#ffd166" stroke-width="2.6"/>'
+      + '<path d="M-12 -8 h24 M0 -20 v24" stroke="#ffd166" stroke-width="2" opacity=".8"/>'
+      + '<path d="M-12 14 h24 M-8 22 h16" stroke="#dbe6f0" stroke-width="2.6" stroke-linecap="round" opacity=".85"/>'),
+    boardingPass: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-40" y="-22" width="80" height="44" rx="6" fill="#ffffff" stroke="#c9d6e2" stroke-width="2.4"/>'
+      + '<path d="M6 -22 v44" stroke="#c9d6e2" stroke-width="2" stroke-dasharray="4 5"/>'
+      + '<path d="M-32 -12 h28 M-32 -3 h20 M-32 6 h24" stroke="#c3d2df" stroke-width="2.6" stroke-linecap="round"/>'
+      + '<path d="M-32 15 h14" stroke="#8fc9ff" stroke-width="3" stroke-linecap="round"/>'
+      + '<path d="M14 -12 v7 M19 -12 v10 M24 -12 v5 M29 -12 v11 M34 -12 v6" stroke="#5a6f93" stroke-width="2.6" stroke-linecap="round"/>'
+      + '<path d="M14 6 h22" stroke="#c3d2df" stroke-width="2.4" stroke-linecap="round"/>'),
+    carousel: (x, y, s) => gWrap(x, y, s,
+      '<path d="M-64 -6 h128 a10 10 0 0 1 0 20 h-128 a10 10 0 0 1 0 -20 Z" fill="#9fb4c8"/>'
+      + '<path d="M-56 2 h112" stroke="#7f96ad" stroke-width="3" stroke-dasharray="8 8"/>'
+      + '<rect x="-42" y="-30" width="30" height="24" rx="3" fill="#f2a93b" stroke="#d98f2b" stroke-width="2"/>'
+      + '<path d="M-42 -22 h30" stroke="#d98f2b" stroke-width="2"/>'
+      + '<rect x="0" y="-32" width="26" height="26" rx="8" fill="#8fc9ff" stroke="#5c92c8" stroke-width="2"/>'
+      + '<path d="M6 -32 q8 -10 16 0" fill="none" stroke="#5c92c8" stroke-width="2.6"/>'
+      + '<rect x="40" y="-24" width="22" height="18" rx="4" fill="#ffb3c7" stroke="#e893ab" stroke-width="2"/>'),
+    tag: (x, y, s, c) => gWrap(x, y, s,
+      '<path d="M-22 -18 h30 l16 16 l-16 16 h-30 a4 4 0 0 1 -4 -4 v-24 a4 4 0 0 1 4 -4 Z" fill="' + (c || '#ffd166') + '" stroke="#e0ae3a" stroke-width="2.4" stroke-linejoin="round"/>'
+      + '<circle cx="-16" cy="-4" r="4" fill="#ffffff"/>'
+      + '<path d="M-6 0 h20 M-6 8 h14" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round" opacity=".9"/>'),
+    train: (x, y, s, c) => gWrap(x, y, s,
+      '<rect x="-50" y="-56" width="100" height="60" rx="12" fill="' + (c || '#eef3f8') + '" stroke="#b9cbdc" stroke-width="2.6"/>'
+      + '<rect x="-40" y="-46" width="38" height="28" rx="4" fill="#8fd0f0"/>'
+      + '<rect x="4" y="-46" width="38" height="28" rx="4" fill="#8fd0f0"/>'
+      + '<path d="M-34 -34 h26 M10 -34 h26" stroke="#ffffff" stroke-width="3" opacity=".75" stroke-linecap="round"/>'
+      + '<rect x="-46" y="-12" width="92" height="8" rx="4" fill="#ffd166"/>'
+      + '<circle cx="-30" cy="6" r="5" fill="#fff3c4" stroke="#e0ae3a" stroke-width="1.6"/>'
+      + '<circle cx="30" cy="6" r="5" fill="#fff3c4" stroke="#e0ae3a" stroke-width="1.6"/>'),
+    turnstile: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-8" y="-58" width="16" height="58" rx="6" fill="#c9d6e2"/>'
+      + '<rect x="-13" y="-72" width="26" height="17" rx="4" fill="#5a6f93"/>'
+      + '<circle cx="0" cy="-63" r="4" fill="#8fd4a0"/>'
+      + '<path d="M8 -40 h28 M8 -28 h24" stroke="#9fb4c8" stroke-width="5" stroke-linecap="round"/>'
+      + '<rect x="-16" y="-5" width="32" height="9" rx="4.5" fill="#b9cbdc"/>'),
+    taxi: (x, y, s) => gWrap(x, y, s,
+      '<path d="M-44 -10 q4 -16 18 -18 h20 q14 0 18 18 Z" fill="#ffd166" stroke="#e0ae3a" stroke-width="2.4"/>'
+      + '<rect x="-50" y="-12" width="100" height="20" rx="7" fill="#ffd166" stroke="#e0ae3a" stroke-width="2.4"/>'
+      + '<rect x="-26" y="-26" width="22" height="14" rx="3" fill="#e6f4ff" stroke="#c9d6e2" stroke-width="2"/>'
+      + '<rect x="6" y="-26" width="20" height="14" rx="3" fill="#e6f4ff" stroke="#c9d6e2" stroke-width="2"/>'
+      + '<rect x="-12" y="-34" width="24" height="9" rx="4" fill="#5a6f93"/>'
+      + '<circle cx="-30" cy="9" r="10" fill="#5a6f93"/><circle cx="-30" cy="9" r="4" fill="#dbe6f0"/>'
+      + '<circle cx="30" cy="9" r="10" fill="#5a6f93"/><circle cx="30" cy="9" r="4" fill="#dbe6f0"/>'),
+    trafficLight: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-3" y="-30" width="6" height="74" rx="3" fill="#9fb4c8"/>'
+      + '<rect x="-16" y="-72" width="32" height="46" rx="8" fill="#5a6f93"/>'
+      + '<circle cx="0" cy="-62" r="6" fill="#ff8f8f"/>'
+      + '<circle cx="0" cy="-50" r="6" fill="#ffd166"/>'
+      + '<circle cx="0" cy="-38" r="6" fill="#8fd4a0"/>'),
+    keyCard: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-30" y="-20" width="60" height="40" rx="6" fill="#ffffff" stroke="#c9d6e2" stroke-width="2.4"/>'
+      + '<rect x="-30" y="-16" width="60" height="9" fill="#5a6f93"/>'
+      + '<circle cx="-14" cy="6" r="6" fill="none" stroke="#ffd166" stroke-width="2.6"/>'
+      + '<path d="M-14 6 h10 v6" stroke="#ffd166" stroke-width="2.6" fill="none" stroke-linecap="round"/>'
+      + '<path d="M6 2 h16 M6 9 h12" stroke="#c3d2df" stroke-width="2.4" stroke-linecap="round"/>'),
+    bell: (x, y, s) => gWrap(x, y, s,
+      '<path d="M-22 0 q0 -24 22 -24 q22 0 22 24 Z" fill="#ffd166" stroke="#e0ae3a" stroke-width="2.4" stroke-linejoin="round"/>'
+      + '<rect x="-26" y="0" width="52" height="7" rx="3.5" fill="#e0ae3a"/>'
+      + '<circle cx="0" cy="-27" r="4" fill="#e0ae3a"/>'),
+    menuCard: (x, y, s) => gWrap(x, y, s,
+      '<path d="M-34 -28 h32 v56 h-32 Z" fill="#fffdf6" stroke="#d9c3a8" stroke-width="2.4"/>'
+      + '<path d="M-2 -28 h32 v56 h-32 Z" fill="#ffffff" stroke="#d9c3a8" stroke-width="2.4"/>'
+      + '<path d="M-2 -28 v56" stroke="#d9c3a8" stroke-width="2"/>'
+      + '<path d="M-26 -18 h18 M-26 -10 h18 M-26 0 h14 M6 -18 h18 M6 -10 h18 M6 0 h14" stroke="#c3d2df" stroke-width="2.2" stroke-linecap="round"/>'),
+    plate: (x, y, s) => gWrap(x, y, s,
+      '<ellipse cx="0" cy="4" rx="46" ry="18" fill="#ffffff" stroke="#dbe6f0" stroke-width="3"/>'
+      + '<ellipse cx="0" cy="2" rx="30" ry="11" fill="#fdf7ec"/>'
+      + '<path d="M-16 -2 q10 -10 22 -2 q8 6 -2 8 q-14 3 -20 -6 Z" fill="#f2c98a"/>'
+      + '<circle cx="-6" cy="-2" r="5" fill="#8fd4a0"/>'
+      + '<circle cx="12" cy="0" r="4" fill="#ff8f8f"/>'),
+    receipt: (x, y, s) => gWrap(x, y, s,
+      '<path d="M-20 -34 h40 v62 l-6 -5 l-7 5 l-7 -5 l-7 5 l-6 -5 l-7 5 Z" fill="#ffffff" stroke="#c9d6e2" stroke-width="2.2" stroke-linejoin="round"/>'
+      + '<path d="M-12 -24 h24 M-12 -16 h24 M-12 -8 h18 M-12 2 h24 M-12 12 h12" stroke="#c3d2df" stroke-width="2.2" stroke-linecap="round"/>'
+      + '<path d="M2 20 h10" stroke="#4fae74" stroke-width="3" stroke-linecap="round"/>'),
+    discountTag: (x, y, s) => gWrap(x, y, s,
+      '<path d="M-24 -20 h32 l18 18 l-18 18 h-32 a4 4 0 0 1 -4 -4 v-28 a4 4 0 0 1 4 -4 Z" fill="#ff8fae" stroke="#e0728f" stroke-width="2.4" stroke-linejoin="round"/>'
+      + '<circle cx="-18" cy="-6" r="4" fill="#ffffff"/>'
+      + '<circle cx="0" cy="-2" r="3.4" fill="none" stroke="#ffffff" stroke-width="2.2"/>'
+      + '<circle cx="10" cy="8" r="3.4" fill="none" stroke="#ffffff" stroke-width="2.2"/>'
+      + '<path d="M12 -6 L-2 12" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>'),
+    curtain: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-42" y="-92" width="84" height="7" rx="3.5" fill="#b9a48c"/>'
+      + '<rect x="-37" y="-86" width="25" height="86" rx="7" fill="#c9a6e8"/>'
+      + '<rect x="-12" y="-86" width="25" height="86" rx="7" fill="#b98fd9"/>'
+      + '<rect x="12" y="-86" width="25" height="86" rx="7" fill="#c9a6e8"/>'
+      + '<path d="M-30 -78 v70 M-18 -78 v70 M-6 -78 v70 M6 -78 v70 M18 -78 v70 M30 -78 v70" stroke="#ffffff" stroke-width="2" opacity=".4"/>'
+      + '<circle cx="-32" cy="-89" r="3" fill="#9fb4c8"/><circle cx="0" cy="-89" r="3" fill="#9fb4c8"/><circle cx="32" cy="-89" r="3" fill="#9fb4c8"/>'),
+    pharmacySign: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-26" y="-46" width="52" height="46" rx="7" fill="#ffffff" stroke="#8fd4a0" stroke-width="4"/>'
+      + '<path d="M-6 -38 h12 v10 h10 v12 h-10 v10 h-12 v-10 h-10 v-12 h10 Z" fill="#4fae74"/>'
+      + '<rect x="-3" y="0" width="6" height="22" rx="3" fill="#9fb4c8"/>'),
+    thermometer: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-9" y="-40" width="18" height="58" rx="9" fill="#ffffff" stroke="#c9d6e2" stroke-width="2.4"/>'
+      + '<rect x="-4" y="-14" width="8" height="26" rx="4" fill="#e8727f"/>'
+      + '<circle cx="0" cy="20" r="9" fill="#e8727f"/>'
+      + '<path d="M0 -34 v18" stroke="#e8727f" stroke-width="4" stroke-linecap="round"/>'
+      + '<path d="M-6 -30 h7 M-6 -24 h5 M-6 -18 h7" stroke="#c3d2df" stroke-width="2" stroke-linecap="round"/>'),
+    policeBadge: (x, y, s) => gWrap(x, y, s,
+      '<path d="M0 -30 L9 -14 L27 -12 L14 2 L18 20 L0 11 L-18 20 L-14 2 L-27 -12 L-9 -14 Z" fill="#ffd166" stroke="#e0ae3a" stroke-width="2.4" stroke-linejoin="round"/>'
+      + '<circle cx="0" cy="-4" r="7" fill="#fff3c4" stroke="#e0ae3a" stroke-width="1.8"/>'
+      + '<path d="M-4 -4 h8 M0 -8 v8" stroke="#c9a45c" stroke-width="2" stroke-linecap="round"/>'),
+    embassy: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-58" y="-5" width="116" height="8" rx="3" fill="#dbe6f0"/>'
+      + '<rect x="-50" y="-31" width="100" height="26" rx="2" fill="#fdf7ec" stroke="#e0cdb2" stroke-width="2"/>'
+      + '<path d="M-56 -31 L0 -49 L56 -31 Z" fill="#c2d5e8" stroke="#a9c4d8" stroke-width="2"/>'
+      + '<path d="M-40 -29 v22 M-14 -29 v22 M14 -29 v22 M40 -29 v22" stroke="#e0cdb2" stroke-width="6" stroke-linecap="round"/>'
+      + '<rect x="-9" y="-17" width="18" height="11" rx="2" fill="#8fc9ff"/>'
+      + '<path d="M0 -49 v-12" stroke="#b9a48c" stroke-width="3"/>'
+      + '<path d="M0 -61 h16 l-4 5 l4 5 h-16 Z" fill="#ff8f8f"/>'),
+    crossRoad: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-74" y="-9" width="148" height="18" rx="3" fill="#e8dcc6"/>'
+      + '<rect x="-9" y="-62" width="18" height="124" rx="3" fill="#e8dcc6"/>'
+      + '<path d="M-64 0 h36 M-16 0 h32 M-28 0 h8" stroke="#ffffff" stroke-width="3" stroke-dasharray="7 8"/>'
+      + '<path d="M28 0 h36" stroke="#ffffff" stroke-width="3" stroke-dasharray="7 8"/>'
+      + '<path d="M0 -52 v34 M0 28 v26" stroke="#ffffff" stroke-width="3" stroke-dasharray="7 8"/>'
+      + '<path d="M-74 -9 h148" stroke="#d9cbb0" stroke-width="1.5" opacity=".8"/>'
+      + '<path d="M-9 -62 h18" stroke="#d9cbb0" stroke-width="1.5" opacity=".8"/>'),
+    safetyLine: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-88" y="-4" width="176" height="9" rx="4" fill="#ffd166"/>'
+      + '<path d="M-76 0 h150" stroke="#fff3c4" stroke-width="3" stroke-dasharray="10 10"/>'),
+    planeWindow: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-30" y="-34" width="60" height="68" rx="26" fill="#ffffff" stroke="#c9d6e2" stroke-width="4"/>'
+      + '<rect x="-22" y="-26" width="44" height="52" rx="20" fill="#bfe3ff"/>'
+      + '<path d="M-22 14 q22 -10 44 -2 q-4 14 -22 14 q-18 0 -22 -12 Z" fill="#ffffff" opacity=".8"/>'
+      + '<path d="M-10 10 q14 -8 30 -4" stroke="#e6f4ff" stroke-width="4" stroke-linecap="round"/>')
+  };
+
+  Object.assign(G, BIZ_KIT, TRAVEL_KIT);
+
   const artScene = (kind, parts, cap) => ({
     html: artSvg(artBg(kind) + (parts || []).map(p => {
       const fn = G[p[0]];
@@ -4134,11 +4394,782 @@
     };
   }
 
+  /* =========================================================================
+     💼 TOEIC packs — four tiers of ten words each
+     Words were picked from the TOEIC Service List (TSL) and Business Service
+     List (BSL) frequency bands and from the score-band word books Korean
+     learners use (해커스 기출보카, 황소보카 정기시험 빈출 순위), then sorted by
+     the band where a learner meets them: office basics → 600 → 750 → 850.
+     ========================================================================= */
+  const TOEIC_PACK_DEFS = [
+    {
+      id: 'toeic1', label: '토익 베이직', short: '베이직', emoji: '💼',
+      words: [
+        {
+          word: 'schedule', pos: 'noun', en: 'A plan that shows when things will happen', ko: '일정, 예정표',
+          art: [
+            ['paper', [['calendarSheet', 112, 128, 1.7], ['clock', 216, 118, 1.6], ['arrowRight', 168, 78, .7], ['sparkle', 274, 60, .7]], '달력과 시계로 오늘 일정을 확인해요'],
+            ['indoor', [['desk', 160, 152, 1.05], ['laptop', 120, 143, .95], ['calendarSheet', 228, 108, 1.1], ['clock', 286, 78, .9]], '책상 위에 하루 일정을 펼쳐 두었어요']
+          ]
+        },
+        {
+          word: 'office', pos: 'noun', en: 'A room or building where people work at desks', ko: '사무실',
+          art: [
+            ['indoor', [['desk', 148, 152, 1.05], ['laptop', 122, 143, .9], ['phoneDesk', 208, 143, .85], ['clock', 276, 80, 1]], '사무실 책상마다 컴퓨터와 전화가 있어요'],
+            ['city', [['city', 138, 140, 1.1], ['door', 150, 156, 1.3], ['kidStand', 252, 158, .75, '#8fc9ff', {}]], '건물 안 사무실로 출근해요']
+          ]
+        },
+        {
+          word: 'meeting', pos: 'noun', en: 'A time when people come together to talk about work', ko: '회의',
+          art: [
+            ['room', [['table', 160, 150, 1.5], ['kidSit', 104, 150, .85, '#8fc9ff', {}], ['kidSit', 214, 150, .85, '#ffb3c7', {}], ['board', 160, 82, .8]], '회의실에 모여 이야기를 나눠요'],
+            ['paper', [['calendarSheet', 122, 126, 1.4], ['clock', 208, 108, 1.4], ['bubble', 258, 82, .8], ['check', 92, 78, 1]], '회의 시간을 달력에 적어 두었어요']
+          ]
+        },
+        {
+          word: 'email', pos: 'noun', en: 'A message sent from one computer to another', ko: '이메일, 전자 우편',
+          art: [
+            ['indoor', [['laptop', 138, 150, 1.5], ['envelope', 238, 106, 1.1], ['arrowRight', 196, 66, .7]], '노트북으로 메일을 보내요'],
+            ['paper', [['envelope', 140, 120, 2.2], ['bubble', 256, 84, .8], ['sparkle', 214, 62, .8]], '메일이 도착해 알림이 떠요']
+          ]
+        },
+        {
+          word: 'document', pos: 'noun', en: 'A paper or computer file that holds information', ko: '문서, 서류',
+          art: [
+            ['paper', [['docSheet', 118, 124, 1.5], ['docStack', 206, 122, 1.3], ['pencil', 272, 100, 1]], '문서를 정리해 서류철에 넣어요'],
+            ['indoor', [['desk', 160, 152, 1.05], ['docSheet', 124, 112, 1.2], ['magnifier', 222, 122, 1.1]], '문서를 자세히 읽어 봐요']
+          ]
+        },
+        {
+          word: 'confirm', pos: 'verb', en: 'To say for sure that something is true or will happen', ko: '확인하다',
+          art: [
+            ['paper', [['clipboard', 128, 124, 1.5], ['check', 208, 104, 1.6], ['stampMark', 268, 128, 1]], '확인한 항목에 표시를 해요'],
+            ['indoor', [['kidStand', 118, 156, .95, '#8fc9ff', {}], ['docSheet', 208, 116, 1.2], ['check', 264, 84, 1.1]], '직원이 서류를 보고 확인해 줘요']
+          ]
+        },
+        {
+          word: 'attend', pos: 'verb', en: 'To be present at a meeting or an event', ko: '참석하다, 출석하다',
+          art: [
+            ['room', [['table', 160, 150, 1.4], ['kidSit', 104, 150, .8, '#8fc9ff', {}], ['kidSit', 160, 150, .8, '#ffd166', {}], ['kidSit', 214, 150, .8, '#ffb3c7', {}], ['board', 160, 80, .75]], '회의에 참석해 자리에 앉았어요'],
+            ['paper', [['calendarSheet', 130, 124, 1.3], ['check', 202, 100, 1.5], ['clock', 258, 120, 1.2]], '참석 여부를 달력에 체크해요']
+          ]
+        },
+        {
+          word: 'submit', pos: 'verb', en: 'To hand in a document for someone to review', ko: '제출하다',
+          art: [
+            ['paper', [['docStack', 118, 124, 1.4], ['arrowUp', 194, 116, 1.1], ['clipboard', 258, 122, 1.1]], '서류를 정리해 위로 올려 보내요'],
+            ['indoor', [['desk', 136, 152, 1], ['kidStand', 250, 156, .9, '#8fd4a0', {}], ['docSheet', 120, 116, 1], ['check', 68, 92, 1.1]], '직원에게 서류를 건네 제출해요']
+          ]
+        },
+        {
+          word: 'deadline', pos: 'noun', en: 'The latest time by which work must be finished', ko: '마감 기한',
+          art: [
+            ['paper', [['clock', 120, 120, 2.2], ['calendarSheet', 212, 128, 1.5], ['bolt', 274, 84, .8, '#e8563f']], '마감 시간이 얼마 남지 않았어요'],
+            ['indoor', [['desk', 140, 152, 1.05], ['clock', 86, 86, 1.4], ['docStack', 136, 118, 1.1], ['kidStand', 252, 156, .85, '#ffb3c7', {}]], '정해진 시간까지 일을 끝내야 해요']
+          ]
+        },
+        {
+          word: 'request', pos: 'noun', en: 'The act of politely asking for something', ko: '요청, 부탁',
+          art: [
+            ['paper', [['docSheet', 118, 124, 1.4], ['envelope', 206, 118, 1.2], ['bubble', 258, 70, .8]], '무엇을 해 달라고 편지로 부탁해요'],
+            ['indoor', [['kidStand', 122, 156, .95, '#ffd166', {}], ['bubble', 192, 92, 1.1], ['heart', 268, 76, 1, '#ffb3c7']], '손을 들고 정중히 부탁해요']
+          ]
+        }
+      ]
+    },
+    {
+      id: 'toeic2', label: '토익 600', short: '600', emoji: '🗂️',
+      words: [
+        {
+          word: 'applicant', pos: 'noun', en: 'A person who asks for a job', ko: '지원자',
+          art: [
+            ['indoor', [['kidStand', 136, 156, .95, '#8fc9ff', {}], ['idBadge', 214, 118, 1.2], ['docSheet', 276, 130, .9]], '지원자가 서류를 들고 왔어요'],
+            ['paper', [['docStack', 126, 122, 1.4], ['idBadge', 220, 118, 1.3], ['check', 278, 74, 1]], '지원 서류를 받아 접수해요']
+          ]
+        },
+        {
+          word: 'interview', pos: 'noun', en: 'A meeting where someone is asked questions for a job', ko: '면접',
+          art: [
+            ['room', [['desk', 168, 152, 1.1], ['kidSit', 114, 152, .8, '#8fd4a0', {}], ['kidSit', 224, 152, .8, '#8fc9ff', {}], ['docSheet', 168, 118, .7]], '면접관과 지원자가 마주 앉았어요'],
+            ['indoor', [['kidStand', 112, 156, .9, '#8fd4a0', {}], ['kidStand', 232, 156, .9, '#8fc9ff', {}], ['bubble', 176, 92, 1.1], ['clock', 282, 78, .9]], '질문과 대답을 주고받아요']
+          ]
+        },
+        {
+          word: 'qualified', pos: 'adjective', en: 'Having the skills and experience a job needs', ko: '자격을 갖춘',
+          art: [
+            ['paper', [['idBadge', 118, 120, 1.4], ['check', 196, 108, 1.7], ['medal', 264, 120, 1.2]], '자격을 갖춘 사람에게 표시를 해요'],
+            ['indoor', [['kidStand', 138, 156, .95, '#8fc9ff', {}], ['medal', 204, 92, 1.2], ['sparkle', 254, 78, .9]], '실력과 경험을 갖춘 직원이에요']
+          ]
+        },
+        {
+          word: 'colleague', pos: 'noun', en: 'A person you work with', ko: '동료',
+          art: [
+            ['room', [['table', 156, 152, 1.1], ['kidSit', 106, 152, .8, '#ffd166', {}], ['kidSit', 208, 152, .8, '#8fd4a0', {}], ['heart', 258, 82, 1.1, '#ffb3c7']], '같은 회사에서 함께 일하는 사이예요'],
+            ['indoor', [['kidStand', 92, 156, .9, '#ffd166', {}], ['kidStand', 244, 156, .9, '#8fd4a0', {}], ['handshake', 168, 128, 1.25]], '동료와 악수하며 인사해요']
+          ]
+        },
+        {
+          word: 'branch', pos: 'noun', en: 'A local office of a larger company', ko: '지점, 지사',
+          art: [
+            ['city', [['city', 104, 142, .9], ['signpost', 148, 150, .8], ['house', 240, 150, .85]], '도시 곳곳에 회사 지점이 있어요'],
+            ['paper', [['map', 152, 120, 1.5], ['pin', 208, 94, 1.2], ['arrowRight', 270, 134, .7]], '지도에서 지점 위치를 찾아요']
+          ]
+        },
+        {
+          word: 'reserve', pos: 'verb', en: 'To keep a seat, room, or table for later use', ko: '예약하다',
+          art: [
+            ['paper', [['calendarSheet', 126, 124, 1.4], ['clock', 208, 112, 1.3], ['check', 268, 82, 1.2]], '달력에 예약 날짜를 적어 둬요'],
+            ['indoor', [['desk', 160, 152, 1], ['phoneDesk', 126, 143, .9], ['calendarSheet', 226, 110, 1.1]], '전화로 자리를 예약해요']
+          ]
+        },
+        {
+          word: 'notify', pos: 'verb', en: 'To tell someone about something officially', ko: '알리다, 통지하다',
+          art: [
+            ['paper', [['envelope', 126, 120, 1.5], ['megaphone', 224, 116, 1.2], ['sparkle', 280, 70, .8]], '안내 편지로 바뀐 일을 알려요'],
+            ['indoor', [['laptop', 136, 150, 1.3], ['bubble', 232, 94, 1.1], ['sparkle', 282, 72, .7]], '노트북으로 변경 사항을 알려요']
+          ]
+        },
+        {
+          word: 'available', pos: 'adjective', en: 'Free to be used or free to meet', ko: '이용할 수 있는, 시간이 되는',
+          art: [
+            ['paper', [['calendarSheet', 126, 124, 1.4], ['check', 212, 102, 1.6], ['clock', 272, 124, 1.1]], '비어 있는 시간에는 표시가 되어 있어요'],
+            ['indoor', [['kidStand', 118, 156, .95, '#8fd4a0', {}], ['bubble', 198, 92, 1.05, '#e4f6e8'], ['check', 266, 128, 1.1]], '지금 도와드릴 수 있어요']
+          ]
+        },
+        {
+          word: 'reschedule', pos: 'verb', en: 'To change the time of a plan to another time', ko: '일정을 변경하다',
+          art: [
+            ['paper', [['calendarSheet', 118, 126, 1.4], ['loopArrow', 212, 108, 1.4], ['pencil', 276, 130, .9]], '날짜를 다른 날로 옮겨요'],
+            ['indoor', [['desk', 160, 152, 1], ['clock', 100, 86, 1.3], ['calendarSheet', 168, 112, 1.05], ['loopArrow', 264, 104, .9]], '회의 시간을 새로 잡아요']
+          ]
+        },
+        {
+          word: 'procedure', pos: 'noun', en: 'The fixed order of steps for doing something', ko: '절차, 순서',
+          art: [
+            ['paper', [['clipboard', 134, 124, 1.5], ['docSheet', 224, 122, 1.2], ['check', 280, 82, 1]], '순서대로 하나씩 확인해요'],
+            ['city', [['city', 104, 142, .9], ['stairs', 216, 156, 1.1], ['check', 272, 122, 1]], '정해진 절차를 차례대로 밟아요']
+          ]
+        }
+      ]
+    },
+    {
+      id: 'toeic3', label: '토익 750', short: '750', emoji: '📈',
+      words: [
+        {
+          word: 'contract', pos: 'noun', en: 'A written agreement between two or more sides', ko: '계약서, 계약',
+          art: [
+            ['paper', [['contract', 126, 122, 1.6], ['stamp', 226, 138, 1.2], ['check', 278, 80, 1]], '두 회사가 계약서에 도장을 찍어요'],
+            ['indoor', [['contract', 74, 128, 1.25], ['handshake', 204, 132, 1.2]], '계약이 성사되어 악수해요']
+          ]
+        },
+        {
+          word: 'invoice', pos: 'noun', en: 'A bill that lists goods or work and the money owed', ko: '청구서, 송장',
+          art: [
+            ['paper', [['docSheet', 118, 124, 1.4], ['coin', 206, 108, 1.4], ['receipt', 260, 122, 1.1]], '값과 수량을 적은 청구서를 보내요'],
+            ['indoor', [['desk', 160, 152, 1], ['receipt', 118, 116, 1.15], ['wallet', 212, 124, 1.05], ['coin', 268, 96, 1]], '청구 금액을 확인하고 돈을 보내요']
+          ]
+        },
+        {
+          word: 'shipment', pos: 'noun', en: 'A load of goods sent from one place to another', ko: '(화물) 발송, 선적',
+          art: [
+            ['water', [['cargoShip', 158, 148, 1.15], ['cloud', 68, 44, .8], ['bird', 250, 52]], '배에 화물을 실어 보내요'],
+            ['paper', [['boxCard', 116, 124, 1.5], ['truck', 216, 132, 1.1]], '상자에 담아 트럭으로 보내요']
+          ]
+        },
+        {
+          word: 'warehouse', pos: 'noun', en: 'A large building where goods are stored', ko: '창고',
+          art: [
+            ['city', [['warehouse', 158, 148, 1.2], ['crate', 62, 152, .8], ['boxCard', 268, 152, .8]], '큰 창고에 물건을 쌓아 둬요'],
+            ['paper', [['crate', 116, 128, 1.5], ['boxCard', 202, 124, 1.3], ['docSheet', 272, 124, .9]], '상자마다 표를 붙여 정리해 둬요']
+          ]
+        },
+        {
+          word: 'freight', pos: 'noun', en: 'Goods carried in bulk by truck, train, or ship', ko: '화물, 운송 화물',
+          art: [
+            ['water', [['cargoShip', 148, 148, 1.15], ['crate', 250, 128, .8], ['cloud', 250, 42, .7]], '화물을 배에 가득 실었어요'],
+            ['city', [['truck', 146, 150, 1.25], ['crate', 250, 150, .9], ['sparkle', 286, 76, .7]], '트럭으로 화물을 나릅니다']
+          ]
+        },
+        {
+          word: 'negotiate', pos: 'verb', en: 'To talk in order to reach an agreement', ko: '협상하다',
+          art: [
+            ['room', [['table', 160, 150, 1.3], ['kidSit', 106, 150, .8, '#8fc9ff', {}], ['kidSit', 214, 150, .8, '#ffd166', {}], ['bubble', 160, 82, 1.2]], '마주 앉아 조건을 의논해요'],
+            ['paper', [['contract', 108, 124, 1.4], ['handshake', 214, 130, 1.25], ['bubble', 178, 62, .8]], '서로 좋은 조건을 찾아 합의해요']
+          ]
+        },
+        {
+          word: 'reimbursement', pos: 'noun', en: 'Money paid back for costs someone already paid', ko: '비용 상환, 환급',
+          art: [
+            ['paper', [['receipt', 118, 124, 1.4], ['coin', 198, 110, 1.3], ['loopArrow', 262, 124, 1.1]], '낸 돈을 되돌려 받아요'],
+            ['indoor', [['desk', 160, 152, 1.05], ['receipt', 120, 116, 1.15], ['wallet', 214, 124, 1.05], ['coin', 272, 96, 1]], '영수증을 내고 돈을 돌려받아요']
+          ]
+        },
+        {
+          word: 'quarterly', pos: 'adjective', en: 'Happening four times a year', ko: '분기별의',
+          art: [
+            ['paper', [['calendarSheet', 114, 124, 1.5], ['pie', 214, 122, 1.3], ['lineChart', 282, 116, 1]], '석 달마다 한 번씩 정리해요'],
+            ['indoor', [['desk', 160, 152, 1], ['lineChart', 126, 108, 1.15], ['chart', 226, 116, 1.1], ['clock', 286, 82, .9]], '분기마다 실적을 살펴봐요']
+          ]
+        },
+        {
+          word: 'performance', pos: 'noun', en: 'The results a person or company shows in its work', ko: '성과, 실적',
+          art: [
+            ['paper', [['chart', 126, 122, 1.5], ['trophy', 222, 126, 1.2], ['sparkle', 280, 68, .9]], '실적이 쑥쑥 올라갔어요'],
+            ['indoor', [['kidStand', 120, 156, .95, '#8fc9ff', {}], ['chart', 216, 112, 1.15], ['medal', 282, 92, 1]], '좋은 성과를 낸 직원을 칭찬해요']
+          ]
+        },
+        {
+          word: 'coordinate', pos: 'verb', en: 'To make separate parts work together well', ko: '조정하다, 짜 맞추다',
+          art: [
+            ['room', [['table', 160, 150, 1.2], ['kidSit', 108, 150, .75, '#ffb3c7', {}], ['kidSit', 160, 150, .75, '#8fd4a0', {}], ['kidSit', 212, 150, .75, '#8fc9ff', {}], ['gear', 280, 80, 1]], '여러 사람의 일정을 맞춰요'],
+            ['paper', [['calendarSheet', 112, 124, 1.3], ['clock', 190, 110, 1.2], ['gear', 252, 120, 1.1], ['check', 290, 80, .8]], '시간과 순서를 잘 맞춰 조정해요']
+          ]
+        }
+      ]
+    },
+    {
+      id: 'toeic4', label: '토익 850', short: '850', emoji: '🏦',
+      words: [
+        {
+          word: 'compliance', pos: 'noun', en: 'The act of following rules and laws', ko: '규정 준수',
+          art: [
+            ['paper', [['shieldCheck', 126, 120, 1.6], ['clipboard', 226, 122, 1.2], ['check', 282, 80, 1]], '정해진 규칙을 잘 지켜요'],
+            ['indoor', [['kidStand', 122, 156, .95, '#8fc9ff', {}], ['shieldCheck', 214, 110, 1.2], ['check', 272, 86, 1]], '규정을 지킨 직원에게 표시를 해요']
+          ]
+        },
+        {
+          word: 'liability', pos: 'noun', en: 'Legal responsibility for something', ko: '법적 책임, 부채',
+          art: [
+            ['paper', [['contract', 120, 122, 1.5], ['gavel', 224, 118, 1.15], ['qmark', 282, 78, .9]], '책임이 누구에게 있는지 따져요'],
+            ['indoor', [['desk', 160, 152, 1.05], ['contract', 118, 114, 1.2], ['gavel', 216, 140, 1.1]], '계약서를 놓고 책임을 확인해요']
+          ]
+        },
+        {
+          word: 'subsidiary', pos: 'noun', en: 'A company owned or controlled by a larger company', ko: '자회사',
+          art: [
+            ['city', [['city', 108, 142, 1], ['house', 216, 150, .8], ['arrowRight', 174, 108, .8]], '큰 회사 아래 작은 회사가 있어요'],
+            ['paper', [['docSheet', 108, 124, 1.3], ['house', 214, 138, 1], ['gear', 278, 116, .8]], '본사와 자회사가 함께 움직여요']
+          ]
+        },
+        {
+          word: 'procurement', pos: 'noun', en: 'The work of buying supplies a company needs', ko: '조달, 구매',
+          art: [
+            ['indoor', [['desk', 160, 152, 1.05], ['clipboard', 122, 112, 1.15], ['boxCard', 222, 136, 1], ['coin', 280, 102, 1]], '필요한 물건을 사서 들여와요'],
+            ['paper', [['docStack', 112, 124, 1.3], ['crate', 202, 132, 1.1], ['truck', 280, 130, .6]], '주문서를 쓰고 물건을 받아요']
+          ]
+        },
+        {
+          word: 'arbitration', pos: 'noun', en: 'Settling a dispute with the help of a neutral person', ko: '중재',
+          art: [
+            ['room', [['table', 160, 150, 1.3], ['kidSit', 106, 150, .75, '#ffb3c7', {}], ['kidSit', 214, 150, .75, '#8fc9ff', {}], ['gavel', 160, 84, 1.2]], '제삼자가 가운데 앉아 중재해요'],
+            ['paper', [['gavel', 116, 120, 1.5], ['contract', 216, 124, 1.3], ['check', 280, 78, 1]], '중재로 문제를 정리했어요']
+          ]
+        },
+        {
+          word: 'acquisition', pos: 'noun', en: 'The buying of one company by another', ko: '인수, 획득',
+          art: [
+            ['city', [['city', 104, 142, 1], ['house', 212, 148, .85], ['arrowRight', 166, 108, .85]], '큰 회사가 작은 회사를 사들여요'],
+            ['paper', [['handshake', 112, 126, 1.25], ['coin', 236, 108, 1.2], ['contract', 288, 126, .75]], '돈을 주고 회사를 넘겨받아요']
+          ]
+        },
+        {
+          word: 'amendment', pos: 'noun', en: 'A change made to a contract or a law', ko: '수정 조항, 개정',
+          art: [
+            ['paper', [['contract', 120, 124, 1.5], ['pencil', 208, 106, 1.1], ['check', 268, 124, 1]], '계약 내용을 고쳐 다시 적어요'],
+            ['indoor', [['desk', 160, 152, 1], ['docSheet', 120, 112, 1.15], ['pencil', 202, 122, 1], ['clipboard', 272, 116, .85]], '서류의 문장을 고쳐요']
+          ]
+        },
+        {
+          word: 'contingency', pos: 'noun', en: 'A possible event that must be planned for', ko: '우발 사태, 비상 대책',
+          art: [
+            ['paper', [['toolbox', 122, 122, 1.5], ['clipboard', 218, 124, 1.2], ['bolt', 286, 76, .7, '#ffcc48']], '갑자기 생길 일에 미리 대비해요'],
+            ['indoor', [['kidStand', 104, 156, .9, '#8fc9ff', {}], ['toolbox', 180, 148, 1.3], ['boxCard', 262, 150, .85]], '비상용 물건을 미리 챙겨 둬요']
+          ]
+        },
+        {
+          word: 'streamline', pos: 'verb', en: 'To make a process simpler and faster', ko: '간소화하다, 효율화하다',
+          art: [
+            ['paper', [['docStack', 108, 124, 1.3], ['arrowRight', 180, 118, 1], ['check', 246, 114, 1.2], ['sparkle', 292, 72, .7]], '복잡한 순서를 짧게 줄여요'],
+            ['indoor', [['desk', 160, 152, 1], ['gear', 120, 114, 1.1], ['arrowRight', 196, 114, .9], ['clock', 266, 94, 1]], '일을 더 빠르고 쉽게 만들어요']
+          ]
+        },
+        {
+          word: 'delegate', pos: 'verb', en: 'To give work or authority to someone else', ko: '위임하다',
+          art: [
+            ['room', [['table', 160, 150, 1.1], ['kidSit', 108, 150, .8, '#8fd4a0', {}], ['kidSit', 214, 150, .8, '#8fc9ff', {}], ['docSheet', 160, 84, 1]], '맡은 일을 다른 사람에게 넘겨요'],
+            ['paper', [['docSheet', 108, 124, 1.3], ['arrowRight', 178, 118, 1], ['idBadge', 254, 120, 1.1]], '일을 맡길 사람에게 서류를 건네요']
+          ]
+        }
+      ]
+    }
+  ];
+
+  /* =========================================================================
+     ✈️ Travel packs — six situations, ten words each
+     Taken from the words traveller word lists repeat most (airport, transit,
+     hotel, restaurant, shopping, emergency), so each pack is one scene the
+     child can walk through from start to finish.
+     ========================================================================= */
+  const TRAVEL_PACK_DEFS = [
+    {
+      id: 'tr1', label: '공항·출입국', short: '공항', emoji: '✈️',
+      words: [
+        {
+          word: 'passport', pos: 'noun', en: 'An official book that proves who you are when you travel', ko: '여권',
+          art: [
+            ['paper', [['passport', 126, 122, 1.6], ['stampMark', 222, 118, 1.1], ['sparkle', 282, 70, .8]], '여권에 출입국 도장을 찍어요'],
+            ['indoor', [['passport', 126, 120, 1.4], ['kidStand', 226, 156, .9, '#8fc9ff', {}], ['check', 282, 84, 1]], '탑승 전에 여권을 보여 줘요']
+          ]
+        },
+        {
+          word: 'boarding pass', pos: 'noun', en: 'The ticket that lets you get on the plane', ko: '탑승권',
+          art: [
+            ['paper', [['boardingPass', 136, 122, 1.6], ['check', 252, 102, 1.1]], '탑승권을 들고 게이트로 가요'],
+            ['indoor', [['desk', 136, 152, 1.05], ['boardingPass', 110, 116, 1.1], ['kidStand', 246, 156, .9, '#ffd166', {}], ['suitcase', 288, 158, .65]], '카운터에서 탑승권을 받아요']
+          ]
+        },
+        {
+          word: 'baggage', pos: 'noun', en: 'The bags and cases you take on a journey', ko: '수하물, 짐',
+          art: [
+            ['indoor', [['suitcase', 110, 152, 1.15], ['suitcase', 184, 152, 1, '#8fc9ff'], ['bag', 246, 148, .9]], '여행 짐을 한데 모았어요'],
+            ['paper', [['suitcase', 216, 128, 1.2], ['tag', 118, 122, 1.4]], '가방마다 이름표를 달았어요']
+          ]
+        },
+        {
+          word: 'gate', pos: 'noun', en: 'The door where you get on the plane', ko: '탑승구, 게이트',
+          art: [
+            ['indoor', [['door', 148, 156, 1.5], ['signpost', 238, 150, 1], ['kidStand', 92, 156, .8, '#ffb3c7', {}]], '탑승구 문 앞에 줄을 서요'],
+            ['paper', [['plane', 118, 116, 1.6], ['boardingPass', 234, 124, 1.1]], '탑승구에서 비행기에 올라요']
+          ]
+        },
+        {
+          word: 'customs', pos: 'noun', en: 'The place where officials check what you bring into a country', ko: '세관',
+          art: [
+            ['indoor', [['desk', 164, 152, 1.1], ['helper', 238, 156, .95], ['suitcase', 74, 156, .85]], '세관원이 가방을 살펴봐요'],
+            ['paper', [['passport', 122, 122, 1.5], ['stampMark', 222, 116, 1.2], ['check', 284, 76, .8]], '여권을 확인하고 도장을 찍어 줘요']
+          ]
+        },
+        {
+          word: 'departure', pos: 'noun', en: 'The act of a plane leaving on a journey', ko: '출발',
+          art: [
+            ['sky', [['plane', 156, 110, 1.8], ['cloud', 64, 56, .9], ['sparkle', 254, 62, .8]], '비행기가 하늘로 출발해요'],
+            ['indoor', [['board', 156, 100, 1.2], ['clock', 254, 104, 1.1], ['kidStand', 86, 156, .8, '#8fc9ff', {}]], '출발 시간이 안내판에 떠요']
+          ]
+        },
+        {
+          word: 'arrival', pos: 'noun', en: 'The act of a plane reaching its destination', ko: '도착',
+          art: [
+            ['sky', [['plane', 146, 118, 1.6], ['pin', 242, 118, 1.2], ['cloud', 218, 46, .7]], '비행기가 목적지에 도착해요'],
+            ['indoor', [['door', 146, 156, 1.4], ['kidStand', 226, 156, .95, '#8fd4a0', {}], ['suitcase', 98, 156, .85]], '도착장 문으로 걸어 나와요']
+          ]
+        },
+        {
+          word: 'delay', pos: 'noun', en: 'A time when something happens later than planned', ko: '지연, 늦어짐',
+          art: [
+            ['indoor', [['clock', 122, 106, 1.8], ['board', 214, 112, 1], ['bolt', 284, 82, .7, '#e8563f']], '비행기가 늦어진다고 알려 줘요'],
+            ['paper', [['clock', 118, 120, 1.9], ['boardingPass', 226, 124, 1.1], ['bolt', 284, 78, .7, '#e8563f']], '출발 시간이 미뤄졌어요']
+          ]
+        },
+        {
+          word: 'layover', pos: 'noun', en: 'A wait at a stop between two flights', ko: '경유, 환승 대기',
+          art: [
+            ['sky', [['plane', 108, 92, 1.2], ['plane', 226, 136, 1.2], ['arc', 168, 116, 1]], '다른 비행기로 갈아타요'],
+            ['indoor', [['clock', 116, 106, 1.5], ['cushion', 208, 148, 1.1], ['cup', 268, 118, .9]], '공항에서 잠시 기다려요']
+          ]
+        },
+        {
+          word: 'carry-on', pos: 'noun', en: 'A small bag you keep with you inside the plane', ko: '기내 수하물',
+          art: [
+            ['indoor', [['bag', 118, 146, 1.4], ['suitcase', 208, 152, .8], ['kidStand', 274, 156, .9, '#ffb3c7', {}]], '기내에 들고 타는 작은 가방이에요'],
+            ['paper', [['bag', 124, 124, 1.6], ['tag', 224, 120, 1.2]], '가방에 표를 달아 두어요']
+          ]
+        }
+      ]
+    },
+    {
+      id: 'tr2', label: '교통·길찾기', short: '교통', emoji: '🚇',
+      words: [
+        {
+          word: 'subway', pos: 'noun', en: 'An underground train that runs in a city', ko: '지하철',
+          art: [
+            ['indoor', [['train', 160, 138, 1.35], ['sparkle', 282, 76, .7]], '지하철이 역에 들어와요'],
+            ['paper', [['map', 146, 120, 1.5], ['pin', 212, 98, 1.1]], '지하철 노선도를 펼쳐 봐요']
+          ]
+        },
+        {
+          word: 'platform', pos: 'noun', en: 'The place beside the track where you wait for a train', ko: '승강장, 플랫폼',
+          art: [
+            ['indoor', [['train', 128, 138, 1.2], ['kidStand', 244, 156, .85, '#8fc9ff', {}]], '승강장에서 지하철을 기다려요'],
+            ['paper', [['safetyLine', 160, 132, 1], ['train', 210, 118, .85], ['kidStand', 82, 124, .55, '#ffb3c7', {}]], '노란 선 안쪽에서 기다려요']
+          ]
+        },
+        {
+          word: 'transfer', pos: 'verb', en: 'To change from one train or bus to another', ko: '갈아타다, 환승하다',
+          art: [
+            ['indoor', [['train', 92, 138, 1], ['train', 232, 138, 1], ['arrowRight', 164, 112, .9]], '다른 노선으로 갈아타요'],
+            ['paper', [['map', 128, 120, 1.3], ['loopArrow', 242, 118, 1.2]], '환승 표시를 따라가요']
+          ]
+        },
+        {
+          word: 'fare', pos: 'noun', en: 'The money you pay to ride a bus or train', ko: '요금, 운임',
+          art: [
+            ['paper', [['coin', 116, 118, 1.5], ['wallet', 200, 124, 1.2], ['turnstile', 278, 116, .75]], '요금을 내고 개찰구를 지나요'],
+            ['indoor', [['turnstile', 146, 152, 1.2], ['coin', 218, 108, 1.2], ['kidStand', 68, 156, .8, '#ffd166', {}]], '카드와 동전으로 요금을 내요']
+          ]
+        },
+        {
+          word: 'ticket', pos: 'noun', en: 'A small card that shows you have paid to travel', ko: '표, 승차권',
+          art: [
+            ['paper', [['boardingPass', 128, 124, 1.5], ['coin', 228, 118, 1.2]], '표를 사서 손에 들고 있어요'],
+            ['indoor', [['desk', 138, 150, 1], ['boardingPass', 108, 116, 1.05], ['kidStand', 252, 156, .9, '#8fc9ff', {}]], '매표소에서 표를 샀어요']
+          ]
+        },
+        {
+          word: 'intersection', pos: 'noun', en: 'The place where two or more roads meet', ko: '교차로',
+          art: [
+            ['city', [['crossRoad', 150, 148, 1], ['trafficLight', 258, 148, 1], ['city', 54, 118, .75]], '길이 네 갈래로 나뉘는 곳이에요'],
+            ['paper', [['map', 146, 120, 1.4], ['pin', 220, 98, 1.2]], '지도에서 교차로를 찾아요']
+          ]
+        },
+        {
+          word: 'round-trip', pos: 'adjective', en: 'Going to a place and coming back again', ko: '왕복의',
+          art: [
+            ['paper', [['boardingPass', 112, 112, 1.2], ['boardingPass', 228, 134, 1.2], ['loopArrow', 172, 76, .9]], '갔다가 다시 오는 표를 샀어요'],
+            ['sky', [['plane', 142, 96, 1.4], ['loopArrow', 246, 138, 1.2], ['cloud', 78, 46, .7]], '같은 길로 다시 돌아와요']
+          ]
+        },
+        {
+          word: 'exit', pos: 'noun', en: 'The way out of a building or station', ko: '출구',
+          art: [
+            ['indoor', [['door', 138, 156, 1.5], ['arrowRight', 232, 118, 1.1], ['signpost', 286, 150, .65]], '출구 표시를 따라 나가요'],
+            ['city', [['stairs', 140, 150, 1.2], ['arrowUp', 236, 120, 1]], '계단을 올라 바깥으로 나가요']
+          ]
+        },
+        {
+          word: 'timetable', pos: 'noun', en: 'A list that shows when trains or buses come and go', ko: '시간표',
+          art: [
+            ['paper', [['board', 154, 112, 1.4], ['clock', 272, 122, 1]], '시간표를 보고 다음 차를 골라요'],
+            ['indoor', [['clock', 122, 102, 1.3], ['board', 220, 110, 1], ['kidStand', 78, 156, .85, '#8fd4a0', {}]], '역 시간표를 확인해요']
+          ]
+        },
+        {
+          word: 'destination', pos: 'noun', en: 'The place you are travelling to', ko: '목적지',
+          art: [
+            ['paper', [['map', 138, 120, 1.4], ['pin', 212, 96, 1.3]], '지도에서 목적지를 짚어요'],
+            ['city', [['crossRoad', 140, 150, .95], ['signpost', 232, 146, 1], ['pin', 286, 100, 1]], '목적지까지 가는 길을 찾아요']
+          ]
+        }
+      ]
+    },
+    {
+      id: 'tr3', label: '숙소·체크인', short: '숙소', emoji: '🏨',
+      words: [
+        {
+          word: 'reservation', pos: 'noun', en: 'An arrangement to keep a room or table for you', ko: '예약',
+          art: [
+            ['paper', [['calendarSheet', 118, 124, 1.4], ['bed', 224, 132, 1], ['check', 284, 78, .9]], '숙소 날짜를 미리 예약했어요'],
+            ['indoor', [['desk', 160, 152, 1.05], ['phoneDesk', 124, 143, .9], ['calendarSheet', 226, 110, 1]], '전화로 방을 예약해요']
+          ]
+        },
+        {
+          word: 'check-in', pos: 'noun', en: 'The act of saying you have arrived at a hotel or airport', ko: '체크인, 탑승 수속',
+          art: [
+            ['indoor', [['desk', 140, 150, 1.1], ['keyCard', 116, 112, 1], ['kidStand', 240, 156, .9, '#ffb3c7', {}]], '카운터에서 방 열쇠를 받아요'],
+            ['paper', [['keyCard', 128, 120, 1.5], ['check', 236, 110, 1.4]], '이름을 확인하고 체크인을 마쳐요']
+          ]
+        },
+        {
+          word: 'lobby', pos: 'noun', en: 'The large room just inside the front door of a hotel', ko: '로비, 현관 홀',
+          art: [
+            ['room', [['cushion', 104, 148, 1.3], ['table', 202, 148, 1.1], ['cup', 202, 132, .8], ['door', 282, 156, 1]], '호텔 로비에서 잠시 쉬어요'],
+            ['indoor', [['cushion', 116, 148, 1.3], ['bag', 208, 144, 1.1], ['bell', 272, 148, 1]], '로비에 짐을 내려놓아요']
+          ]
+        },
+        {
+          word: 'keycard', pos: 'noun', en: 'A card that opens the door of your room', ko: '객실 카드, 키카드',
+          art: [
+            ['paper', [['keyCard', 148, 120, 1.7], ['door', 256, 130, 1]], '카드를 문에 대면 열려요'],
+            ['indoor', [['door', 148, 156, 1.6], ['keyCard', 248, 114, 1.2]], '방 카드로 문을 열어요']
+          ]
+        },
+        {
+          word: 'deposit', pos: 'noun', en: 'Money held in case something is damaged or lost', ko: '보증금, 예치금',
+          art: [
+            ['paper', [['coin', 118, 118, 1.4], ['wallet', 202, 124, 1.2], ['receipt', 274, 124, .9]], '보증금을 먼저 맡겨요'],
+            ['indoor', [['desk', 160, 152, 1.05], ['wallet', 122, 118, 1.1], ['receipt', 214, 116, 1], ['coin', 272, 92, 1]], '돈을 맡기고 영수증을 받아요']
+          ]
+        },
+        {
+          word: 'amenity', pos: 'noun', en: 'A useful extra a hotel offers its guests', ko: '편의시설, 부대시설',
+          art: [
+            ['water', [['swimmer', 160, 118, 1.4], ['waves', 202, 144, 1], ['sun', 272, 40, 1.2]], '호텔 수영장도 마음껏 써요'],
+            ['indoor', [['cup', 112, 122, .9], ['cushion', 198, 146, 1.2], ['sparkle', 262, 78, .9]], '방 안의 편의시설이 잘 갖춰져 있어요']
+          ]
+        },
+        {
+          word: 'housekeeping', pos: 'noun', en: 'The work of cleaning and tidying hotel rooms', ko: '객실 정리, 청소',
+          art: [
+            ['room', [['broom', 116, 150, 1.2], ['bed', 216, 146, 1.2]], '객실을 깨끗이 청소해요'],
+            ['paper', [['broom', 118, 120, 1.4], ['bed', 232, 132, .85], ['sparkle', 282, 70, .8]], '방을 정리해 새것처럼 만들어요']
+          ]
+        },
+        {
+          word: 'vacancy', pos: 'noun', en: 'A room that is free for a guest to stay in', ko: '빈방, 공석',
+          art: [
+            ['indoor', [['door', 138, 156, 1.5], ['check', 230, 106, 1.4], ['sparkle', 278, 78, .8]], '빈방이 있어 들어갈 수 있어요'],
+            ['indoor', [['desk', 136, 152, 1.05], ['bell', 104, 144, 1], ['kidStand', 252, 156, .9, '#8fd4a0', {}], ['keyCard', 288, 108, .7]], '카운터에서 빈방이 있다고 알려 줘요']
+          ]
+        },
+        {
+          word: 'breakfast', pos: 'noun', en: 'The first meal of the day', ko: '아침 식사',
+          art: [
+            ['paper', [['breakfast', 146, 124, 1.6], ['cup', 238, 118, 1.1]], '호텔 아침 식사가 차려졌어요'],
+            ['room', [['table', 160, 150, 1.1], ['breakfast', 128, 132, 1.2], ['cup', 236, 122, 1]], '식탁에 앉아 아침을 먹어요']
+          ]
+        },
+        {
+          word: 'luggage', pos: 'noun', en: 'The bags you carry when you travel', ko: '여행 가방, 짐',
+          art: [
+            ['indoor', [['suitcase', 118, 152, 1.2], ['bag', 194, 146, 1.1], ['kidStand', 262, 156, .8, '#8fc9ff', {}]], '짐을 방에 두고 나왔어요'],
+            ['paper', [['suitcase', 126, 124, 1.5], ['tag', 226, 118, 1.2]], '여행 가방에 이름표를 달았어요']
+          ]
+        }
+      ]
+    },
+    {
+      id: 'tr4', label: '식당·주문', short: '식당', emoji: '🍽️',
+      words: [
+        {
+          word: 'menu', pos: 'noun', en: 'The list of food and drinks a restaurant serves', ko: '메뉴, 차림표',
+          art: [
+            ['paper', [['menuCard', 146, 120, 1.5], ['cup', 252, 118, .9]], '메뉴를 펼쳐 음식을 골라요'],
+            ['indoor', [['table', 160, 150, 1.2], ['menuCard', 126, 124, 1.1], ['kidSit', 220, 150, .85, '#8fc9ff', {}]], '자리에 앉아 메뉴를 봐요']
+          ]
+        },
+        {
+          word: 'appetizer', pos: 'noun', en: 'A small dish served before the main meal', ko: '전채 요리, 에피타이저',
+          art: [
+            ['paper', [['plate', 128, 120, 1.4], ['spoon', 226, 120, 1]], '식사 전에 조금 먹는 요리예요'],
+            ['indoor', [['table', 160, 150, 1.15], ['plate', 122, 126, 1], ['cup', 226, 118, .9]], '작은 접시에 담아 먼저 내와요']
+          ]
+        },
+        {
+          word: 'beverage', pos: 'noun', en: 'Any drink, such as water, juice, or coffee', ko: '음료',
+          art: [
+            ['paper', [['cup', 118, 120, 1.6], ['cup', 210, 124, 1.5, '#ffd0dc']], '마실 것을 골라요'],
+            ['indoor', [['table', 160, 150, 1.1], ['cup', 122, 124, 1.2], ['cup', 214, 124, 1.1, '#c9e8b0']], '식탁에 음료를 놓았어요']
+          ]
+        },
+        {
+          word: 'bill', pos: 'noun', en: 'The paper that shows how much you must pay for a meal', ko: '계산서, 청구서',
+          art: [
+            ['paper', [['receipt', 128, 120, 1.6], ['coin', 222, 114, 1.2]], '먹은 값이 적힌 종이를 받아요'],
+            ['indoor', [['table', 160, 150, 1.1], ['receipt', 122, 122, 1.1], ['wallet', 216, 126, 1.05]], '식사 후에 계산서를 받아요']
+          ]
+        },
+        {
+          word: 'tip', pos: 'noun', en: 'Extra money you leave for good service', ko: '팁, 서비스료',
+          art: [
+            ['paper', [['coin', 126, 114, 1.5], ['receipt', 218, 124, 1.2]], '고마운 마음을 더 얹어 드려요'],
+            ['indoor', [['table', 160, 150, 1.1], ['coin', 126, 128, 1.3], ['receipt', 214, 122, 1]], '식탁 위에 팁을 두고 나와요']
+          ]
+        },
+        {
+          word: 'allergy', pos: 'noun', en: 'A bad reaction of the body to certain food or medicine', ko: '알레르기',
+          art: [
+            ['paper', [['apple', 108, 116, 1.6], ['crossMark', 198, 118, 1.4, '#e8563f'], ['qmark', 268, 80, .9]], '이 음식은 먹으면 안 돼요'],
+            ['indoor', [['doctor', 136, 156, 1], ['qmark', 228, 108, 1.1], ['heart', 278, 82, .9, '#ffb3c7']], '몸에 맞지 않는 것을 조심해요']
+          ]
+        },
+        {
+          word: 'takeaway', pos: 'noun', en: 'Food you buy and carry home to eat', ko: '포장 음식',
+          art: [
+            ['paper', [['bowl', 118, 124, 1.4], ['bag', 208, 120, 1.3]], '먹을 것을 봉투에 담아 가요'],
+            ['indoor', [['bowl', 108, 122, 1.1], ['bag', 204, 146, 1.2], ['kidStand', 278, 156, .75, '#ffd166', {}]], '포장해 달라고 말해요']
+          ]
+        },
+        {
+          word: 'spicy', pos: 'adjective', en: 'Having a strong hot taste that burns the mouth', ko: '매운',
+          art: [
+            ['paper', [['plate', 128, 120, 1.4], ['bolt', 216, 114, 1, '#e8563f'], ['drop', 262, 114, .8, '#ff8f8f']], '혀가 얼얼할 만큼 매워요'],
+            ['room', [['bowl', 116, 128, 1.2], ['bolt', 190, 102, .9, '#e8563f'], ['kidStand', 254, 156, .9, '#ffb3c7', {}]], '매운 음식을 먹고 물을 찾아요']
+          ]
+        },
+        {
+          word: 'recommend', pos: 'verb', en: 'To say that something is good and worth choosing', ko: '추천하다',
+          art: [
+            ['paper', [['menuCard', 136, 120, 1.4], ['heart', 234, 108, 1.3, '#ff8fae']], '오늘의 메뉴를 추천해 줘요'],
+            ['indoor', [['helper', 128, 156, .95], ['menuCard', 216, 122, 1], ['heart', 278, 82, .9]], '직원이 맛있는 것을 골라 줘요']
+          ]
+        },
+        {
+          word: 'refill', pos: 'verb', en: 'To fill a cup or glass again', ko: '다시 채우다, 리필하다',
+          art: [
+            ['paper', [['cup', 124, 120, 1.5], ['loopArrow', 220, 118, 1.3]], '잔을 다시 채워 달라고 해요'],
+            ['indoor', [['cup', 126, 128, 1.2], ['cup', 204, 138, 1.2, '#c9e8b0'], ['loopArrow', 268, 96, .9]], '물을 더 따라 줘요']
+          ]
+        }
+      ]
+    },
+    {
+      id: 'tr5', label: '쇼핑·환불', short: '쇼핑', emoji: '🛍️',
+      words: [
+        {
+          word: 'receipt', pos: 'noun', en: 'A paper that proves you bought something', ko: '영수증',
+          art: [
+            ['paper', [['receipt', 136, 120, 1.6], ['coin', 230, 116, 1]], '물건을 산 증거 종이를 받아요'],
+            ['indoor', [['desk', 160, 150, 1], ['receipt', 122, 114, 1.15], ['bag', 216, 144, 1]], '계산대에서 영수증을 받아요']
+          ]
+        },
+        {
+          word: 'discount', pos: 'noun', en: 'A lower price than usual', ko: '할인',
+          art: [
+            ['paper', [['percent', 126, 118, 1.6], ['tag', 226, 118, 1.2, '#8fd4a0']], '값을 깎아 준다고 표시해요'],
+            ['indoor', [['bag', 124, 146, 1.3], ['discountTag', 218, 122, 1.3]], '세일 표를 붙은 가방을 샀어요']
+          ]
+        },
+        {
+          word: 'refund', pos: 'noun', en: 'Money given back when you return something', ko: '환불',
+          art: [
+            ['paper', [['receipt', 116, 120, 1.4], ['loopArrow', 202, 118, 1.3], ['coin', 272, 118, 1]], '물건을 돌려주고 돈을 받아요'],
+            ['indoor', [['desk', 160, 150, 1], ['receipt', 118, 114, 1.1], ['wallet', 214, 122, 1], ['coin', 268, 94, 1]], '영수증을 내고 돈을 돌려받아요']
+          ]
+        },
+        {
+          word: 'exchange', pos: 'verb', en: 'To give one thing back and get another instead', ko: '교환하다',
+          art: [
+            ['paper', [['bag', 112, 120, 1.3], ['loopArrow', 190, 116, 1.3], ['bag', 268, 120, 1.2]], '다른 물건으로 바꿔 줘요'],
+            ['indoor', [['desk', 160, 150, 1], ['bag', 118, 144, 1.1], ['bag', 210, 144, 1.1], ['loopArrow', 268, 108, .9]], '크기가 달라 바꿔 달라고 해요']
+          ]
+        },
+        {
+          word: 'tax-free', pos: 'adjective', en: 'Sold without the tax added to the price', ko: '면세의',
+          art: [
+            ['paper', [['receipt', 118, 120, 1.4], ['percent', 206, 116, 1.3, '#8fc9ff'], ['passport', 282, 120, .8]], '세금을 빼고 사는 가게예요'],
+            ['indoor', [['desk', 160, 150, 1], ['passport', 118, 114, 1.1], ['receipt', 202, 116, 1], ['check', 266, 92, 1]], '여권을 보여 주면 세금을 돌려줘요']
+          ]
+        },
+        {
+          word: 'fitting room', pos: 'noun', en: 'A small room in a shop where you try on clothes', ko: '탈의실',
+          art: [
+            ['room', [['curtain', 158, 152, 1.5], ['heart', 268, 84, 1.2, '#ffb3c7'], ['sparkle', 72, 96, .8]], '커튼을 치고 옷을 입어 봐요'],
+            ['paper', [['curtain', 132, 148, 1.7], ['tag', 248, 116, 1.1]], '옷을 입어 보고 크기를 확인해요']
+          ]
+        },
+        {
+          word: 'cash', pos: 'noun', en: 'Money in coins and notes, not on a card', ko: '현금',
+          art: [
+            ['paper', [['coin', 112, 116, 1.3], ['coin', 146, 132, 1.1], ['wallet', 236, 120, 1.3]], '지갑에 든 현금으로 계산해요'],
+            ['indoor', [['desk', 160, 150, 1], ['wallet', 120, 120, 1.1], ['coin', 200, 116, 1.2], ['receipt', 266, 120, .9]], '현금을 내고 영수증을 받아요']
+          ]
+        },
+        {
+          word: 'warranty', pos: 'noun', en: 'A promise to repair a product if it breaks', ko: '품질 보증',
+          art: [
+            ['paper', [['docSheet', 122, 120, 1.4], ['shieldCheck', 212, 116, 1.3], ['check', 282, 78, 1]], '고장 나면 고쳐 준다는 약속이에요'],
+            ['indoor', [['desk', 160, 150, 1], ['docSheet', 120, 114, 1.1], ['gear', 202, 114, 1.1], ['check', 266, 88, 1]], '기계를 무료로 고쳐 줘요']
+          ]
+        },
+        {
+          word: 'size', pos: 'noun', en: 'How big or small something is', ko: '크기, 치수, 사이즈',
+          art: [
+            ['paper', [['ruler', 146, 118, 1.5], ['tag', 240, 118, 1.1]], '자를 대어 크기를 재요'],
+            ['indoor', [['bag', 120, 146, 1.1], ['bag', 202, 144, 1.5]], '작은 것과 큰 것을 나란히 놓고 골라요']
+          ]
+        },
+        {
+          word: 'bargain', pos: 'verb', en: 'To talk about the price until it is lower', ko: '흥정하다, 싸게 산 물건',
+          art: [
+            ['paper', [['tag', 120, 118, 1.3], ['coin', 202, 114, 1.3], ['percent', 274, 120, 1]], '값을 깎아 싸게 사요'],
+            ['indoor', [['kidStand', 112, 156, .9, '#8fc9ff', {}], ['kidStand', 232, 156, .9, '#ffd166', {}], ['bag', 172, 142, .9]], '점원과 값을 맞춰 흥정해요']
+          ]
+        }
+      ]
+    },
+    {
+      id: 'tr6', label: '병원·긴급상황', short: '응급', emoji: '🚑',
+      words: [
+        {
+          word: 'pharmacy', pos: 'noun', en: 'A shop where you buy medicine', ko: '약국',
+          art: [
+            ['city', [['pharmacySign', 146, 142, 1.2], ['door', 68, 156, 1], ['city', 252, 140, .8]], '초록 십자 표시가 있는 약국이에요'],
+            ['indoor', [['shelf', 132, 148, 1.2], ['pharmacySign', 250, 106, .9], ['helper', 76, 156, .8]], '약을 사러 약국에 들러요']
+          ]
+        },
+        {
+          word: 'prescription', pos: 'noun', en: 'A paper from a doctor that lets you buy medicine', ko: '처방전',
+          art: [
+            ['paper', [['docSheet', 122, 120, 1.4], ['crossBadge', 212, 114, 1.2]], '의사가 써 준 약 처방전이에요'],
+            ['indoor', [['doctor', 124, 156, .95], ['docSheet', 208, 114, 1], ['check', 272, 88, 1]], '의사에게 처방전을 받아요']
+          ]
+        },
+        {
+          word: 'fever', pos: 'noun', en: 'A body temperature higher than normal', ko: '열, 발열',
+          art: [
+            ['paper', [['thermometer', 128, 120, 1.6], ['bolt', 212, 108, .9, '#e8563f']], '체온이 높아 열이 나요'],
+            ['indoor', [['bed', 160, 146, 1.3], ['icepack', 234, 106, 1.2], ['thermometer', 96, 118, 1.1]], '이불을 덮고 열을 내려요']
+          ]
+        },
+        {
+          word: 'insurance', pos: 'noun', en: 'An agreement that pays costs when something goes wrong', ko: '보험',
+          art: [
+            ['paper', [['docSheet', 120, 120, 1.4], ['shieldCheck', 210, 114, 1.3], ['coin', 278, 118, .9]], '걱정되는 일에 대비해 미리 들어요'],
+            ['indoor', [['desk', 160, 150, 1], ['docSheet', 120, 114, 1.1], ['shieldCheck', 206, 110, 1.1], ['phoneDesk', 274, 142, .8]], '보험사에 전화해 도움을 청해요']
+          ]
+        },
+        {
+          word: 'emergency', pos: 'noun', en: 'A sudden dangerous situation that needs quick help', ko: '긴급 상황, 비상',
+          art: [
+            ['city', [['crossBadge', 126, 118, 1.4], ['bolt', 212, 110, 1.2, '#e8563f'], ['qmark', 278, 78, .9]], '급한 일이 생기면 바로 도움을 청해요'],
+            ['indoor', [['helper', 136, 156, 1], ['bolt', 230, 106, 1, '#e8563f'], ['heart', 280, 82, .9]], '도와주는 사람에게 달려가요']
+          ]
+        },
+        {
+          word: 'embassy', pos: 'noun', en: 'Your country\'s office in another country', ko: '대사관',
+          art: [
+            ['city', [['embassy', 152, 154, 1.15], ['cloud', 262, 40, .7], ['bird', 70, 54]], '우리나라 대사관 건물이에요'],
+            ['paper', [['docSheet', 122, 120, 1.3], ['flag', 214, 110, 1.2], ['check', 280, 78, .9]], '대사관에서 새 여권을 받아요']
+          ]
+        },
+        {
+          word: 'symptom', pos: 'noun', en: 'A sign in the body that shows you are ill', ko: '증상',
+          art: [
+            ['paper', [['torso', 126, 116, 1.05], ['bolt', 202, 108, .9, '#e8563f'], ['qmark', 258, 78, .9]], '몸이 아픈 곳을 하나씩 말해요'],
+            ['indoor', [['doctor', 118, 156, 1], ['bubble', 210, 104, 1.2], ['heart', 282, 82, .9]], '의사에게 어디가 아픈지 말해요']
+          ]
+        },
+        {
+          word: 'bandage', pos: 'noun', en: 'A strip of cloth you put over a cut', ko: '붕대, 반창고',
+          art: [
+            ['paper', [['bandage', 126, 118, 2.4], ['heart', 232, 104, 1.2, '#ffb3c7']], '상처에 붙이는 얇은 천이에요'],
+            ['indoor', [['kidCross', 126, 156, 1.1, '#ffd166'], ['bandage', 152, 138, 1.5, -18]], '넘어져서 상처에 붙였어요']
+          ]
+        },
+        {
+          word: 'lost', pos: 'adjective', en: 'Not able to find the way, or missing something', ko: '길을 잃은, 잃어버린',
+          art: [
+            ['paper', [['map', 128, 120, 1.3], ['qmark', 224, 102, 1.2]], '어디로 가야 할지 몰라 헤매요'],
+            ['indoor', [['passport', 136, 118, 1.1], ['qmark', 220, 102, 1.2], ['magnifier', 282, 118, 1]], '여권을 잃어버려 찾고 있어요']
+          ]
+        },
+        {
+          word: 'police', pos: 'noun', en: 'The people whose job is to keep people safe and catch thieves', ko: '경찰',
+          art: [
+            ['city', [['policeBadge', 144, 118, 1.5], ['city', 254, 142, .8]], '경찰에게 도움을 청해요'],
+            ['indoor', [['helper', 136, 156, 1], ['policeBadge', 228, 110, 1.2]], '경찰관이 사건을 적어 줘요']
+          ]
+        }
+      ]
+    }
+  ];
+
   /* The order below is the order the Home screen shows them in. */
   const PACKS = [buildGradePack(NOV26_DEF), buildSciencePack(NOV23_DEF), { id: '261120', label: '261120', short: '261120', emoji: '📸', words: BUILTIN }]
     .concat(GRADE_PACK_DEFS.map(buildGradePack))
     .concat(MIDDLE_PACK_DEFS.map(buildGradePack))
-    .concat(HIGH_PACK_DEFS.map(buildGradePack));
+    .concat(HIGH_PACK_DEFS.map(buildGradePack))
+    .concat(TOEIC_PACK_DEFS.map(buildGradePack))
+    .concat(TRAVEL_PACK_DEFS.map(buildGradePack));
 
   /* Two levels on Home: a big category, then the packs inside it. */
   const CATEGORIES = [
@@ -4146,8 +5177,8 @@
     { id: 'elem', label: '초등단어', emoji: '🌱', packs: ['g1', 'g2', 'g3', 'g4', 'g5', 'g6'] },
     { id: 'mid', label: '중등단어', emoji: '📘', packs: ['m1', 'm2', 'm3'] },
     { id: 'high', label: '고등단어', emoji: '🎓', packs: ['h1', 'h2', 'h3'] },
-    { id: 'toeic', label: '토익단어', emoji: '💼', packs: [], soon: '토익 단어 팩을 준비하고 있어요' },
-    { id: 'travel', label: '여행단어', emoji: '✈️', packs: [], soon: '여행 단어 팩을 준비하고 있어요' }
+    { id: 'toeic', label: '토익단어', emoji: '💼', packs: ['toeic1', 'toeic2', 'toeic3', 'toeic4'] },
+    { id: 'travel', label: '여행단어', emoji: '✈️', packs: ['tr1', 'tr2', 'tr3', 'tr4', 'tr5', 'tr6'] }
   ];
 
   function categoryById(id) {
@@ -4269,7 +5300,7 @@
   /* what the child is studying now: the picked pack, plus their own words */
   function activeWords() {
     const cat = currentCategory();
-    if (!cat.packs.length) return [];   // 토익·여행: nothing to study yet
+    if (!cat.packs.length) return [];   // a category with no pack yet has nothing to study
     return currentPack().words.concat(customWords());
   }
 

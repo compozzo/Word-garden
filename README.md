@@ -12,7 +12,7 @@ Open `index.html` (or the GitHub Pages URL) on a phone or tablet.
 
 **Sticker book** — collected fruits and total score are kept in `localStorage` on the device.
 
-**두 단계로 고르기** — Home first shows the six big categories (숙제단어 · 초등단어 · 중등단어 · 고등단어 · 토익단어 · 여행단어) as a 3×2 grid, then the packs inside the picked category as a horizontal strip. The category is kept in `localStorage` (`wg_cat_v1`) and the pack in `wg_pack_v1`; the hero chips, Learn Stage and Test Stage follow the picked pack. Words added with 단어 관리 ride along in whichever pack is picked. A category with no packs yet (토익·여행) shows a "준비 중" notice and greys out Learn/Test instead of opening an empty round. Devices that saved an old pack key still work: `today`/`photo` map to `261120` and `nov23` to `261123`.
+**두 단계로 고르기** — Home first shows the six big categories (숙제단어 · 초등단어 · 중등단어 · 고등단어 · 토익단어 · 여행단어) as a 3×2 grid, then the packs inside the picked category as a horizontal strip. All six categories now hold packs. The category is kept in `localStorage` (`wg_cat_v1`) and the pack in `wg_pack_v1`; the hero chips, Learn Stage and Test Stage follow the picked pack. Words added with 단어 관리 ride along in whichever pack is picked. The empty-category path is still in the file for a future category: a category whose `packs` list is empty shows a "준비 중" notice and greys out Learn/Test instead of opening an empty round. Devices that saved an old pack key still work: `today`/`photo` map to `261120` and `nov23` to `261123`.
 
 **단어 관리** — a parent can add a word (English, Korean meaning, English definition, part of speech, and a picture emoji). Words added there are stored on the device only; for illustrated multi-scene pictures, update the word list in the file.
 
@@ -30,9 +30,23 @@ Open `index.html` (or the GitHub Pages URL) on a phone or tablet.
 
 `📘 중등단어` (중1·중2·중3) and `🎓 고등단어` (고1·고2·고3) add thirty words each, ten per grade, drawn from the 2022 revised English curriculum vocabulary range for middle and high school and ordered by difficulty (adventure ~ prepare, achieve ~ honest, analyze ~ perspective, anticipate ~ verify, ambiguous ~ prevalent, alleviate ~ skeptical). Each grade pack is labelled with its short name in the strip (`중1`) and its theme in the hero (`중1 필수`).
 
-`💼 토익단어` and `✈️ 여행단어` are placeholders: the category shows a "준비 중" note and Learn/Test stay disabled until a pack is added to its `packs` list in `CATEGORIES`.
+`💼 토익단어` holds four ten-word tiers, ordered by the score band where a learner meets the words (TOEIC Service List / Business Service List frequency bands, plus the score-band word books Korean learners use):
 
-Every word carries two inline SVG scenes, built from a shared set of flat-shape pieces (`artBg`, the `G` glyph library and `artScene`) so all 152 words stay crisp at phone size without external files.
+- `베이직` — office and daily business basics: schedule ~ request.
+- `600` — hiring, scheduling and communication: applicant ~ procedure.
+- `750` — contracts, billing, shipping and performance: contract ~ coordinate.
+- `850` — finance, legal, compliance and abstract business verbs: compliance ~ delegate.
+
+`✈️ 여행단어` holds six ten-word situations, each one a trip the child can walk through:
+
+- `공항` — passport ~ carry-on.
+- `교통` — subway ~ destination.
+- `숙소` — reservation ~ luggage.
+- `식당` — menu ~ refill.
+- `쇼핑` — receipt ~ bargain.
+- `응급` — pharmacy ~ police.
+
+Every word carries two inline SVG scenes, built from a shared set of flat-shape pieces (`artBg`, the `G` glyph library and `artScene`) so all 252 words stay crisp at phone size without external files. The business and travel pictures add their own pieces (`BIZ_KIT`: desk, laptop, contract, stamp, handshake, briefcase, truck, cargo ship, warehouse, gavel … and `TRAVEL_KIT`: passport, boarding pass, train, turnstile, key card, menu, receipt, curtain, pharmacy sign, embassy …), merged into `G` with `Object.assign` so one art description can name any piece.
 
 ## The environment unit (📸 오늘의 단어장)
 
