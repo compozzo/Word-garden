@@ -480,10 +480,10 @@
     </div>
 
     <div class="pack-select">
-      <div class="head"><span class="t" id="packHeadTitle">숙제단어 팩</span><span class="h">좌우로 넘겨 보세요</span></div>
+      <div class="head"><span class="t" id="packHeadTitle">숙제단어 팩</span><span class="h" id="packHint">좌우로 넘겨 보세요</span></div>
       <div class="pack-scroll" id="packScroll"></div>
       <div class="soon-box" id="soonBox">
-        <span class="big">🌱</span>
+        <span class="big soon-emoji">🌱</span>
         <span class="soon-text">단어 팩을 준비하고 있어요</span>
       </div>
     </div>
@@ -715,12 +715,19 @@
 
   /* ------------------------- toast ------------------------- */
   let toastTimer = null;
+  let toastClearTimer = null;
   function toast(msg) {
     const t = $('#toast');
     t.textContent = msg;
     t.classList.add('show');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+    toastTimer = setTimeout(() => {
+      t.classList.remove('show');
+      clearTimeout(toastClearTimer);
+      toastClearTimer = setTimeout(() => {
+        if (!t.classList.contains('show')) t.textContent = '';
+      }, 320);
+    }, 2200);
   }
 
   /* ------------------------- sound ------------------------- */
@@ -2474,8 +2481,12 @@
     arrowRight: (x, y, s, c) => arrowRight(x, y, s, c),
     arrowDown: (x, y, s, c) => arrowDown(x, y, s, c),
     ropeTaut: (x, y, s) => gWrap(x, y, s,
-      '<path d="M-46 0 q24 -8 46 0 q22 8 46 0" fill="none" stroke="#c9a67b" stroke-width="5.5" stroke-linecap="round"/>'
-      + '<path d="M-40 -4 l6 8 M-16 -5 l6 8 M8 -3 l6 8 M32 -5 l6 8" stroke="#b98f5c" stroke-width="2.2" stroke-linecap="round"/>'),
+      '<path d="M-46 0 q23 -4 46 0 q23 4 46 0" fill="none" stroke="#b08d6a" stroke-width="3.6" stroke-linecap="round"/>'
+      + '<path d="M-34 -1 l4 4 M-14 -2 l4 4 M6 -1 l4 4 M26 -2 l4 4" stroke="#9a7a5b" stroke-width="1.6" stroke-linecap="round"/>'),
+    lever: (x, y, s) => gWrap(x, y, s,
+      '<rect x="-3.5" y="-52" width="7" height="52" rx="3" fill="#b9a48c"/>'
+      + '<circle cy="-55" r="7" fill="#e8563f" stroke="#c9452f" stroke-width="1.6"/>'
+      + '<rect x="-16" y="-4" width="32" height="8" rx="4" fill="#9fb4c8"/>'),
     sixNineCard: (x, y, s) => gWrap(x, y, s,
       '<rect x="-46" y="-36" width="92" height="72" rx="7" fill="#ffffff" stroke="#c9b291" stroke-width="3"/>'
       + '<path d="M0 -36 V36" stroke="#e0d2bd" stroke-width="2"/>'
@@ -3330,7 +3341,7 @@
           word: 'inevitable', pos: 'adjective', en: 'Certain to happen and impossible to avoid', ko: '불가피한, 피할 수 없는',
           art: [
             ['paper', [['domino', 126, 120, 1.3], ['clock', 232, 100, 1.2], ['arrowRight', 194, 74, .8]], '쓰러지기 시작하면 멈출 수 없어요'],
-            ['meadow', [['mountains', 160, 150, .9], ['ball', 176, 74, 1.05, '#ff8f8f'], ['arrowDown', 212, 96, 1, '#e8563f'], ['speed', 248, 70, .9]], '비구름이 오면 비가 오는 건 피할 수 없어요']
+            ['paper', [['clock', 126, 110, 1.6], ['calendarSheet', 224, 110, 1.35], ['arrowDown', 176, 68, .9, '#e8563f'], ['sparkle', 62, 64, .7]], '비구름이 오면 비가 오는 건 피할 수 없어요']
           ]
         },
         {
@@ -3377,7 +3388,7 @@
           word: 'advocate', pos: 'verb', en: 'To speak in support of a person or an idea', ko: '옹호하다, 주장하다',
           art: [
             ['meadow', [['kidStand', 118, 154, .85, '#8fc9ff', {}], ['flag', 190, 146, 1.4, '#8fd4a0'], ['megaphone', 76, 92, .9], ['heart', 246, 66, .8, '#ff9fb2']], '깃발을 들고 함께하자고 외쳐요'],
-            ['meadow', [['tree', 168, 150, 1.6], ['umbrella', 168, 108, 1.2, '#8fd4a0'], ['kidStand', 80, 154, .8, '#ffd166', {}], ['heart', 246, 76, .9, '#ff9fb2']], '나무를 지켜야 한다고 목소리를 내요']
+            ['meadow', [['tree', 190, 150, 1.6], ['kidStand', 104, 154, .8, '#ffd166', {}], ['heart', 250, 76, .9, '#ff9fb2'], ['megaphone', 58, 96, .8]], '나무를 지켜야 한다고 목소리를 내요']
           ]
         },
         {
@@ -3426,7 +3437,7 @@
           word: 'manipulate', pos: 'verb', en: 'To control or change something by hand or with skill', ko: '조작하다, 다루다',
           art: [
             ['indoor', [['gear', 152, 106, 1.5, '#a9c4d8'], ['toolbox', 76, 144, 1], ['hammer', 232, 118, 1], ['sparkle', 250, 66, .8]], '공구로 기계를 손보아 움직여요'],
-            ['room', [['kidStand', 160, 154, .85, '#ffd166', {}], ['ropeTaut', 160, 62, .9], ['gear', 254, 118, 1.1, '#a9c4d8'], ['arrowRight', 214, 78, .7]], '끈을 당겨 톱니를 돌려요']
+            ['indoor', [['kidStand', 96, 154, .85, '#ffd166', {}], ['lever', 132, 152, 1.15], ['gear', 228, 116, 1.3, '#a9c4d8'], ['arrowRight', 182, 84, .8]], '끈을 당겨 톱니를 돌려요']
           ]
         },
         {
@@ -4335,9 +4346,12 @@
     if (soon) {
       soon.classList.toggle('show', !list.length);
       $$('.soon-text', soon).forEach(t => { t.textContent = cat.soon || '단어 팩을 준비하고 있어요'; });
+      $$('.soon-emoji', soon).forEach(t => { t.textContent = cat.emoji; });
     }
     const head = $('#packHeadTitle');
     if (head) head.textContent = cat.label + (list.length ? ' 팩' : '');
+    const hint = $('#packHint');
+    if (hint) hint.hidden = !list.length;
 
     // bring the picked pack into sight without moving the page itself.
     // Measured from the strip's own edges, so the app can sit centred on a
@@ -4349,6 +4363,9 @@
       box.scrollLeft += (pill.left - strip.left) - (box.clientWidth - pill.width) / 2;
     }
   }
+
+  /* while the app is open, a category remembers the pack last opened in it */
+  const lastPackByCat = {};
 
   function resetRound() {
     state.learnIndex = 0;
@@ -4363,7 +4380,11 @@
     if (!cat || id === state.catId) return;
     state.catId = id;
     saveCat();
-    if (cat.packs.length) { state.packId = cat.packs[0]; savePack(); }
+    if (cat.packs.length) {
+      const remembered = lastPackByCat[cat.id];
+      state.packId = (remembered && cat.packs.indexOf(remembered) !== -1) ? remembered : cat.packs[0];
+      savePack();
+    }
     resetRound();
     sfx.pick();
     renderHome();
@@ -4373,6 +4394,7 @@
   function selectPack(id) {
     if (!packById(id) || id === state.packId) return;
     state.packId = id;
+    lastPackByCat[state.catId] = id;
     savePack();
     resetRound();
     sfx.pick();
