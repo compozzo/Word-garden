@@ -4924,163 +4924,16 @@
   }
 
   /* =========================================================================
-     💼 TOEIC packs — four tiers of ten words each
+     💼 TOEIC packs — four score tiers
      Words were picked from the TOEIC Service List (TSL) and Business Service
      List (BSL) frequency bands and from the score-band word books Korean
      learners use (해커스 기출보카, 황소보카 정기시험 빈출 순위), then sorted by
      the band where a learner meets them: office basics → 600 → 750 → 850.
+     베이직(120) and 600(180) are too big to keep inline, so they live in
+     data/toeic.json and are fetched in the background (see loadToeicPacks);
+     the two upper tiers stay here as ten-word packs.
      ========================================================================= */
   const TOEIC_PACK_DEFS = [
-    {
-      id: 'toeic1', label: '토익 베이직', short: '베이직', emoji: '💼',
-      words: [
-        {
-          word: 'schedule', pos: 'noun', en: 'A plan that shows when things will happen', ko: '일정, 예정표',
-          art: [
-            ['paper', [['calendarSheet', 112, 128, 1.7], ['clock', 216, 118, 1.6], ['arrowRight', 168, 78, .7], ['sparkle', 274, 60, .7]], '달력과 시계로 오늘 일정을 확인해요'],
-            ['indoor', [['desk', 160, 152, 1.05], ['laptop', 120, 143, .95], ['calendarSheet', 228, 108, 1.1], ['clock', 286, 78, .9]], '책상 위에 하루 일정을 펼쳐 두었어요']
-          ]
-        },
-        {
-          word: 'office', pos: 'noun', en: 'A room or building where people work at desks', ko: '사무실',
-          art: [
-            ['indoor', [['desk', 148, 152, 1.05], ['laptop', 122, 143, .9], ['phoneDesk', 208, 143, .85], ['clock', 276, 80, 1]], '사무실 책상마다 컴퓨터와 전화가 있어요'],
-            ['city', [['city', 138, 140, 1.1], ['door', 150, 156, 1.3], ['kidStand', 252, 158, .75, '#8fc9ff', {}]], '건물 안 사무실로 출근해요']
-          ]
-        },
-        {
-          word: 'meeting', pos: 'noun', en: 'A time when people come together to talk about work', ko: '회의',
-          art: [
-            ['room', [['table', 160, 150, 1.5], ['kidSit', 104, 150, .85, '#8fc9ff', {}], ['kidSit', 214, 150, .85, '#ffb3c7', {}], ['board', 160, 82, .8]], '회의실에 모여 이야기를 나눠요'],
-            ['paper', [['calendarSheet', 122, 126, 1.4], ['clock', 208, 108, 1.4], ['bubble', 258, 82, .8], ['check', 92, 78, 1]], '회의 시간을 달력에 적어 두었어요']
-          ]
-        },
-        {
-          word: 'email', pos: 'noun', en: 'A message sent from one computer to another', ko: '이메일, 전자 우편',
-          art: [
-            ['indoor', [['laptop', 138, 150, 1.5], ['envelope', 238, 106, 1.1], ['arrowRight', 196, 66, .7]], '노트북으로 메일을 보내요'],
-            ['paper', [['envelope', 140, 120, 2.2], ['bubble', 256, 84, .8], ['sparkle', 214, 62, .8]], '메일이 도착해 알림이 떠요']
-          ]
-        },
-        {
-          word: 'document', pos: 'noun', en: 'A paper or computer file that holds information', ko: '문서, 서류',
-          art: [
-            ['paper', [['docSheet', 118, 124, 1.5], ['docStack', 206, 122, 1.3], ['pencil', 272, 100, 1]], '문서를 정리해 서류철에 넣어요'],
-            ['indoor', [['desk', 160, 152, 1.05], ['docSheet', 124, 112, 1.2], ['magnifier', 222, 122, 1.1]], '문서를 자세히 읽어 봐요']
-          ]
-        },
-        {
-          word: 'confirm', pos: 'verb', en: 'To say for sure that something is true or will happen', ko: '확인하다',
-          art: [
-            ['paper', [['clipboard', 128, 124, 1.5], ['check', 208, 104, 1.6], ['stampMark', 268, 128, 1]], '확인한 항목에 표시를 해요'],
-            ['indoor', [['kidStand', 118, 156, .95, '#8fc9ff', {}], ['docSheet', 208, 116, 1.2], ['check', 264, 84, 1.1]], '직원이 서류를 보고 확인해 줘요']
-          ]
-        },
-        {
-          word: 'attend', pos: 'verb', en: 'To be present at a meeting or an event', ko: '참석하다, 출석하다',
-          art: [
-            ['room', [['table', 160, 150, 1.4], ['kidSit', 104, 150, .8, '#8fc9ff', {}], ['kidSit', 160, 150, .8, '#ffd166', {}], ['kidSit', 214, 150, .8, '#ffb3c7', {}], ['board', 160, 80, .75]], '회의에 참석해 자리에 앉았어요'],
-            ['paper', [['calendarSheet', 130, 124, 1.3], ['check', 202, 100, 1.5], ['clock', 258, 120, 1.2]], '참석 여부를 달력에 체크해요']
-          ]
-        },
-        {
-          word: 'submit', pos: 'verb', en: 'To hand in a document for someone to review', ko: '제출하다',
-          art: [
-            ['paper', [['docStack', 118, 124, 1.4], ['arrowUp', 194, 116, 1.1], ['clipboard', 258, 122, 1.1]], '서류를 정리해 위로 올려 보내요'],
-            ['indoor', [['desk', 136, 152, 1], ['kidStand', 250, 156, .9, '#8fd4a0', {}], ['docSheet', 120, 116, 1], ['check', 68, 92, 1.1]], '직원에게 서류를 건네 제출해요']
-          ]
-        },
-        {
-          word: 'deadline', pos: 'noun', en: 'The latest time by which work must be finished', ko: '마감 기한',
-          art: [
-            ['paper', [['clock', 120, 120, 2.2], ['calendarSheet', 212, 128, 1.5], ['bolt', 274, 84, .8, '#e8563f']], '마감 시간이 얼마 남지 않았어요'],
-            ['indoor', [['desk', 140, 152, 1.05], ['clock', 86, 86, 1.4], ['docStack', 136, 118, 1.1], ['kidStand', 252, 156, .85, '#ffb3c7', {}]], '정해진 시간까지 일을 끝내야 해요']
-          ]
-        },
-        {
-          word: 'request', pos: 'noun', en: 'The act of politely asking for something', ko: '요청, 부탁',
-          art: [
-            ['paper', [['docSheet', 118, 124, 1.4], ['envelope', 206, 118, 1.2], ['bubble', 258, 70, .8]], '무엇을 해 달라고 편지로 부탁해요'],
-            ['indoor', [['kidStand', 122, 156, .95, '#ffd166', {}], ['bubble', 192, 92, 1.1], ['heart', 268, 76, 1, '#ffb3c7']], '손을 들고 정중히 부탁해요']
-          ]
-        }
-      ]
-    },
-    {
-      id: 'toeic2', label: '토익 600', short: '600', emoji: '🗂️',
-      words: [
-        {
-          word: 'applicant', pos: 'noun', en: 'A person who asks for a job', ko: '지원자',
-          art: [
-            ['indoor', [['kidStand', 136, 156, .95, '#8fc9ff', {}], ['idBadge', 214, 118, 1.2], ['docSheet', 276, 130, .9]], '지원자가 서류를 들고 왔어요'],
-            ['paper', [['docStack', 126, 122, 1.4], ['idBadge', 220, 118, 1.3], ['check', 278, 74, 1]], '지원 서류를 받아 접수해요']
-          ]
-        },
-        {
-          word: 'interview', pos: 'noun', en: 'A meeting where someone is asked questions for a job', ko: '면접',
-          art: [
-            ['room', [['desk', 168, 152, 1.1], ['kidSit', 114, 152, .8, '#8fd4a0', {}], ['kidSit', 224, 152, .8, '#8fc9ff', {}], ['docSheet', 168, 118, .7]], '면접관과 지원자가 마주 앉았어요'],
-            ['indoor', [['kidStand', 112, 156, .9, '#8fd4a0', {}], ['kidStand', 232, 156, .9, '#8fc9ff', {}], ['bubble', 176, 92, 1.1], ['clock', 282, 78, .9]], '질문과 대답을 주고받아요']
-          ]
-        },
-        {
-          word: 'qualified', pos: 'adjective', en: 'Having the skills and experience a job needs', ko: '자격을 갖춘',
-          art: [
-            ['paper', [['idBadge', 118, 120, 1.4], ['check', 196, 108, 1.7], ['medal', 264, 120, 1.2]], '자격을 갖춘 사람에게 표시를 해요'],
-            ['indoor', [['kidStand', 138, 156, .95, '#8fc9ff', {}], ['medal', 204, 92, 1.2], ['sparkle', 254, 78, .9]], '실력과 경험을 갖춘 직원이에요']
-          ]
-        },
-        {
-          word: 'colleague', pos: 'noun', en: 'A person you work with', ko: '동료',
-          art: [
-            ['room', [['table', 156, 152, 1.1], ['kidSit', 106, 152, .8, '#ffd166', {}], ['kidSit', 208, 152, .8, '#8fd4a0', {}], ['heart', 258, 82, 1.1, '#ffb3c7']], '같은 회사에서 함께 일하는 사이예요'],
-            ['indoor', [['kidStand', 92, 156, .9, '#ffd166', {}], ['kidStand', 244, 156, .9, '#8fd4a0', {}], ['handshake', 168, 128, 1.25]], '동료와 악수하며 인사해요']
-          ]
-        },
-        {
-          word: 'branch', pos: 'noun', en: 'A local office of a larger company', ko: '지점, 지사',
-          art: [
-            ['city', [['city', 104, 142, .9], ['signpost', 148, 150, .8], ['house', 240, 150, .85]], '도시 곳곳에 회사 지점이 있어요'],
-            ['paper', [['map', 152, 120, 1.5], ['pin', 208, 94, 1.2], ['arrowRight', 270, 134, .7]], '지도에서 지점 위치를 찾아요']
-          ]
-        },
-        {
-          word: 'reserve', pos: 'verb', en: 'To keep a seat, room, or table for later use', ko: '예약하다',
-          art: [
-            ['paper', [['calendarSheet', 126, 124, 1.4], ['clock', 208, 112, 1.3], ['check', 268, 82, 1.2]], '달력에 예약 날짜를 적어 둬요'],
-            ['indoor', [['desk', 160, 152, 1], ['phoneDesk', 126, 143, .9], ['calendarSheet', 226, 110, 1.1]], '전화로 자리를 예약해요']
-          ]
-        },
-        {
-          word: 'notify', pos: 'verb', en: 'To tell someone about something officially', ko: '알리다, 통지하다',
-          art: [
-            ['paper', [['envelope', 126, 120, 1.5], ['megaphone', 224, 116, 1.2], ['sparkle', 280, 70, .8]], '안내 편지로 바뀐 일을 알려요'],
-            ['indoor', [['laptop', 136, 150, 1.3], ['bubble', 232, 94, 1.1], ['sparkle', 282, 72, .7]], '노트북으로 변경 사항을 알려요']
-          ]
-        },
-        {
-          word: 'available', pos: 'adjective', en: 'Free to be used or free to meet', ko: '이용할 수 있는, 시간이 되는',
-          art: [
-            ['paper', [['calendarSheet', 126, 124, 1.4], ['check', 212, 102, 1.6], ['clock', 272, 124, 1.1]], '비어 있는 시간에는 표시가 되어 있어요'],
-            ['indoor', [['kidStand', 118, 156, .95, '#8fd4a0', {}], ['bubble', 198, 92, 1.05, '#e4f6e8'], ['check', 266, 128, 1.1]], '지금 도와드릴 수 있어요']
-          ]
-        },
-        {
-          word: 'reschedule', pos: 'verb', en: 'To change the time of a plan to another time', ko: '일정을 변경하다',
-          art: [
-            ['paper', [['calendarSheet', 118, 126, 1.4], ['loopArrow', 212, 108, 1.4], ['pencil', 276, 130, .9]], '날짜를 다른 날로 옮겨요'],
-            ['indoor', [['desk', 160, 152, 1], ['clock', 100, 86, 1.3], ['calendarSheet', 168, 112, 1.05], ['loopArrow', 264, 104, .9]], '회의 시간을 새로 잡아요']
-          ]
-        },
-        {
-          word: 'procedure', pos: 'noun', en: 'The fixed order of steps for doing something', ko: '절차, 순서',
-          art: [
-            ['paper', [['clipboard', 134, 124, 1.5], ['docSheet', 224, 122, 1.2], ['check', 280, 82, 1]], '순서대로 하나씩 확인해요'],
-            ['city', [['city', 104, 142, .9], ['stairs', 216, 156, 1.1], ['check', 272, 122, 1]], '정해진 절차를 차례대로 밟아요']
-          ]
-        }
-      ]
-    },
     {
       id: 'toeic3', label: '토익 750', short: '750', emoji: '📈',
       words: [
@@ -5693,9 +5546,16 @@
   ];
 
   /* The order below is the order the Home screen shows them in. */
+  /* 베이직 and 600 start empty and are filled from data/toeic.json, so the pack
+     strip can show them before the file has arrived. */
+  const TOEIC_STUBS = [
+    { id: 'toeic1', label: '토익 베이직', short: '베이직', emoji: '💼', words: [] },
+    { id: 'toeic2', label: '토익 600', short: '600', emoji: '🗂️', words: [] }
+  ];
   const PACKS = [buildGradePack(NOV26_DEF), buildSciencePack(NOV23_DEF), { id: '261120', label: '261120', short: '261120', emoji: '📸', words: BUILTIN }]
     .concat(MIDDLE_PACK_DEFS.map(buildGradePack))
     .concat(HIGH_PACK_DEFS.map(buildGradePack))
+    .concat(TOEIC_STUBS)
     .concat(TOEIC_PACK_DEFS.map(buildGradePack))
     .concat(TRAVEL_PACK_DEFS.map(buildGradePack));
 
@@ -5737,10 +5597,13 @@
      is split into Days of twelve words for Learn and Test.
      ========================================================================= */
   const ELEM_URL = 'data/elem.json';
+  const TOEIC_URL = 'data/toeic.json';
   const WORDS_PER_DAY = 12;
   const elemLoad = { state: 'idle', note: '' };
+  const toeicLoad = { state: 'idle', note: '' };
 
-  function buildElemPack(g) {
+  /* One shape for both fetched word files (data/elem.json, data/toeic.json). */
+  function buildJsonPack(g) {
     return {
       id: g.id,
       label: g.label,
@@ -5757,18 +5620,23 @@
     };
   }
 
-  function loadElemPacks() {
-    if (elemLoad.state !== 'idle') return;
-    elemLoad.state = 'loading';
-    if (currentCategory().id === 'elem') renderHome();
-    fetch(ELEM_URL)   // default cache mode: revalidate, so a new word list is picked up
+  /* ---- the two background fetches ---- */
+  function loadWordFile(url, listKey, bucket, catId) {
+    if (bucket.state !== 'idle') return;
+    bucket.state = 'loading';
+    if (currentCategory().id === catId) renderHome();
+    fetch(url)   // default cache mode: revalidate, so a new word list is picked up
       .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(data => {
-        const packs = (data.grades || []).map(buildElemPack);
-        packs.forEach(pk => PACKS.push(pk));
-        elemLoad.state = 'ready';
+        (data[listKey] || []).map(buildJsonPack).forEach(pk => {
+          // a stub from PACKS is replaced in place, so a saved pack id keeps working
+          let at = -1;
+          for (let i = 0; i < PACKS.length; i++) if (PACKS[i].id === pk.id) at = i;
+          if (at >= 0) PACKS[at] = pk; else PACKS.push(pk);
+        });
+        bucket.state = 'ready';
         const cat = currentCategory();
-        if (cat && cat.id === 'elem' && (state.packId.indexOf('g') !== 0 || !packById(state.packId))) {
+        if (cat && cat.id === catId && !packById(state.packId)) {
           state.packId = cat.packs[0];
           state.day = 1;
           savePack(); saveDay();
@@ -5776,14 +5644,31 @@
         renderHome();
       })
       .catch(err => {
-        elemLoad.state = 'error';
-        elemLoad.note = (err && err.message) || '불러오기 실패';
+        bucket.state = 'error';
+        bucket.note = (err && err.message) || '불러오기 실패';
         renderHome();
-        toast('초등 단어를 불러오지 못했어요. 잠시 뒤 다시 열어 주세요');
+        toast((catId === 'elem' ? '초등' : '토익') + ' 단어를 불러오지 못했어요. 잠시 뒤 다시 열어 주세요');
       });
   }
 
+  function loadElemPacks() { loadWordFile(ELEM_URL, 'grades', elemLoad, 'elem'); }
+  function loadToeicPacks() { loadWordFile(TOEIC_URL, 'packs', toeicLoad, 'toeic'); }
+
   function elemReady() { return elemLoad.state === 'ready'; }
+
+  /* the fetch bucket a category waits on, if it has one */
+  function catBucket(cat) {
+    if (!cat) return null;
+    if (cat.id === 'elem') return elemLoad;
+    if (cat.id === 'toeic') return toeicLoad;
+    return null;
+  }
+  function catReady(cat) { const b = catBucket(cat); return !b || b.state === 'ready'; }
+  function catLoadNote(cat) {
+    const b = catBucket(cat);
+    if (!b) return '';
+    return b.state === 'error' ? '불러오지 못했어요' : '단어를 불러오는 중…';
+  }
 
   /* ---------- Days ---------- */
   function dayTotal(pack) {
@@ -5942,8 +5827,9 @@
   function go(name) {
     if ((name === 'learn' || name === 'test') && !activeWords().length) {
       const cat = currentCategory();
-      if (cat.id === 'elem' && !elemReady()) {
-        toast(elemLoad.state === 'error' ? '초등 단어를 불러오지 못했어요' : '초등 단어를 불러오는 중이에요');
+      const bucket = catBucket(cat);
+      if (bucket && bucket.state !== 'ready') {
+        toast(cat.label + (bucket.state === 'error' ? '를 불러오지 못했어요' : '를 불러오는 중이에요'));
         return;
       }
       toast(cat.soon || '이 팩에는 아직 단어가 없어요');
@@ -5994,16 +5880,16 @@
       b.setAttribute('aria-pressed', p.id === state.packId ? 'true' : 'false');
       b.innerHTML = '<span class="em">' + p.emoji + '</span>'
         + '<span class="nm">' + escapeHTML(p.short || p.label) + '</span>'
-        + '<span class="ct">' + p.words.length + '</span>';
+        + '<span class="ct">' + (p.words.length || '…') + '</span>';
       box.appendChild(b);
     });
 
     const soon = $('#soonBox');
-    const waiting = cat.id === 'elem' && !elemReady();
+    const waiting = !catReady(cat);
     if (soon) {
       soon.classList.toggle('show', !list.length);
       const soonMsg = waiting
-        ? (elemLoad.state === 'error' ? '초등 단어를 불러오지 못했어요' : '초등 단어를 불러오는 중이에요…')
+        ? catLoadNote(cat)
         : (cat.soon || '단어 팩을 준비하고 있어요');
       $$('.soon-text', soon).forEach(t => { t.textContent = soonMsg; });
       $$('.soon-emoji', soon).forEach(t => { t.textContent = cat.emoji; });
@@ -6110,7 +5996,7 @@
     refreshChrome();
     const cat = currentCategory();
     const cur = currentPack();
-    const loading = cat.id === 'elem' && !elemReady();
+    const loading = !catReady(cat);
     const empty = !cat.packs.length || loading;
     const dayWords = loading ? [] : studyWords();
     const words = loading ? [] : activeWords();
@@ -6128,7 +6014,7 @@
     }
     let tag;
     if (loading) {
-      tag = cat.emoji + ' ' + cat.label + ' · ' + (elemLoad.state === 'error' ? '불러오지 못했어요' : '단어를 불러오는 중…');
+      tag = cat.emoji + ' ' + cat.label + ' · ' + catLoadNote(cat);
     } else if (!cat.packs.length) {
       tag = cat.emoji + ' ' + cat.label + ' · 준비 중이에요';
     } else {
@@ -6853,6 +6739,7 @@
     renderHome();
     refreshChrome();
     loadElemPacks();
+    loadToeicPacks();
 
     // no horizontal scroll, ever: keep the viewport honest on late layout
     document.documentElement.style.overflowX = 'hidden';

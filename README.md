@@ -30,18 +30,22 @@ Open `index.html` (or the GitHub Pages URL) on a phone or tablet.
 
 `🌱 초등단어` now carries the whole 교육부 elementary vocabulary list: **800 words** from 교육부 고시 제2022-33호 [별책 14] 영어과 교육과정 [별표 3] 어휘 — the asterisked (`*`) 초등학교 권장 어휘 (the list also prints 1,200 `**` middle/high words and 1,000 unmarked ones; only the 800 `*` words are used here). The six grades split it up by difficulty: 초1·초2 hold the concrete everyday words, 초3·초4 the school, town, sports and health words, 초5·초6 the abstract nouns, school subjects and function words (above, because, however, myself …). Sixteen words that the packs already had but that are not on the 800 list (share, healthy, compare, practice, useful, wonder, achieve, balance, challenge, curious, describe, express, improve, respect, responsible, explain) are kept as they were, so the category holds 816 words.
 
-Every grade keeps its original ten hand-drawn words as **Day 1** (apple ~ happy, run ~ school, animal ~ smile, arrive ~ weather, agree ~ wonder, achieve ~ responsible), so the pictures that were already there and the stickers children collected still match. The rest follows in Days of twelve words: 초1–초4 have 11 Days (132 words each), 초5–초6 have 12 Days (144 words each). A Day row under the pack strip picks the twelve words that Learn Stage and Test Stage use, so a Test round stays a clean 3 × 4 words instead of 48 chips. Packs of 15 words or fewer (숙제단어, 중등단어, 고등단어, 토익단어, 여행단어) have no Day row and behave exactly as before.
+Every grade keeps its original ten hand-drawn words as **Day 1** (apple ~ happy, run ~ school, animal ~ smile, arrive ~ weather, agree ~ wonder, achieve ~ responsible), so the pictures that were already there and the stickers children collected still match. The rest follows in Days of twelve words: 초1–초4 have 11 Days (132 words each), 초5–초6 have 12 Days (144 words each). A Day row under the pack strip picks the twelve words that Learn Stage and Test Stage use, so a Test round stays a clean 3 × 4 words instead of 48 chips. Packs of 15 words or fewer (숙제단어, 중등단어, 고등단어, 토익 750·850, 여행단어) have no Day row and behave exactly as before.
 
 Because 816 words would bloat a single file, the elementary packs live in `data/elem.json` (about 350 KB) and are fetched once, in the background, the first time the page opens; `index.html` keeps the homework pack inline so `261126` still renders instantly. The Day is remembered per pack in `localStorage` (`wg_day_v1`).
 
+The two big 토익 packs follow the same route: `data/toeic.json` (about 135 KB) holds 베이직 and 600 and is fetched in the background beside `elem.json`. The 💼 토익단어 strip shows both pack names from the first paint; each pack's words arrive a moment later, and a device that had already picked 베이직 or 600 keeps its pack and its Day. Until the file answers, Learn and Test answer with a "불러오는 중" toast instead of opening an empty round, the same way 초등단어 does.
+
 `📘 중등단어` (중1·중2·중3) and `🎓 고등단어` (고1·고2·고3) add thirty words each, ten per grade, drawn from the 2022 revised English curriculum vocabulary range for middle and high school and ordered by difficulty (adventure ~ prepare, achieve ~ honest, analyze ~ perspective, anticipate ~ verify, ambiguous ~ prevalent, alleviate ~ skeptical). Each grade pack is labelled with its short name in the strip (`중1`) and its theme in the hero (`중1 필수`).
 
-`💼 토익단어` holds four ten-word tiers, ordered by the score band where a learner meets the words (TOEIC Service List / Business Service List frequency bands, plus the score-band word books Korean learners use):
+`💼 토익단어` holds four tiers, ordered by the score band where a learner meets the words (TOEIC Service List / Business Service List frequency bands, plus the score-band word books Korean learners use):
 
-- `베이직` — office and daily business basics: schedule ~ request.
-- `600` — hiring, scheduling and communication: applicant ~ procedure.
-- `750` — contracts, billing, shipping and performance: contract ~ coordinate.
-- `850` — finance, legal, compliance and abstract business verbs: compliance ~ delegate.
+- `베이직` — 120 words in 10 Days: office basics, time and scheduling, money and price, the people and the verbs of a working day, the things in an office, simple describing words, and the first verbs a learner reads in a TOEIC sentence. Day 1 keeps the ten pictures the pack has always had (schedule ~ request) and adds `desk` and `printer`.
+- `600` — 180 words in 15 Days, one Part 1–7 theme a Day: hiring and HR, meetings, travel and reservations, customer service, orders and shipping, announcements, workplace rules, money at work, papers and mail, appointments, problems, reports and numbers, the building, and conferences. Day 1 keeps `applicant` ~ `procedure` and adds `position` and `salary`.
+- `750` — ten words, contracts, billing, shipping and performance: contract ~ coordinate.
+- `850` — ten words, finance, legal, compliance and abstract business verbs: compliance ~ delegate.
+
+Words were picked from the TSL/BSL frequency bands and the 600-level word books Korean learners use, then spread across the themes above; no word appears in both 베이직 and 600, and none of the 750 or 850 words repeats in the two big packs. Eight words (bill, exchange, refund, warranty, departure, arrival, delay, fare) also appear in ✈️ 여행단어, where the travel sense is what the picture shows.
 
 `✈️ 여행단어` holds six ten-word situations, each one a trip the child can walk through:
 
@@ -90,3 +94,14 @@ Every word carries two hand-drawn inline SVG scenes.
 - `build/build_elem.py` — writes `data/elem.json`, checking every word against the official 800 list and reporting anything missing or repeated.
 - `build/check_elem.py` — runs the page's own script headless (quickjs), draws every scene and fails if a scene is malformed, a Day holds fewer than 10 or more than 12 words, or two words in one Day look the same.
 - `build/elem_sheet.py g3 5 1` — renders one Day as a PNG contact sheet so the pictures can be looked at.
+
+## Building the 토익 packs
+
+`data/toeic.json` is built the same way, from two word files in `build/`:
+
+- `build/toeic_basic.py` — the 108 new 베이직 words (Days 2–10) plus the two that join Day 1 (`desk`, `printer`), in the same `background|piece@x,y,scale,name@…` recipe form.
+- `build/toeic_600.py` — the 168 new 600 words (Days 2–15) plus `position` and `salary`.
+- `build/build_toeic.py` — reads the ten words each pack already drew out of `build/02-toeic.js` (so their pictures and word ids stay identical and collected stickers still match), adds the new words, and writes `data/toeic.json`. It stops on an unknown piece name, a Day that does not hold twelve words, or a word that appears in both packs.
+- `build/check_toeic.py` — runs the page's own script headless, draws all 600 scenes and fails on a malformed picture, a Day that is not twelve words, two words in one Day that look the same, or any letter inside a picture (which would give the answer away).
+- `build/toeic_sheet.py toeic2 2` — renders one Day as a labelled contact sheet.
+- `build/smoke_loader.py` — boots the page with a stubbed `fetch` and checks that both word files land in `PACKS`, that a saved 베이직 Day survives, and that 750/850 stay ten-word packs.
