@@ -2805,6 +2805,12 @@
 
 
 
+
+
+
+
+
+
   /* =========================================================================
      Elementary kit — the extra pictures the 교육부 800-word packs need.
      Same flat shapes, same soft palette, same 320-wide canvas as the kit above.
@@ -3325,7 +3331,7 @@
       case 'chopsticks': return ekPath('M-6 20 L2 -24 M6 20 L12 -22', 'none', ' stroke="#c9a06b" stroke-width="4" stroke-linecap="round"');
       case 'jar': return ekRect(-14, -14, 28, 32, 6, '#dff0fb', ' opacity=".85"') + ekRect(-16, -19, 32, 7, 3, '#c9a06b') + ekCir(0, 2, 7, '#f2c94c');
       case 'stairs': return ekPath('M-30 20 h14 v-10 h14 v-10 h14 v-10 h14 v30 Z', '#e0cbab') + ekPath('M-30 20 h14 v-10 h14 v-10 h14 v-10 h14', 'none', ' stroke="#c9a06b" stroke-width="2"');
-      case 'fan': return ekCir(0, -4, 18, '#dff0fb') + ekPath('M0 -4 q0 -16 12 -16 q10 0 10 12 q0 8 -22 4 M0 -4 q0 16 -12 14 q-10 -2 -8 -14', 'none', ' stroke="#8fc9ff" stroke-width="3"') + ekRect(-3, 12, 6, 12, 2, '#c9d6e2') + ekEll(0, 24, 12, 4, '#c9d6e2');
+      case 'fan': return ekCir(0, -6, 6, '#8fa6bb') + ekEll(0, -20, 7, 14, '#dff0fb', ' stroke="#8fc9ff" stroke-width="2"') + ekEll(12, -2, 7, 14, '#dff0fb', ' stroke="#8fc9ff" stroke-width="2" transform="rotate(120 12 -2)"') + ekEll(-12, -2, 7, 14, '#dff0fb', ' stroke="#8fc9ff" stroke-width="2" transform="rotate(-120 -12 -2)"') + ekRect(-3, -2, 6, 20, 3, '#c9d6e2') + ekEll(0, 20, 14, 5, '#c9d6e2');
       case 'elevator': return ekRect(-20, -30, 40, 58, 3, '#dff0fb') + ekPath('M-20 -30 h40 v58 h-40 Z', 'none', ' stroke="#8fa6bb" stroke-width="3"') + ekPath('M0 -30 v58', 'none', ' stroke="#c9d6e2" stroke-width="2"') + ekPath('M-8 0 l4 -6 l4 6 M8 2 l-4 6 l-4 -6', 'none', ' stroke="#5a6a8a" stroke-width="2.4"');
       case 'doll': return ekCir(0, -22, 11, '#f7c9a3') + ekPath('M-11 -24 a11 11 0 0 1 22 0 q-11 -7 -22 0', '#8a5a3a') + ekPath('M-10 -10 h20 l4 20 h-28 Z', '#ffb3c7') + ekRect(-7, 10, 5, 12, 2.5, '#f7c9a3') + ekRect(2, 10, 5, 12, 2.5, '#f7c9a3') + ekCir(-4, -22, 1.6, '#4a3728') + ekCir(4, -22, 1.6, '#4a3728') + ekPath('M-4 -17 q4 4 8 0', 'none', ' stroke="#c98f6e" stroke-width="1.6"');
       case 'mat': return ekRect(-26, -6, 52, 14, 3, '#c8b8a0') + ekPath('M-20 -2 h40 M-20 2 h40', 'none', ' stroke="#b0a08a" stroke-width="1.6"') + ekPath('M-24 -4 q6 6 0 10', 'none', ' stroke="#b0a08a" stroke-width="1.6"');
@@ -3609,7 +3615,7 @@
       case 'fire': return ekPath('M0 -30 q14 14 10 26 q-2 10 -10 10 q-8 0 -10 -10 q-4 -12 10 -26 Z', '#f26d6d') + ekPath('M0 -14 q8 8 6 16 q-2 6 -6 6 q-4 0 -6 -6 q-2 -8 6 -16 Z', '#ffd166') + ekPath('M-20 6 q6 -8 10 0 M20 6 q-6 -8 -10 0', 'none', ' stroke="#f26d6d" stroke-width="3" stroke-linecap="round"');
       case 'ice': return ekRect(-18, -14, 36, 32, 6, '#dff0fb', ' opacity=".9"') + ekPath('M-18 -6 h36 M-6 -14 v32 M8 -14 v32', 'none', ' stroke="#bfe4f7" stroke-width="2"') + ekPath('M-14 -8 l4 4 M10 4 l4 4', 'none', ' stroke="#ffffff" stroke-width="2.4"');
       case 'leaf': return ekPath('M-2 16 q-18 -10 -14 -26 q14 -10 26 2 q8 12 -12 24 Z', '#8fd4a0') + ekPath('M-10 12 q6 -12 14 -18', 'none', ' stroke="#5f9e70" stroke-width="2"');
-      case 'grass': return ekPath('M-22 12 q-4 -14 2 -20 q4 8 2 20 M-8 12 q-2 -18 4 -24 q4 10 0 24 M6 12 q0 -16 6 -20 q2 10 -2 20 M20 12 q-2 -12 4 -16 q2 10 0 16', 'none', ' stroke="#8fd4a0" stroke-width="2.6" stroke-linecap="round') + ekRect(-26, 12, 52, 5, 2.5, '#a8dfb4');
+      case 'grass': return ekPath('M-22 12 q-4 -14 2 -20 q4 8 2 20 M-8 12 q-2 -18 4 -24 q4 10 0 24 M6 12 q0 -16 6 -20 q2 10 -2 20 M20 12 q-2 -12 4 -16 q2 10 0 16', 'none', ' stroke="#8fd4a0" stroke-width="2.6" stroke-linecap="round"') + ekRect(-26, 12, 52, 5, 2.5, '#a8dfb4');
       case 'sand': return ekEll(0, 10, 30, 10, '#f7e0b0') + ekCir(-12, 6, 1.6, '#e0c890') + ekCir(4, 8, 1.6, '#e0c890') + ekCir(14, 4, 1.6, '#e0c890') + ekCir(-2, 2, 1.6, '#e0c890');
       case 'mud': return ekEll(0, 8, 26, 11, '#a9825a') + ekEll(-8, 4, 6, 4, '#8a6a4a') + ekEll(10, 6, 7, 4, '#8a6a4a') + ekPath('M-14 -2 q-4 -8 4 -10 M6 0 q6 -8 12 -4', 'none', ' stroke="#a9825a" stroke-width="3" stroke-linecap="round"');
       case 'seed': return ekEll(0, 8, 24, 8, '#8a6a4a') + ekEll(0, 2, 7, 9, '#c9a06b') + ekPath('M0 -6 q-4 -8 2 -10', 'none', ' stroke="#8fd4a0" stroke-width="2.4"');
