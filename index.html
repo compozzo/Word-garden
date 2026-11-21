@@ -535,6 +535,7 @@
   .btn.go{background:linear-gradient(120deg,#5cbf83,#3f9e63);color:#fff;box-shadow:0 6px 14px rgba(63,158,99,.26)}
   .btn.ghost{background:#fff;color:#3f9e63;border:1.5px solid #cfe9db}
   .btn.dim{background:#f1f5f9;color:#55637a}
+  #btnStoryHint{flex:0 0 auto;padding:12px 18px}
   .res-banner{
     display:none;padding:10px 12px;border-radius:var(--r-sm);font-size:13px;font-weight:900;
     line-height:1.4;text-align:center;
@@ -576,7 +577,8 @@
   }
   .draw-stage{border-radius:var(--r-md);overflow:hidden;border:1.5px solid #e2e9f0;background:#fff}
   #drawCanvas{display:block;width:100%;height:auto;touch-action:none;background:#fff}
-  .draw-tools{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .draw-tools{display:flex;flex-direction:column;gap:7px}
+  .tool-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
   .swatch{width:25px;height:25px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1.5px #e2e9f0}
   .swatch.on{box-shadow:0 0 0 2.5px #4fae74}
   .size-btn{width:29px;height:29px;border-radius:10px;border:1.5px solid #e2e9f0;background:#fff;display:flex;align-items:center;justify-content:center}
@@ -7801,26 +7803,30 @@
     if (!box || box.dataset.built) return;
     box.dataset.built = '1';
     box.innerHTML = '';
+    const paints = el('div', 'tool-row');
     DRAW_COLORS.forEach((col, i) => {
       const b = el('button', 'swatch' + (i === 0 ? ' on' : ''));
       b.type = 'button';
       b.style.background = col;
       b.dataset.color = col;
       b.setAttribute('aria-label', '색 ' + col);
-      box.appendChild(b);
+      paints.appendChild(b);
     });
+    box.appendChild(paints);
+    const tools = el('div', 'tool-row');
     DRAW_SIZES.forEach(s => {
       const b = el('button', 'size-btn' + (s === DRAW.size ? ' on' : ''));
       b.type = 'button';
       b.dataset.size = String(s);
       const dot = Math.min(18, 4 + s);
       b.innerHTML = '<i style="width:' + dot + 'px;height:' + dot + 'px"></i>';
-      box.appendChild(b);
+      tools.appendChild(b);
     });
     const er = el('button', 'tool-btn', '🧽 지우개'); er.type = 'button'; er.id = 'btnDrawEraser';
     const un = el('button', 'tool-btn', '↩ 되돌리기'); un.type = 'button'; un.id = 'btnDrawUndo';
     const cl = el('button', 'tool-btn', '🗑 전체'); cl.type = 'button'; cl.id = 'btnDrawClear';
-    box.appendChild(er); box.appendChild(un); box.appendChild(cl);
+    tools.appendChild(er); tools.appendChild(un); tools.appendChild(cl);
+    box.appendChild(tools);
   }
 
   function drawMakeChoices(w) {
@@ -7865,8 +7871,9 @@
 
     let who;
     if (!online) {
-      const p = DRAW.turn === 1 ? '1번' : '2번';
-      who = DRAW.phase === 'draw' ? p + ' 친구가 그려요' : (DRAW.phase === 'done' ? '라운드 끝!' : p + ' 친구가 맞혀요');
+      const drawer = DRAW.turn === 1 ? '1번' : '2번';
+      const guesser = DRAW.turn === 1 ? '2번' : '1번';
+      who = DRAW.phase === 'draw' ? drawer + ' 친구가 그려요' : (DRAW.phase === 'done' ? '라운드 끝!' : guesser + ' 친구가 맞혀요');
     } else if (!connected) {
       who = '친구를 기다리는 중';
     } else {
@@ -8336,6 +8343,7 @@
     $('#hangSetup').hidden = false;
     $('#hangPlay').hidden = true;
     $('#hangSub').textContent = '2인 대결 · 출제자와 풀이자';
+    $('#hangChances').textContent = '기회 20';
     const w = $('#hangInWord'), h = $('#hangInHint');
     if (w) w.value = '';
     if (h) h.value = '';
