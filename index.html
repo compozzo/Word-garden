@@ -3235,10 +3235,14 @@
         + '<span class="ct">' + p.words.length + '</span>';
       box.appendChild(b);
     });
-    // bring the picked pack into sight without moving the page itself
+    // bring the picked pack into sight without moving the page itself.
+    // Measured from the strip's own edges, so the app can sit centred on a
+    // wide screen without the strip jumping to its end.
     const on = $('.pack-pill.on', box);
     if (on) {
-      box.scrollLeft = Math.max(0, on.offsetLeft - (box.clientWidth - on.offsetWidth) / 2);
+      const strip = box.getBoundingClientRect();
+      const pill = on.getBoundingClientRect();
+      box.scrollLeft += (pill.left - strip.left) - (box.clientWidth - pill.width) / 2;
     }
   }
 
