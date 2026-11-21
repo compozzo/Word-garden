@@ -325,6 +325,31 @@
     box-shadow:0 6px 14px rgba(63,158,99,.16);
   }
   .pack-pill.on .ct{background:#d9f2e3;color:#2f7a52}
+
+  /* ---------- Day picker ---------- */
+  .day-select{margin-top:2px}
+  .day-select .head{display:flex;align-items:baseline;gap:6px;padding:0 3px 7px}
+  .day-select .head .t{font-size:12.5px;font-weight:900;color:var(--ink-soft);letter-spacing:-.2px}
+  .day-select .head .h{margin-left:auto;font-size:10.5px;font-weight:700;color:var(--ink-faint)}
+  .day-scroll{
+    display:flex;gap:5px;overflow-x:auto;padding:1px 2px 6px;
+    scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+  }
+  .day-scroll::-webkit-scrollbar{display:none}
+  .day-pill{
+    flex:0 0 auto;display:flex;align-items:center;gap:4px;
+    padding:6px 10px;border-radius:999px;background:#fff;border:1.5px solid var(--line);
+    box-shadow:var(--shadow-sm);font-size:11.5px;font-weight:800;color:var(--ink-soft);
+    scroll-snap-align:start;white-space:nowrap;line-height:1.1;
+  }
+  .day-pill b{font-weight:900;letter-spacing:-.3px}
+  .day-pill i{font-style:normal;font-size:9.5px;font-weight:900;color:var(--ink-faint);
+    background:#f1f6fa;border-radius:999px;padding:1px 5px}
+  .day-pill.on{
+    background:linear-gradient(120deg,#e8f9ee,#f6fdf9);border-color:#9fd9b5;color:#2f7a52;
+    box-shadow:0 5px 12px rgba(63,158,99,.16);
+  }
+  .day-pill.on i{background:#d9f2e3;color:#2f7a52}
   .list-note{
     font-size:11.5px;line-height:1.45;font-weight:700;color:var(--ink-faint);
     background:#f6fafd;border:1px dashed #dbe6f0;border-radius:12px;padding:8px 11px;margin-bottom:11px;
@@ -486,6 +511,11 @@
         <span class="big soon-emoji">🌱</span>
         <span class="soon-text">단어 팩을 준비하고 있어요</span>
       </div>
+    </div>
+
+    <div class="day-select" id="dayBox" hidden>
+      <div class="head"><span class="t">Day 고르기</span><span class="h" id="dayHint">하루 12단어</span></div>
+      <div class="day-scroll" id="dayScroll"></div>
     </div>
 
     <div class="stage-list">
@@ -2755,6 +2785,958 @@
 
   Object.assign(G, BIZ_KIT, TRAVEL_KIT);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  /* =========================================================================
+     Elementary kit — the extra pictures the 교육부 800-word packs need.
+     Same flat shapes, same soft palette, same 320-wide canvas as the kit above.
+     One builder draws a whole family of pictures (an animal, a dish, a piece of
+     clothing) and a small table picks the colour, the ears, the tail and so on,
+     so every word can own a picture that no other word in its Day repeats.
+     ========================================================================= */
+  const ekRect = (x, y, w, h, r, fill, extra) =>
+    '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="' + (r || 0) + '" fill="' + fill + '"' + (extra || '') + '/>';
+  const ekCir = (cx, cy, r, fill, extra) =>
+    '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="' + fill + '"' + (extra || '') + '/>';
+  const ekEll = (cx, cy, rx, ry, fill, extra) =>
+    '<ellipse cx="' + cx + '" cy="' + cy + '" rx="' + rx + '" ry="' + ry + '" fill="' + fill + '"' + (extra || '') + '/>';
+  const ekPath = (d, fill, extra) => '<path d="' + d + '" fill="' + fill + '"' + (extra || '') + '/>';
+
+  /* ---------- four-legged animals ---------- */
+  const ANIMAL = {
+    cow:    { c: '#ffffff', pat: 'patch', pc: '#5b5b66', ear: 'side', horn: 'short', tail: 'tuft', snout: 'wide', leg: 1, body: 1.05, head: 'low' },
+    pig:    { c: '#ffc6cf', pat: 'none', ear: 'tri', horn: 'none', tail: 'curl', snout: 'flat', leg: .8, body: 1, head: 'low' },
+    horse:  { c: '#c98f5e', pat: 'none', ear: 'tall', horn: 'none', tail: 'long', snout: 'long', leg: 1.35, body: 1.05, head: 'high', mane: '#8a5a33' },
+    sheep:  { c: '#fbfbfb', pat: 'fluffy', pc: '#f1f1f1', ear: 'side', horn: 'none', tail: 'short', snout: 'small', leg: .8, body: 1.15, head: 'low' },
+    goat:   { c: '#e8e2d4', pat: 'none', ear: 'side', horn: 'curve', tail: 'up', snout: 'small', leg: 1.05, body: .95, head: 'mid', beard: true },
+    tiger:  { c: '#ffb457', pat: 'stripe', pc: '#5b4a3a', ear: 'round', horn: 'none', tail: 'long', snout: 'small', leg: 1, body: 1.1, head: 'low' },
+    lion:   { c: '#f5c26b', pat: 'none', ear: 'round', horn: 'none', tail: 'tuft', snout: 'small', leg: 1, body: 1.05, head: 'low', mane: '#d9932f' },
+    bear:   { c: '#b08968', pat: 'none', ear: 'round', horn: 'none', tail: 'short', snout: 'small', leg: .95, body: 1.15, head: 'low' },
+    monkey: { c: '#c99a6b', pat: 'none', ear: 'round', horn: 'none', tail: 'curl', snout: 'small', leg: .95, body: .95, head: 'mid', thin: true },
+    fox:    { c: '#f0a35e', pat: 'none', ear: 'tall', horn: 'none', tail: 'bushy', snout: 'point', leg: .95, body: 1, head: 'low' },
+    wolf:   { c: '#9aa6b4', pat: 'none', ear: 'tall', horn: 'none', tail: 'bushy', snout: 'point', leg: 1.05, body: 1.05, head: 'low' },
+    deer:   { c: '#d8ab7a', pat: 'spot', pc: '#f3e3cc', ear: 'side', horn: 'antler', tail: 'short', snout: 'long', leg: 1.3, body: 1, head: 'high' },
+    giraffe:{ c: '#ffd88a', pat: 'patch', pc: '#c98f5e', ear: 'side', horn: 'nub', tail: 'tuft', snout: 'long', leg: 1.4, body: 1.05, head: 'tall' },
+    zebra:  { c: '#ffffff', pat: 'stripe', pc: '#4a4a55', ear: 'tall', horn: 'none', tail: 'tuft', snout: 'long', leg: 1.25, body: 1.05, head: 'high', mane: '#4a4a55' },
+    kangaroo:{c: '#cf9a6c', pat: 'none', ear: 'tall', horn: 'none', tail: 'thick', snout: 'point', leg: 1.1, body: .95, head: 'mid', sit: true },
+    camel:  { c: '#e0b878', pat: 'none', ear: 'side', horn: 'none', tail: 'tuft', snout: 'long', leg: 1.3, body: 1.1, head: 'tall', hump: true },
+    squirrel:{c: '#e8a15c', pat: 'none', ear: 'tuftEar', horn: 'none', tail: 'fan', snout: 'point', leg: .8, body: .8, head: 'low' },
+    hamster:{ c: '#f7dfc0', pat: 'none', ear: 'round', horn: 'none', tail: 'none', snout: 'small', leg: .6, body: .75, head: 'low', round: true },
+    hedgehog:{c: '#a8835e', pat: 'spike', pc: '#7d5f40', ear: 'small', horn: 'none', tail: 'none', snout: 'point', leg: .6, body: .85, head: 'low', round: true },
+    panda:  { c: '#ffffff', pat: 'pandaeye', pc: '#3d3d47', ear: 'round', horn: 'none', tail: 'none', snout: 'small', leg: .85, body: 1.05, head: 'low' },
+    koala:  { c: '#c5cbd3', pat: 'none', ear: 'fluffy', horn: 'none', tail: 'none', snout: 'small', leg: .7, body: .9, head: 'low', round: true },
+    moose:  { c: '#a97e5b', pat: 'none', ear: 'side', horn: 'antler', tail: 'short', snout: 'long', leg: 1.3, body: 1.1, head: 'high' }
+  };
+
+  function ekAnimal(kind) {
+    const a = ANIMAL[kind] || ANIMAL.bear;
+    const s = 1;
+    const legTop = -34 * a.leg, gy = 0;
+    const bodyY = -58 - (a.leg - 1) * 20;
+    const bodyRX = 38 * a.body, bodyRY = 24 * a.body;
+    let out = '';
+    // legs
+    const legX = [-24, -14, 16, 26];
+    legX.forEach((lx, i) => {
+      const lx2 = lx * (a.thin ? .8 : 1);
+      out += ekRect(lx2 - 4, bodyY + 12, 8, -bodyY - 10 + (a.sit && i > 1 ? 8 : 0), 4, a.dark ? '#00000022' : '#ffffff33');
+      out += ekRect(lx2 - 4, bodyY + 12, 8, -bodyY - 10 + (a.sit && i > 1 ? 8 : 0), 4, a.c);
+      out += ekRect(lx2 - 5, -5, 10, 6, 3, a.c);
+    });
+    // tail behind body
+    if (a.tail === 'long') out += ekPath('M-36 ' + (bodyY - 2) + ' q-22 6 -20 26 q2 12 -6 20', 'none', ' stroke="' + a.c + '" stroke-width="7" stroke-linecap="round"');
+    if (a.tail === 'bushy') out += ekEll(-46, bodyY + 6, 17, 10, a.c) + ekEll(-58, bodyY + 2, 12, 8, '#ffffff');
+    if (a.tail === 'fan') out += ekPath('M-30 ' + (bodyY + 6) + ' q-30 -24 -26 -52 q22 6 30 30 q6 -12 4 -22 q20 20 6 44 Z', a.c);
+    if (a.tail === 'thick') out += ekPath('M-30 ' + (bodyY + 10) + ' q-26 14 -18 30 q10 12 20 -4 Z', a.c);
+    if (a.tail === 'curl') out += ekPath('M-32 ' + (bodyY - 4) + ' q-16 -4 -14 -14 q2 -9 -8 -8', 'none', ' stroke="' + a.c + '" stroke-width="6" stroke-linecap="round"');
+    if (a.tail === 'tuft') out += ekRect(-40, bodyY - 6, 6, 26, 3, a.c) + ekEll(-37, bodyY + 20, 7, 8, a.mane || a.c);
+    if (a.tail === 'up') out += ekRect(-34, bodyY - 20, 6, 22, 3, a.c);
+    // body
+    if (a.round) out += ekCir(0, bodyY + 2, 30 * a.body, a.c);
+    else if (a.pat === 'fluffy') {
+      out += ekEll(0, bodyY, bodyRX, bodyRY, a.c);
+      for (let i = 0; i < 7; i++) {
+        const ang = Math.PI * (i + .5) / 7;
+        out += ekCir(Math.cos(ang) * bodyRX * .92, bodyY - Math.sin(ang) * bodyRY * .82, 9, a.c);
+      }
+    } else out += ekEll(0, bodyY, bodyRX, bodyRY, a.c);
+    // patches / stripes
+    if (a.pat === 'patch') {
+      out += ekEll(-12, bodyY - 6, 11, 9, a.pc) + ekEll(16, bodyY + 8, 8, 7, a.pc);
+    } else if (a.pat === 'stripe') {
+      for (let i = -2; i <= 2; i++) {
+        out += ekPath('M' + (i * 15 - 4) + ' ' + (bodyY - bodyRY + 4) + ' q6 10 2 22 q-4 12 2 ' + (bodyRY * 2 - 8), 'none', ' stroke="' + a.pc + '" stroke-width="5" stroke-linecap="round"');
+      }
+    } else if (a.pat === 'spot') {
+      [[-14, -8], [8, -12], [18, 2], [-6, 6], [10, 10]].forEach(p => { out += ekCir(p[0], bodyY + p[1], 3.2, a.pc); });
+    } else if (a.pat === 'spike') {
+      for (let i = 0; i < 9; i++) {
+        const ang = Math.PI * (i + .5) / 9;
+        const x = Math.cos(ang) * bodyRX * .8, y = bodyY - Math.sin(ang) * bodyRY * .75;
+        out += ekPath('M' + (x - 5) + ' ' + (y + 5) + ' L' + x + ' ' + (y - 12) + ' L' + (x + 5) + ' ' + (y + 5) + ' Z', a.pc);
+      }
+    }
+    if (a.hump) out += ekPath('M-16 ' + (bodyY - bodyRY + 4) + ' q14 -24 30 0 Z', a.c);
+    // neck + head
+    let hx = 30, hy = bodyY - 26;
+    if (a.head === 'high') { hx = 40; hy = bodyY - 40; }
+    if (a.head === 'mid') { hx = 36; hy = bodyY - 34; }
+    if (a.head === 'tall') { hx = 34; hy = bodyY - 86; }
+    if (a.head === 'low') { hx = 32; hy = bodyY - 18; }
+    if (a.head === 'tall' || a.head === 'high') {
+      out += ekPath('M' + (hx - 16) + ' ' + (bodyY - 8) + ' q2 -' + (Math.abs(hy - bodyY) * .9) + ' 8 -' + (Math.abs(hy - bodyY)) + ' h14 q4 ' + (Math.abs(hy - bodyY) * .5) + ' -2 ' + (Math.abs(hy - bodyY)) + ' Z', a.c);
+    }
+    if (a.mane) out += ekPath('M' + (hx - 14) + ' ' + (hy + 20) + ' q-6 -18 4 -26 q2 12 10 4 q-4 14 4 22 Z', a.mane);
+    // ears
+    if (a.ear === 'tall') out += ekPath('M' + (hx - 8) + ' ' + (hy - 12) + ' l-2 -18 l8 8 Z', a.c) + ekPath('M' + (hx + 6) + ' ' + (hy - 12) + ' l6 -16 l2 18 Z', a.c);
+    else if (a.ear === 'side') out += ekEll(hx - 14, hy - 6, 8, 5, a.c) + ekEll(hx + 14, hy - 6, 8, 5, a.c);
+    else if (a.ear === 'round') out += ekCir(hx - 13, hy - 13, 7, a.c) + ekCir(hx + 13, hy - 13, 7, a.c);
+    else if (a.ear === 'tri') out += ekPath('M' + (hx - 14) + ' ' + (hy - 10) + ' l-2 -14 l10 8 Z', a.c) + ekPath('M' + (hx + 14) + ' ' + (hy - 10) + ' l4 -13 l-10 7 Z', a.c);
+    else if (a.ear === 'small') out += ekCir(hx - 11, hy - 12, 4, a.c) + ekCir(hx + 11, hy - 12, 4, a.c);
+    else if (a.ear === 'fluffy') out += ekCir(hx - 16, hy - 6, 11, a.c) + ekCir(hx + 16, hy - 6, 11, a.c);
+    else if (a.ear === 'tuftEar') out += ekPath('M' + (hx - 10) + ' ' + (hy - 10) + ' l-1 -14 l7 10 Z', a.c) + ekPath('M' + (hx + 10) + ' ' + (hy - 10) + ' l3 -14 l-7 10 Z', a.c);
+    // horns / antlers
+    if (a.horn === 'short') out += ekPath('M' + (hx - 8) + ' ' + (hy - 14) + ' q-2 -9 4 -10' , 'none', ' stroke="#e8d9b8" stroke-width="4" stroke-linecap="round"') + ekPath('M' + (hx + 8) + ' ' + (hy - 14) + ' q2 -9 -4 -10', 'none', ' stroke="#e8d9b8" stroke-width="4" stroke-linecap="round"');
+    if (a.horn === 'curve') out += ekPath('M' + (hx - 6) + ' ' + (hy - 12) + ' q-8 -12 2 -16', 'none', ' stroke="#cbbfa6" stroke-width="4" stroke-linecap="round"') + ekPath('M' + (hx + 6) + ' ' + (hy - 12) + ' q8 -12 -2 -16', 'none', ' stroke="#cbbfa6" stroke-width="4" stroke-linecap="round"');
+    if (a.horn === 'nub') out += ekRect(hx - 10, hy - 20, 5, 8, 2, '#a9825a') + ekRect(hx + 5, hy - 20, 5, 8, 2, '#a9825a');
+    if (a.horn === 'antler') out += ekPath('M' + (hx - 9) + ' ' + (hy - 12) + ' q-6 -14 -14 -18 M' + (hx - 14) + ' ' + (hy - 20) + ' q-8 -2 -10 -10', 'none', ' stroke="#a9825a" stroke-width="3.4" stroke-linecap="round"') + ekPath('M' + (hx + 9) + ' ' + (hy - 12) + ' q6 -14 14 -18 M' + (hx + 14) + ' ' + (hy - 20) + ' q8 -2 10 -10', 'none', ' stroke="#a9825a" stroke-width="3.4" stroke-linecap="round"');
+    // head
+    out += ekCir(hx, hy, 17, a.c);
+    // muzzle
+    if (a.snout === 'wide') out += ekEll(hx + 8, hy + 6, 12, 8, '#ffd9d9') + ekCir(hx + 4, hy + 5, 1.8, '#c98f8f') + ekCir(hx + 12, hy + 5, 1.8, '#c98f8f');
+    if (a.snout === 'flat') out += ekEll(hx + 9, hy + 5, 9, 7, '#f59aa8') + ekCir(hx + 6, hy + 4, 1.6, '#b06a76') + ekCir(hx + 12, hy + 4, 1.6, '#b06a76');
+    if (a.snout === 'long') out += ekPath('M' + (hx + 6) + ' ' + (hy - 2) + ' q16 2 14 12 q-2 6 -12 4 q-6 -2 -6 -8 Z', a.c);
+    if (a.snout === 'point') out += ekPath('M' + (hx + 4) + ' ' + (hy + 2) + ' q16 0 16 6 q-4 6 -16 2 Z', a.c);
+    if (a.snout === 'small') out += ekEll(hx + 7, hy + 6, 7, 5, '#f8d9c9');
+    // eyes + nose
+    out += ekCir(hx + 2, hy - 4, 2.6, '#3c3644') + ekCir(hx + 12, hy - 4, 2.6, '#3c3644');
+    out += ekCir(hx + 4, hy - 5, .9, '#ffffff') + ekCir(hx + 14, hy - 5, .9, '#ffffff');
+    if (a.pat === 'pandaeye') out += ekEll(hx + 2, hy - 3, 6, 5, '#3d3d47') + ekEll(hx + 12, hy - 3, 6, 5, '#3d3d47') + ekCir(hx + 2, hy - 3, 1.6, '#ffffff') + ekCir(hx + 12, hy - 3, 1.6, '#ffffff');
+    if (a.beard) out += ekPath('M' + (hx + 6) + ' ' + (hy + 10) + ' q4 10 -2 12 q-4 -4 -4 -10 Z', '#e8e2d4');
+    return out;
+  }
+
+  /* ---------- birds, sea animals, bugs, reptiles ---------- */
+  const BIRD = {
+    chicken: { c: '#fff6ea', w: '#f4e3cc', beak: 'point', comb: '#ef8d8d', tail: 'fan', legs: 1, neck: 'short', size: 1 },
+    duck:    { c: '#ffe9a8', beak: 'flat', tail: 'up', legs: .8, neck: 'short', water: '#f6c96b' },
+    owl:     { c: '#c8a882', beak: 'hook', tail: 'short', legs: .5, neck: 'none', eyes: 'big', size: 1.05 },
+    parrot:  { c: '#7fd1a8', beak: 'hook', tail: 'long', legs: .8, neck: 'short', crest: '#ff9f6b' },
+    penguin: { c: '#4a5670', belly: '#ffffff', beak: 'point', tail: 'short', legs: .5, neck: 'none', flipper: true },
+    eagle:   { c: '#b0794b', beak: 'hook', tail: 'fan', legs: .7, neck: 'short', wings: 'spread' },
+    swan:    { c: '#ffffff', beak: 'flat', tail: 'up', legs: .6, neck: 'long', orange: '#f6b23f' },
+    ostrich: { c: '#5a4a48', beak: 'point', tail: 'fan', legs: 1.7, neck: 'long', longLeg: true },
+    chick:   { c: '#ffe07a', beak: 'point', tail: 'up', legs: .5, neck: 'none', size: .7 },
+    peacock: { c: '#5ab0c8', beak: 'point', tail: 'wheel', legs: .9, neck: 'short', crest: '#7fd1a8' },
+    turkey:  { c: '#c98f5e', beak: 'point', tail: 'wheel', legs: .9, neck: 'short', wattle: '#e0766e' },
+    flamingo:{ c: '#ffb0c4', beak: 'hook', tail: 'short', legs: 1.6, neck: 'long', longLeg: true },
+    dove:    { c: '#f2f6fa', beak: 'point', tail: 'fan', legs: .5, neck: 'short', size: .85 }
+  };
+
+  function ekBird(kind) {
+    const b = BIRD[kind] || BIRD.chicken;
+    const s = b.size || 1;
+    let out = '';
+    const bodyY = b.longLeg ? -74 : -38;
+    // legs
+    if (b.longLeg) {
+      out += ekRect(-7, bodyY + 22, 4, 56, 2, '#e8b45c') + ekRect(5, bodyY + 22, 4, 56, 2, '#e8b45c');
+      out += ekRect(-12, -4, 14, 5, 2, '#e8b45c') + ekRect(1, -4, 14, 5, 2, '#e8b45c');
+    } else {
+      out += ekRect(-9, bodyY + 20, 4, -bodyY - 20, 2, '#e8b45c') + ekRect(7, bodyY + 20, 4, -bodyY - 20, 2, '#e8b45c');
+      out += ekRect(-14, -4, 12, 5, 2, '#e8b45c') + ekRect(3, -4, 12, 5, 2, '#e8b45c');
+    }
+    // tail
+    if (b.tail === 'fan') out += ekPath('M-8 ' + bodyY + ' l-26 -14 l4 16 l-8 6 l14 8 l16 4 Z', b.w || b.c);
+    if (b.tail === 'up') out += ekPath('M-6 ' + bodyY + ' q-20 -14 -6 -20 q6 6 12 6 Z', b.c);
+    if (b.tail === 'long') out += ekPath('M-6 ' + bodyY + ' q-16 10 -26 34 l10 4 q10 -20 22 -30 Z', b.crest || b.c);
+    if (b.tail === 'wheel') {
+      for (let i = 0; i < 7; i++) {
+        const ang = -0.5 - i * 0.32;
+        out += ekEll(Math.cos(ang) * 30 - 8, bodyY + 6 + Math.sin(ang) * 26, 9, 7, i % 2 ? '#8fd4c8' : '#5ab0c8');
+      }
+    }
+    // wings
+    if (b.wings === 'spread') {
+      out += ekPath('M-8 ' + (bodyY - 4) + ' q-34 -22 -46 -4 q18 10 42 16 Z', b.c) + ekPath('M8 ' + (bodyY - 4) + ' q34 -22 46 -4 q-18 10 -42 16 Z', b.c);
+    } else if (b.flipper) {
+      out += ekPath('M-12 ' + (bodyY - 2) + ' q-16 14 -8 22 q10 -4 14 -14 Z', '#3c465c');
+    } else {
+      out += ekEll(-2, bodyY + 2, 11, 9, b.w || b.c);
+    }
+    // body
+    out += ekEll(0, bodyY, 21 * s, 17 * s, b.c);
+    if (b.belly) out += ekEll(3, bodyY + 4, 13 * s, 13 * s, b.belly);
+    // neck + head
+    let hx = 15, hy = bodyY - 20;
+    if (b.neck === 'long') { hx = 20; hy = bodyY - 46; out += ekRect(12, hy, 9, 34, 5, b.c); }
+    if (b.neck === 'none') { hx = 8; hy = bodyY - 14; }
+    out += ekCir(hx, hy, 12 * s, b.c);
+    // eyes
+    const er = b.eyes === 'big' ? 6 : 2.8;
+    out += ekCir(hx + 3, hy - 3, er, b.eyes === 'big' ? '#ffffff' : '#3c3644');
+    if (b.eyes === 'big') out += ekCir(hx + 4, hy - 3, 3.2, '#3c3644') + ekCir(hx + 5, hy - 4, 1.2, '#ffffff');
+    // beak
+    if (b.beak === 'flat') out += ekEll(hx + 13, hy + 2, 9, 4, b.orange || '#f2a34b');
+    else if (b.beak === 'hook') out += ekPath('M' + (hx + 9) + ' ' + (hy - 3) + ' q12 2 10 10 q-2 6 -9 3 q-4 -2 -4 -8 Z', '#f2a34b');
+    else out += ekPath('M' + (hx + 9) + ' ' + hy + ' l12 4 l-12 5 Z', '#f2a34b');
+    if (b.comb) out += ekPath('M' + (hx - 7) + ' ' + (hy - 10) + ' q3 -9 8 -2 q3 -7 8 -1 q-2 7 -16 5 Z', b.comb);
+    if (b.crest) out += ekPath('M' + (hx - 2) + ' ' + (hy - 10) + ' q2 -12 8 -6 q2 -8 8 -4 q-4 10 -16 12 Z', b.crest);
+    if (b.wattle) out += ekEll(hx + 12, hy + 8, 3, 5, b.wattle);
+    return out;
+  }
+
+  const SEA = {
+    whale:   { c: '#8fc4e8', belly: '#e8f4fb', size: 1.25, spout: true },
+    dolphin: { c: '#a8d4ef', belly: '#f2faff', size: 1.05, fin: true },
+    shark:   { c: '#9fb0c0', belly: '#f2f6fa', size: 1.15, tooth: true },
+    octopus: { c: '#f0a0b8', size: 1, legs: 6 },
+    crab:    { c: '#f28b82', size: .9, claws: true },
+    seal:    { c: '#c8ccd4', size: 1, flipper: true },
+    starfish:{ c: '#f7b267', size: .9, star: true },
+    seahorse:{ c: '#f2c48d', size: .9, horse: true },
+    jellyfish:{c: '#e0b8f0', size: 1, jelly: true },
+    shrimp:  { c: '#f9b4a6', size: .8, curl: true },
+    turtle2: { c: '#8fd4a0', size: 1, shell: true }
+  };
+
+  function ekSea(kind) {
+    const f = SEA[kind] || SEA.whale;
+    const s = f.size || 1;
+    let out = '';
+    if (f.star) {
+      out += ekPath('M0 -22 L7 -6 L24 -6 L10 5 L15 22 L0 12 L-15 22 L-10 5 L-24 -6 L-7 -6 Z', f.c);
+      out += ekCir(0, 0, 2.4, '#e08a3c');
+      return out;
+    }
+    if (f.jelly) {
+      out += ekPath('M-20 0 q0 -22 20 -22 q20 0 20 22 Z', f.c);
+      for (let i = -2; i <= 2; i++) out += ekPath('M' + (i * 8) + ' 0 q-4 10 0 18 q4 6 0 12', 'none', ' stroke="' + f.c + '" stroke-width="3" stroke-linecap="round"');
+      out += ekCir(-7, -10, 1.8, '#6a4a72') + ekCir(7, -10, 1.8, '#6a4a72');
+      return out;
+    }
+    if (f.shell) {
+      out += ekEll(0, 0, 26, 18, f.c);
+      out += ekPath('M0 -18 v36 M-18 -8 l36 16 M-18 8 l36 -16', 'none', ' stroke="#5f9e70" stroke-width="2.4"');
+      out += ekCir(24, -6, 7, '#a8dfb4') + ekCir(24, -8, 1.6, '#3c3644');
+      out += ekRect(-14, 12, 8, 8, 3, '#a8dfb4') + ekRect(6, 12, 8, 8, 3, '#a8dfb4');
+      return out;
+    }
+    // fish-like body
+    out += ekPath('M-26 0 q14 -20 34 -14 q16 4 24 14 q-8 10 -24 14 q-20 6 -34 -14 Z', f.c);
+    if (f.belly) out += ekPath('M-20 4 q14 12 30 6 q10 -3 16 -8 q-14 12 -30 10 q-12 -2 -16 -8 Z', f.belly);
+    out += ekPath('M-26 0 l-14 -12 l6 12 l-6 12 Z', f.c);
+    out += ekCir(20, -4, 2.6, '#3c3644');
+    if (f.tooth) out += ekPath('M10 6 q4 4 8 0 q-4 6 -8 4 Z', '#ffffff') + ekPath('M-2 -6 l0 -14 l10 8 Z', f.c);
+    if (f.fin) out += ekPath('M-4 -12 l8 -12 l8 12 Z', f.c);
+    if (f.spout) out += ekPath('M6 -16 q-4 -14 4 -18 M6 -16 q6 -12 14 -14', 'none', ' stroke="#bfe4f7" stroke-width="3.4" stroke-linecap="round"');
+    if (f.legs) {
+      for (let i = 0; i < f.legs; i++) {
+        const x = -20 + i * 8;
+        out += ekPath('M' + x + ' 12 q-4 12 2 18 q4 4 8 0', 'none', ' stroke="' + f.c + '" stroke-width="5" stroke-linecap="round"');
+      }
+      out += ekCir(-12, -2, 2.6, '#3c3644') + ekCir(2, -2, 2.6, '#3c3644');
+    }
+    if (f.claws) {
+      out += ekCir(0, 0, 16, f.c) + ekCir(-12, 10, 5, f.c) + ekCir(12, 10, 5, f.c);
+      out += ekPath('M-16 -10 q-12 -6 -12 -14 q8 0 12 8 Z', f.c) + ekPath('M16 -10 q12 -6 12 -14 q-8 0 -12 8 Z', f.c);
+      out += ekCir(-5, -4, 2.4, '#3c3644') + ekCir(5, -4, 2.4, '#3c3644');
+    }
+    if (f.horse) {
+      out = ekPath('M4 -26 q14 2 12 12 q-2 8 -10 8 q-2 10 2 16 q6 8 0 16 q-8 4 -10 -4 q-4 6 -10 2 q-4 -6 2 -12 q4 -6 2 -14 q-4 -8 2 -14 Z', f.c);
+      out += ekPath('M16 -18 q6 -6 4 -12', 'none', ' stroke="' + f.c + '" stroke-width="4" stroke-linecap="round"');
+      out += ekCir(12, -8, 1.8, '#3c3644');
+    }
+    if (f.curl) {
+      out = ekPath('M-18 10 q-8 -14 6 -18 q14 -4 20 6 q6 10 -4 14 q-8 2 -8 -4 q0 -6 6 -4', 'none', ' stroke="' + f.c + '" stroke-width="9" stroke-linecap="round"');
+      out += ekCir(-16, 12, 3, '#3c3644');
+    }
+    return out;
+  }
+
+  const BUG = {
+    bee:     { c: '#ffd166', stripe: '#4a4a55', wings: true },
+    ant:     { c: '#8a6a54', legs: 6 },
+    spider:  { c: '#6a5a72', legs: 8, web: true },
+    dragonfly:{c: '#8fd4c8', wings: 'long' },
+    ladybug: { c: '#f26d6d', dot: '#3c3644', shell: true },
+    snail:   { c: '#d8b48c', shell: '#f0b27a', spiral: true },
+    firefly: { c: '#c8b06a', glow: true },
+    worm:    { c: '#eba8b8', curl: true },
+    beetle:  { c: '#5a6a8a', shell: true },
+    mosquito:{ c: '#7a6a5a', wings: true, needle: true }
+  };
+
+  function ekBug(kind) {
+    const b = BUG[kind] || BUG.bee;
+    let out = '';
+    if (b.curl) {
+      out = ekPath('M-22 8 q0 -14 14 -12 q14 2 12 12 q-2 8 -10 6', 'none', ' stroke="' + b.c + '" stroke-width="9" stroke-linecap="round"');
+      out += ekCir(-20, 8, 2, '#3c3644');
+      return out;
+    }
+    if (b.spiral) {
+      out += ekPath('M6 4 q0 -18 -16 -18 q-18 0 -18 18 q0 14 14 14', 'none', ' stroke="' + b.c + '" stroke-width="8" stroke-linecap="round"');
+      out += ekCir(-2, -6, 16, b.shell);
+      out += ekPath('M-14 -6 q10 -12 18 0 q-8 10 -18 0', 'none', ' stroke="#c98f5e" stroke-width="3"');
+      out += ekPath('M10 -2 q10 -6 10 -12 M10 2 q10 2 12 -2', 'none', ' stroke="' + b.c + '" stroke-width="2.4" stroke-linecap="round"');
+      return out;
+    }
+    if (b.legs) {
+      for (let i = 0; i < b.legs; i++) {
+        const y = -6 + (i % (b.legs / 2)) * 7, dir = i < b.legs / 2 ? -1 : 1;
+        out += ekPath('M' + (dir * 8) + ' ' + y + ' q' + (dir * 10) + ' 4 ' + (dir * 12) + ' 12', 'none', ' stroke="' + b.c + '" stroke-width="2.6" stroke-linecap="round"');
+      }
+    }
+    // body
+    if (b.shell) {
+      out += ekEll(0, 0, 15, 13, b.c);
+      out += ekPath('M0 -13 v26', 'none', ' stroke="#00000022" stroke-width="2"');
+      if (b.dot) out += ekCir(-6, -4, 2.8, b.dot) + ekCir(6, -4, 2.8, b.dot) + ekCir(-5, 6, 2.6, b.dot) + ekCir(6, 6, 2.6, b.dot);
+    } else {
+      out += ekEll(0, 0, 16, 11, b.c);
+    }
+    if (b.stripe) {
+      out += ekPath('M-6 -10 q-3 10 0 20', 'none', ' stroke="' + b.stripe + '" stroke-width="4"') + ekPath('M6 -9 q3 9 0 18', 'none', ' stroke="' + b.stripe + '" stroke-width="4"');
+    }
+    // wings
+    if (b.wings === 'long') {
+      out += ekEll(-6, -14, 18, 5, '#d8f2f8') + ekEll(6, -14, 18, 5, '#d8f2f8');
+    } else if (b.wings) {
+      out += ekEll(-6, -13, 10, 7, '#ffffff', ' opacity=".85"') + ekEll(6, -13, 10, 7, '#ffffff', ' opacity=".85"');
+    }
+    // head
+    out += ekCir(14, -2, 7, b.c === '#8a6a54' ? b.c : b.c);
+    out += ekCir(12, -3, 1.8, '#3c3644');
+    out += ekPath('M20 -2 q6 -2 6 -6 M20 0 q6 2 6 6', 'none', ' stroke="' + b.c + '" stroke-width="1.8" stroke-linecap="round"');
+    if (b.needle) out += ekPath('M20 -2 q10 0 14 -6', 'none', ' stroke="#7a6a5a" stroke-width="1.6"');
+    if (b.glow) out += ekCir(-16, 6, 5, '#ffe08a', ' opacity=".85"');
+    if (b.web) out += ekPath('M-30 -26 l60 0 M-30 -26 l0 40 M-30 -26 l60 40', 'none', ' stroke="#dbe6f0" stroke-width="1.4" opacity=".9"');
+    return out;
+  }
+
+  const REPTILE = {
+    frog:    { c: '#8fd4a0', kind: 'frog' },
+    snake:   { c: '#a8d47f', kind: 'snake' },
+    turtle:  { c: '#8fc9a0', shell: '#c9a06b', kind: 'turtle' },
+    crocodile:{c: '#7fb08f', kind: 'croc' },
+    lizard:  { c: '#b8d47f', kind: 'lizard' },
+    dinosaur:{ c: '#8fb0d4', kind: 'dino' }
+  };
+
+  function ekReptile(kind) {
+    const r = REPTILE[kind] || REPTILE.frog;
+    let out = '';
+    if (r.kind === 'snake') {
+      out += ekPath('M-26 14 q10 -14 22 -4 q12 10 4 18 q-8 8 -18 0', 'none', ' stroke="' + r.c + '" stroke-width="10" stroke-linecap="round"');
+      out += ekCir(20, 14, 8, r.c) + ekCir(22, 12, 2, '#3c3644');
+      out += ekPath('M26 16 q6 2 8 -2', 'none', ' stroke="#e0766e" stroke-width="2" stroke-linecap="round"');
+      return out;
+    }
+    if (r.kind === 'turtle') {
+      out += ekEll(0, -2, 26, 18, r.shell);
+      out += ekPath('M0 -20 v36 M-18 -10 l36 20 M-18 10 l36 -20', 'none', ' stroke="#a9825a" stroke-width="2.2"');
+      out += ekCir(24, -6, 8, r.c) + ekCir(26, -8, 1.8, '#3c3644');
+      out += ekRect(-14, 12, 9, 8, 4, r.c) + ekRect(6, 12, 9, 8, 4, r.c);
+      return out;
+    }
+    if (r.kind === 'croc' || r.kind === 'dino') {
+      out += ekPath('M-32 6 q16 -18 44 -12 q18 4 20 10 q-2 8 -22 8 q-28 0 -42 -6 Z', r.c);
+      if (r.kind === 'dino') {
+        out += ekPath('M-6 -8 q4 -24 16 -22 q10 2 8 14 q-6 -6 -8 2 Z', r.c);
+        out += ekPath('M-30 10 q-8 8 -2 14 M-18 10 q-8 6 -4 14', 'none', ' stroke="' + r.c + '" stroke-width="5" stroke-linecap="round"');
+      } else {
+        for (let i = 0; i < 5; i++) out += ekPath('M' + (-24 + i * 9) + ' -4 l2 -6 l3 6 Z', '#6a9a7f');
+      }
+      out += ekCir(-2, -14, 2.2, '#3c3644');
+      for (let i = 0; i < 6; i++) out += ekPath('M' + (2 + i * 6) + ' 0 l2 4 l2 -4 Z', '#ffffff');
+      out += ekPath('M-30 6 q-8 4 -12 -2', 'none', ' stroke="' + r.c + '" stroke-width="6" stroke-linecap="round"');
+      return out;
+    }
+    if (r.kind === 'lizard') {
+      out += ekEll(0, 0, 18, 10, r.c);
+      out += ekPath('M-16 0 q-12 4 -18 -2 M-4 -8 q4 -8 10 -8 M-8 8 q-6 8 0 12 M6 8 q6 8 0 12', 'none', ' stroke="' + r.c + '" stroke-width="4" stroke-linecap="round"');
+      out += ekCir(16, -2, 6, r.c) + ekCir(18, -3, 1.8, '#3c3644');
+      return out;
+    }
+    // frog
+    out += ekEll(0, 0, 18, 13, r.c);
+    out += ekCir(-4, -12, 6, r.c) + ekCir(8, -12, 6, r.c);
+    out += ekCir(-4, -12, 3, '#ffffff') + ekCir(8, -12, 3, '#ffffff');
+    out += ekCir(-4, -12, 1.6, '#3c3644') + ekCir(8, -12, 1.6, '#3c3644');
+    out += ekPath('M-4 6 q4 4 8 0', 'none', ' stroke="#5f9e70" stroke-width="2" stroke-linecap="round"');
+    out += ekPath('M-14 10 q-8 6 -4 12 q6 2 8 -6 Z', r.c) + ekPath('M14 10 q8 6 4 12 q-6 2 -8 -6 Z', r.c);
+    return out;
+  }
+
+  /* ---------- food ---------- */
+  const FRUIT_FAMILY = {
+    round:    ['apple2', 'orange', 'lemon', 'peach', 'pear', 'melon', 'watermelon', 'mango', 'coconut', 'cherry', 'grape', 'pineapple'],
+    plate:    ['rice', 'soup', 'noodle', 'salad', 'spaghetti', 'cereal', 'porridge'],
+    cup:      ['milk', 'water', 'juice', 'tea', 'coffee', 'soda'],
+    breadish: ['bread', 'cake2', 'cookie', 'biscuit', 'doughnut', 'sandwich'],
+    hand:     ['burger', 'pizza', 'sausage', 'chickenleg', 'steak', 'taco', 'icecream', 'popcorn', 'candy', 'chocolate', 'egg', 'cheese', 'butter', 'jam', 'honey', 'salt', 'sugar', 'gum', 'bean', 'corn', 'potato', 'onion', 'pumpkin', 'pepper']
+  };
+
+  /* ---------- food ---------- */
+  function ekFood(kind) {
+    const cy = 0;
+    const bowl = (fill, rim) => ekPath('M-30 -4 q0 26 30 26 q30 0 30 -26 Z', fill) + ekRect(-32, -10, 64, 8, 4, rim || fill);
+    const steam = (x, y, s) => ekPath('M' + x + ' ' + (y - 16) + ' q-6 -12 2 -20 M' + (x + 12) + ' ' + (y - 14) + ' q6 -12 -2 -20', 'none', ' stroke="#cfe3ef" stroke-width="3" stroke-linecap="round"');
+    const cup = (fill, liquid) => ekPath('M-16 -14 h32 l-4 30 q-1 6 -8 6 h-8 q-7 0 -8 -6 Z', fill) + ekPath('M-13 -6 h26 l-2 14 q-1 4 -6 4 h-10 q-5 0 -6 -4 Z', liquid) + ekPath('M16 -8 q8 2 6 10 q-2 6 -7 4', 'none', ' stroke="' + fill + '" stroke-width="4" stroke-linecap="round"');
+    switch (kind) {
+      case 'orange': return ekCir(0, cy, 22, '#ffa94d') + ekPath('M0 -22 q2 -8 10 -10' , 'none', ' stroke="#a9825a" stroke-width="3"') + ekEll(12, -20, 8, 4, '#8fd4a0') + ekPath('M-14 -6 q6 12 0 20 M0 -10 q0 18 0 20 M14 -6 q-6 12 0 20', 'none', ' stroke="#f79a3c" stroke-width="1.6" opacity=".7"');
+      case 'lemon': return ekPath('M-24 0 q6 -20 24 -20 q18 0 24 20 q-6 20 -24 20 q-18 0 -24 -20 Z', '#ffe066') + ekCir(-24, 0, 3.5, '#f5d34a') + ekCir(24, 0, 3.5, '#f5d34a') + ekPath('M-10 -8 q10 6 0 16', 'none', ' stroke="#f0c93a" stroke-width="1.8"');
+      case 'peach': return ekCir(0, cy, 22, '#ffb3a7') + ekPath('M0 -22 q-2 22 0 44', 'none', ' stroke="#f79a8c" stroke-width="2.4"') + ekEll(10, -20, 9, 4, '#8fd4a0') + ekCir(-8, -4, 3, '#ff9d8c');
+      case 'pear': return ekPath('M0 -24 q10 0 10 10 q0 8 12 16 q10 10 0 18 q-14 8 -22 0 q-10 -8 0 -18 q12 -8 12 -16 q0 -10 -12 -10 Z', '#c8e08a') + ekPath('M0 -24 q-2 -8 4 -12', 'none', ' stroke="#8a6a4a" stroke-width="3"');
+      case 'melon': return ekCir(0, cy, 23, '#c8e6a0') + ekPath('M-20 -12 q20 12 40 0 M-22 0 q22 12 44 0 M-20 12 q20 12 40 0', 'none', ' stroke="#a8cf7a" stroke-width="1.8"') + ekEll(4, -22, 8, 4, '#8fd4a0');
+      case 'watermelon': return ekPath('M-26 0 a26 26 0 0 1 52 0 Z', '#f26d6d') + ekPath('M-26 0 a26 26 0 0 1 52 0', 'none', ' stroke="#8fd4a0" stroke-width="6"') + ekCir(-10, -8, 1.8, '#5b3a3a') + ekCir(4, -12, 1.8, '#5b3a3a') + ekCir(14, -5, 1.8, '#5b3a3a') + ekCir(-2, -2, 1.8, '#5b3a3a');
+      case 'mango': return ekEll(0, cy, 22, 18, '#ffb347', ' transform="rotate(-14)"') + ekEll(-4, -4, 12, 6, '#ffd88a', ' transform="rotate(-14)"') + ekEll(12, -18, 7, 3.4, '#8fd4a0');
+      case 'coconut': return ekCir(0, cy, 22, '#a97e5b') + ekCir(0, cy, 15, '#f7f0e0') + ekCir(-8, -8, 2.6, '#6a4a30') + ekCir(0, -10, 2.6, '#6a4a30') + ekCir(8, -8, 2.6, '#6a4a30');
+      case 'cherry': return ekPath('M-10 -8 q4 -18 14 -22 M10 -6 q0 -18 -8 -22', 'none', ' stroke="#6a9a5f" stroke-width="3" stroke-linecap="round"') + ekCir(-12, 6, 10, '#e0566d') + ekCir(10, 8, 10, '#f26d7d') + ekEll(-2, -26, 8, 3.4, '#8fd4a0');
+      case 'grape': {
+        let o = '<path d="M0 -20 q-2 -8 4 -12" fill="none" stroke="#8a6a4a" stroke-width="3"/>' + ekEll(6, -22, 9, 4, '#8fd4a0');
+        [[-9, -8], [0, -10], [9, -8], [-13, 2], [-4, 0], [5, 0], [13, 2], [-8, 10], [2, 10], [-2, 19]].forEach(p => { o += ekCir(p[0], p[1], 6, '#b28ad4'); });
+        return o;
+      }
+      case 'pineapple': return ekPath('M-16 -14 q16 -8 32 0 q4 22 -4 34 q-12 6 -24 0 q-8 -12 -4 -34 Z', '#f2c94c') + ekPath('M-12 -10 q10 20 0 30 M0 -14 q6 20 0 32 M12 -10 q-10 20 0 30', 'none', ' stroke="#d8a92a" stroke-width="1.6"') + ekPath('M0 -16 q-12 -10 -14 -22 q12 2 16 14 q2 -14 12 -18 q0 12 -10 24 Z', '#8fd4a0');
+      case 'rice': return bowl('#e8f1f8', '#d4e4ef') + ekPath('M-22 -6 q22 -18 44 0 Z', '#ffffff') + ekPath('M10 -14 l18 -16 M16 -10 l20 -12', 'none', ' stroke="#c9a06b" stroke-width="3" stroke-linecap="round"');
+      case 'soup': return bowl('#f7d9b0', '#e8c396') + ekEll(0, -6, 22, 6, '#e8a86b') + steam(-8, -14) + ekEll(6, -8, 4, 2.4, '#8fd4a0');
+      case 'noodle': return bowl('#f2e6d0', '#e0cfb0') + ekPath('M-20 -8 q10 -12 20 0 q10 12 20 0', 'none', ' stroke="#f5d76e" stroke-width="5"') + ekPath('M-12 -10 q8 10 16 0', 'none', ' stroke="#f5d76e" stroke-width="5"') + ekPath('M8 -18 l16 -12 M14 -12 l18 -10', 'none', ' stroke="#c9a06b" stroke-width="3" stroke-linecap="round"');
+      case 'salad': return bowl('#dff2e2', '#c8e6cf') + ekCir(-12, -8, 9, '#8fd4a0') + ekCir(2, -10, 10, '#a8dfb4') + ekCir(14, -7, 8, '#7fc98f') + ekCir(-2, -4, 4, '#f26d6d') + ekCir(10, -3, 3.4, '#ffb457');
+      case 'spaghetti': return ekEll(0, 4, 32, 12, '#ffffff') + ekEll(0, 0, 26, 10, '#f5d76e') + ekPath('M-16 0 q8 -8 16 0 q8 8 16 0', 'none', ' stroke="#f2c94c" stroke-width="4"') + ekPath('M18 -16 l8 12 M22 -18 l10 10 M14 -20 l6 12', 'none', ' stroke="#b8c4cf" stroke-width="2.4" stroke-linecap="round"');
+      case 'cereal': return bowl('#f2e6d0', '#e0cfb0') + ekCir(-10, -8, 5, '#e8b45c') + ekCir(2, -10, 5, '#d8a04a') + ekCir(12, -7, 5, '#e8b45c') + ekPath('M16 -14 q10 -12 4 -22', 'none', ' stroke="#b8c4cf" stroke-width="3" stroke-linecap="round"');
+      case 'porridge': return bowl('#f7f2e4', '#e8ddc6') + ekEll(0, -6, 20, 5, '#ffffff') + ekPath('M14 -16 q6 -12 0 -18', 'none', ' stroke="#cfe3ef" stroke-width="3"') + ekEll(-4, -7, 3, 2, '#e8c396');
+      case 'milk': return ekPath('M-14 -18 h28 v34 q0 4 -4 4 h-20 q-4 0 -4 -4 Z', '#ffffff') + ekPath('M-14 -18 l6 -10 h16 l6 10 Z', '#e8f1f8') + ekRect(-10, -6, 20, 12, 3, '#8fc9ff') + ekCir(0, 0, 4, '#ffffff');
+      case 'water': return ekPath('M-13 -16 h26 l-3 30 q-1 5 -7 5 h-6 q-6 0 -7 -5 Z', '#e8f6fb') + ekPath('M-12 -6 h24 l-2 19 q-1 4 -6 4 h-8 q-5 0 -6 -4 Z', '#8fc9ff') + ekPath('M0 -30 q6 8 0 12 q-6 -4 0 -12 Z', '#8fc9ff');
+      case 'juice': return cup('#fff6e8', '#ffb457') + ekPath('M4 -18 l10 -14', 'none', ' stroke="#f28b82" stroke-width="4" stroke-linecap="round"') + ekEll(2, -6, 8, 4, '#ffd88a');
+      case 'tea': return ekEll(0, 18, 24, 5, '#e8f1f8') + cup('#ffffff', '#d8a04a') + ekRect(-4, -8, 8, 10, 1, '#b98f5c') + ekPath('M-3 -8 q0 -14 -6 -18', 'none', ' stroke="#b98f5c" stroke-width="1.4"') + steam(2, -14);
+      case 'coffee': return ekRect(-16, -18, 32, 34, 5, '#ffffff') + ekRect(-12, -14, 24, 10, 2, '#8a5a3a') + ekPath('M16 -10 q10 2 8 12 q-2 8 -9 6', 'none', ' stroke="#ffffff" stroke-width="5" stroke-linecap="round"') + steam(0, -20);
+      case 'soda': return ekRect(-12, -24, 24, 46, 6, '#f26d6d') + ekRect(-12, -14, 24, 10, 0, '#ffffff') + ekCir(0, 6, 5, '#ffffff', ' opacity=".7"') + ekRect(-6, -28, 12, 5, 2, '#c9d6e2');
+      case 'bread': return ekPath('M-28 12 q-4 -26 10 -30 q16 -6 34 2 q12 6 10 28 Z', '#e8b46b') + ekPath('M-24 2 q12 -8 26 -2 q10 4 20 0', 'none', ' stroke="#d8a04a" stroke-width="2"') + ekPath('M-16 -14 l4 8 M-2 -18 l4 8 M12 -14 l4 8', 'none', ' stroke="#c98f5e" stroke-width="2.4" stroke-linecap="round"');
+      case 'cake2': return ekRect(-22, -4, 44, 18, 3, '#f7d9b0') + ekRect(-22, -12, 44, 9, 3, '#ffb3c7') + ekPath('M-14 -12 q4 -8 0 -12 M0 -12 q4 -8 0 -12 M14 -12 q4 -8 0 -12', 'none', ' stroke="#8fc9ff" stroke-width="2.4"') + ekCir(-10, -12, 2.4, '#f26d6d') + ekCir(4, -12, 2.4, '#f26d6d');
+      case 'cookie': return ekCir(0, cy, 20, '#d8a45c') + ekCir(-8, -6, 3, '#6a4a30') + ekCir(6, -8, 2.6, '#6a4a30') + ekCir(2, 6, 3.4, '#6a4a30') + ekCir(-6, 8, 2.4, '#6a4a30') + ekCir(12, 2, 2.2, '#6a4a30');
+      case 'biscuit': return ekCir(0, cy, 19, '#f0c98a') + ekCir(0, cy, 12, '#f7dfb4') + ekCir(-5, -5, 1.8, '#c98f5e') + ekCir(5, -5, 1.8, '#c98f5e') + ekCir(-5, 5, 1.8, '#c98f5e') + ekCir(5, 5, 1.8, '#c98f5e');
+      case 'doughnut': return ekCir(0, cy, 22, '#f0c98a') + ekPath('M0 -22 a22 22 0 0 1 0 44 a22 22 0 0 1 0 -44 Z M0 -8 a8 8 0 0 0 0 16 a8 8 0 0 0 0 -16 Z', '#ffb3c7', ' fill-rule="evenodd"') + ekPath('M-14 -8 l3 4 M8 -12 l3 4 M10 6 l3 4 M-8 10 l3 4', 'none', ' stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"');
+      case 'sandwich': return ekPath('M-26 12 L0 -20 L26 12 Z', '#e8b46b') + ekPath('M-20 4 L0 -12 L20 4 Z', '#f7dfb4') + ekPath('M-22 0 h44 l-4 5 h-36 Z', '#8fd4a0') + ekPath('M-18 6 h36 l-3 5 h-30 Z', '#f26d6d');
+      case 'burger': return ekPath('M-24 0 q0 -22 24 -22 q24 0 24 22 Z', '#e8b46b') + ekPath('M-26 2 h52 l-4 8 h-44 Z', '#8fd4a0') + ekRect(-22, 8, 44, 8, 3, '#a97e5b') + ekPath('M-24 16 q24 12 48 0 q0 8 -24 8 q-24 0 -24 -8 Z', '#e8b46b') + ekCir(-10, -12, 1.4, '#ffffff') + ekCir(0, -16, 1.4, '#ffffff') + ekCir(10, -12, 1.4, '#ffffff');
+      case 'pizza': return ekPath('M0 -24 L26 20 L-26 20 Z', '#f2c94c') + ekPath('M-20 14 L0 -18 L20 14 Z', '#ffb457') + ekCir(-6, 0, 4, '#f26d6d') + ekCir(8, 2, 4, '#f26d6d') + ekCir(0, 10, 3.4, '#f26d6d') + ekPath('M-24 20 h48 v4 h-48 Z', '#e8b46b');
+      case 'sausage': return ekRect(-24, -6, 30, 14, 7, '#e08a6b') + ekRect(-4, 4, 30, 14, 7, '#d97a5c') + ekPath('M-18 -2 q4 6 0 10 M-10 -2 q4 6 0 10 M2 8 q4 6 0 10 M12 8 q4 6 0 10', 'none', ' stroke="#c96a4c" stroke-width="1.8"');
+      case 'chickenleg': return ekEll(-2, -4, 18, 14, '#e8a05c') + ekPath('M12 2 q10 6 6 14 q-4 6 -12 2 Z', '#e8a05c') + ekRect(14, 14, 12, 6, 3, '#f7f0e0', ' transform="rotate(28 20 17)"');
+      case 'steak': return ekPath('M-22 -12 q22 -10 42 2 q6 12 -6 20 q-20 8 -34 -2 q-8 -10 -2 -20 Z', '#c9705a') + ekPath('M-14 -6 q14 -2 22 6', 'none', ' stroke="#e8a08a" stroke-width="3"') + ekRect(16, 6, 16, 6, 3, '#f7f0e0', ' transform="rotate(20 24 9)"');
+      case 'taco': return ekPath('M-24 12 a24 24 0 0 1 48 0 Z', '#f2c94c') + ekCir(-8, 0, 5, '#8fd4a0') + ekCir(2, -2, 5, '#f26d6d') + ekCir(10, 2, 4.4, '#f2c94c') + ekPath('M-24 12 h48 v4 h-48 Z', '#e8b46b');
+      case 'icecream': return ekPath('M-16 4 L0 30 L16 4 Z', '#e8b46b') + ekCir(-6, -2, 10, '#ffb3c7') + ekCir(7, -2, 9, '#fff6ea') + ekCir(0, -14, 9, '#a8dfb4') + ekPath('M0 -22 q4 -6 0 -10', 'none', ' stroke="#f26d6d" stroke-width="2"');
+      case 'popcorn': return ekPath('M-16 -10 h32 l-4 34 h-24 Z', '#f26d6d') + ekPath('M-16 -10 h32 l-2 10 h-28 Z', '#ffffff') + ekCir(-8, -16, 7, '#fff6e8') + ekCir(4, -20, 8, '#fff6e8') + ekCir(12, -14, 6, '#fff6e8') + ekCir(-2, -12, 6, '#fff6e8');
+      case 'candy': return ekCir(0, cy, 12, '#ffb3c7') + ekPath('M-12 -4 l-14 -8 v24 l14 -8 Z', '#ffd1dd') + ekPath('M12 -4 l14 -8 v24 l-14 -8 Z', '#ffd1dd') + ekPath('M-6 -8 q6 8 0 16', 'none', ' stroke="#ffffff" stroke-width="2.4"');
+      case 'chocolate': return ekRect(-20, -16, 40, 34, 3, '#8a5a3a') + ekPath('M-20 -4 h40 M-20 8 h40 M-6 -16 v34 M6 -16 v34', 'none', ' stroke="#6a4230" stroke-width="1.8"') + ekRect(-20, -16, 40, 6, 3, '#c98f5e');
+      case 'egg': return ekPath('M-24 2 q0 -16 14 -18 q16 -2 26 6 q12 10 4 20 q-10 12 -28 6 q-16 -6 -16 -14 Z', '#ffffff') + ekCir(2, -2, 9, '#ffcf4d') + ekCir(-3, -6, 3, '#ffe08a');
+      case 'cheese': return ekPath('M-24 10 h48 l-6 -20 q-18 -6 -36 4 Z', '#ffd166') + ekCir(-12, 2, 4, '#f0b840') + ekCir(4, 4, 3.2, '#f0b840') + ekCir(12, -2, 2.6, '#f0b840') + ekPath('M-24 10 h48 v4 h-48 Z', '#e8b46b');
+      case 'butter': return ekPath('M-20 8 h40 v-16 h-40 Z', '#ffe08a') + ekPath('M-20 8 l6 4 h40 l-6 -4 Z', '#f5cf6a') + ekPath('M-14 6 v-14', 'none', ' stroke="#f0c95a" stroke-width="1.6"');
+      case 'jam': return ekRect(-16, -12, 32, 32, 4, '#f26d7d') + ekRect(-18, -18, 36, 8, 3, '#c94f5f') + ekCir(0, 4, 8, '#ffffff', ' opacity=".85"') + ekCir(-2, 4, 3, '#f26d7d');
+      case 'honey': return ekRect(-15, -10, 30, 30, 4, '#f2c94c') + ekRect(-17, -16, 34, 7, 3, '#d8a92a') + ekPath('M0 -16 v-10 l10 -6', 'none', ' stroke="#d8a92a" stroke-width="3" stroke-linecap="round"');
+      case 'salt': return ekPath('M-12 -14 h24 v28 q0 6 -6 6 h-12 q-6 0 -6 -6 Z', '#ffffff') + ekRect(-12, -18, 24, 6, 3, '#c9d6e2') + ekCir(-4, -2, 1.4, '#a9c4d8') + ekCir(3, 2, 1.4, '#a9c4d8') + ekCir(0, 8, 1.4, '#a9c4d8');
+      case 'sugar': return ekPath('M-18 -2 q0 18 18 18 q18 0 18 -18 Z', '#ffffff') + ekRect(-10, -12, 10, 10, 2, '#f7f7f7') + ekRect(2, -8, 10, 10, 2, '#f0f0f0') + ekRect(-8, -22, 9, 9, 2, '#ffffff');
+      case 'gum': return ekRect(-16, -10, 32, 30, 8, '#8fd4a0') + ekPath('M-16 -2 h32 v10 h-32 Z', '#ffffff', ' opacity=".85"') + ekCir(16, -16, 5, '#ffb3c7');
+      case 'bean': return ekEll(-12, 6, 7, 5, '#8a9a5f') + ekEll(0, 2, 7, 5, '#7f8f57') + ekEll(10, 7, 7, 5, '#8a9a5f') + ekPath('M-20 0 q10 -14 20 -6', 'none', ' stroke="#a8dfb4" stroke-width="2"');
+      case 'corn': return ekPath('M-8 -22 q14 -4 14 12 q0 20 -8 26 q-10 -6 -10 -26 q0 -10 4 -12 Z', '#ffd166') + ekPath('M-8 -22 q4 20 0 36 M-2 -24 q6 20 2 38', 'none', ' stroke="#f0b840" stroke-width="1.4"') + ekPath('M-14 -10 q-12 0 -14 14 q10 6 16 -2 Z', '#8fd4a0');
+      case 'potato': return ekEll(0, cy, 20, 15, '#c9a06b') + ekCir(-8, -4, 2, '#a9825a') + ekCir(6, 2, 2, '#a9825a') + ekCir(-2, 8, 1.8, '#a9825a') + ekCir(10, -8, 1.6, '#a9825a');
+      case 'onion': return ekPath('M0 -20 q16 4 14 20 q-2 14 -14 14 q-12 0 -14 -14 q-2 -16 14 -20 Z', '#e8c8f0') + ekPath('M0 -20 q-6 -8 0 -12 q6 4 0 12', 'none', ' stroke="#a8cf7a" stroke-width="3"') + ekPath('M-8 -4 q8 8 0 16 M6 -6 q-8 10 0 18', 'none', ' stroke="#c9a0d8" stroke-width="1.8"');
+      case 'pumpkin': return ekEll(0, 2, 24, 18, '#f2a03c') + ekPath('M-10 -14 q6 16 0 32 M0 -16 q0 36 0 32 M10 -14 q-6 16 0 32', 'none', ' stroke="#d88a2a" stroke-width="2"') + ekRect(-3, -26, 6, 10, 3, '#8a6a4a') + ekPath('M4 -24 q10 -4 12 -12', 'none', ' stroke="#8fd4a0" stroke-width="3"');
+      case 'pepper': return ekPath('M0 -14 q14 0 14 14 q0 16 -14 16 q-14 0 -14 -16 q0 -14 14 -14 Z', '#f26d6d') + ekPath('M-6 -14 q6 -8 12 0', 'none', ' stroke="#8fd4a0" stroke-width="4"') + ekPath('M-6 4 q6 8 0 14', 'none', ' stroke="#e0566d" stroke-width="2"');
+      default: return ekCir(0, cy, 20, '#e8c396');
+    }
+  }
+
+  /* ---------- clothes ---------- */
+  function ekWear(kind) {
+    switch (kind) {
+      case 'hat': return ekEll(0, 8, 26, 6, '#ffd166') + ekPath('M-16 8 q0 -26 16 -26 q16 0 16 26 Z', '#f7a03c') + ekPath('M-16 0 h32 v4 h-32 Z', '#e0862a');
+      case 'cap': return ekPath('M-18 4 q0 -22 18 -22 q18 0 18 22 Z', '#8fc9ff') + ekPath('M0 4 h26 q6 0 4 6 h-30 Z', '#5f9ed8') + ekCir(0, -18, 3, '#5f9ed8');
+      case 'shirt': return ekPath('M-22 -16 h44 l10 12 l-10 6 v22 h-44 v-22 l-10 -6 Z', '#ffffff') + ekPath('M-8 -16 q8 10 16 0', 'none', ' stroke="#c9d6e2" stroke-width="2.4"') + ekPath('M0 -6 v28', 'none', ' stroke="#c9d6e2" stroke-width="1.8"');
+      case 'coat': return ekPath('M-20 -18 h40 l8 14 l-8 8 v26 h-40 v-26 l-8 -8 Z', '#8fa6c8') + ekPath('M0 -18 v48', 'none', ' stroke="#6f86a8" stroke-width="2"') + ekCir(-6, -6, 1.8, '#4a5a72') + ekCir(6, 2, 1.8, '#4a5a72') + ekCir(-6, 10, 1.8, '#4a5a72');
+      case 'dress': return ekPath('M-12 -20 h24 l4 12 l-8 4 l10 26 h-32 l10 -26 l-8 -4 Z', '#ffb3c7') + ekPath('M-8 -20 q8 8 16 0', 'none', ' stroke="#f79ab0" stroke-width="2"') + ekPath('M-14 14 h28', 'none', ' stroke="#f79ab0" stroke-width="2"');
+      case 'skirt': return ekPath('M-14 -14 h28 l10 30 h-48 Z', '#c8a0e0') + ekPath('M-14 -14 h28 v5 h-28 Z', '#b088cc') + ekPath('M-6 -9 l-4 25 M6 -9 l4 25', 'none', ' stroke="#b088cc" stroke-width="1.6"');
+      case 'pants': return ekPath('M-16 -20 h32 v20 l-4 28 h-10 l-2 -22 l-2 22 h-10 l-4 -28 Z', '#7f9fd4') + ekPath('M-16 -20 h32 v6 h-32 Z', '#6a88bc');
+      case 'shorts': return ekPath('M-16 -14 h32 v12 l-4 14 h-9 l-2 -10 l-2 10 h-9 l-4 -14 Z', '#8fd4a0') + ekPath('M-16 -14 h32 v5 h-32 Z', '#7fc48f');
+      case 'socks': return ekPath('M-10 -18 h12 v22 l10 6 q4 4 0 8 h-22 Z', '#ffffff') + ekPath('M-10 -18 h12 v6 h-12 Z', '#8fc9ff') + ekPath('M14 -20 h12 v22 l10 6 q4 4 0 8 h-22 Z', '#ffffff') + ekPath('M14 -20 h12 v6 h-12 Z', '#8fc9ff');
+      case 'shoes': return ekPath('M-26 8 q0 -12 10 -12 q8 0 10 8 h14 q10 0 10 8 v4 h-44 Z', '#f26d6d') + ekPath('M-26 8 h44 v5 h-44 Z', '#d95a5a') + ekPath('M-16 0 q8 -4 14 0', 'none', ' stroke="#ffffff" stroke-width="2"');
+      case 'boots': return ekPath('M-14 -22 h14 v26 h14 q6 0 6 8 v4 h-34 Z', '#a97e5b') + ekPath('M-14 -22 h14 v8 h-14 Z', '#c9a06b') + ekPath('M14 -22 h14 v26 h14 q6 0 6 8 v4 h-34 Z', '#a97e5b') + ekPath('M14 -22 h14 v8 h-14 Z', '#c9a06b');
+      case 'gloves': return ekPath('M-22 -8 q0 -12 8 -12 q6 0 7 6 q1 -8 7 -8 q6 0 6 7 v13 q0 8 -8 8 h-12 q-8 0 -8 -8 Z', '#f7a03c') + ekPath('M-4 -2 v8', 'none', ' stroke="#e0862a" stroke-width="2"') + ekPath('M6 -2 v8', 'none', ' stroke="#e0862a" stroke-width="2"');
+      case 'scarf': return ekPath('M-16 -14 q16 10 32 0 q-2 12 -16 12 q-14 0 -16 -12 Z', '#f26d6d') + ekPath('M4 0 v20 q0 4 4 4 h8 v-8 h-4 v-16 Z', '#e05a5a');
+      case 'belt': return ekRect(-26, -6, 52, 12, 4, '#8a5a3a') + ekRect(-6, -9, 14, 18, 3, '#c9a06b') + ekRect(-2, -4, 6, 8, 2, '#8a5a3a');
+      case 'glasses': return ekCir(-12, 0, 9, 'none', ' stroke="#5a6a8a" stroke-width="3"') + ekCir(12, 0, 9, 'none', ' stroke="#5a6a8a" stroke-width="3"') + ekPath('M-3 0 h6 M-21 0 h-6 M21 0 h6', 'none', ' stroke="#5a6a8a" stroke-width="3"') + '<circle cx="-12" cy="0" r="8" fill="#dff0fb" opacity=".7"/><circle cx="12" cy="0" r="8" fill="#dff0fb" opacity=".7"/>';
+      case 'watch': return ekCir(0, 0, 13, '#ffffff') + ekCir(0, 0, 10, '#e8f1f8') + ekPath('M0 -6 v6 l5 3', 'none', ' stroke="#5a6a8a" stroke-width="2.2" stroke-linecap="round"') + ekRect(-4, -22, 8, 8, 2, '#c9a06b') + ekRect(-4, 14, 8, 8, 2, '#c9a06b');
+      case 'ring': return ekCir(0, 2, 12, 'none', ' stroke="#ffd166" stroke-width="4"') + ekPath('M-5 -12 l5 -8 l5 8 Z', '#dff0fb') + ekCir(0, -16, 2.4, '#a8e0f0');
+      case 'necklace': return ekPath('M-16 -8 q16 22 32 0', 'none', ' stroke="#ffd166" stroke-width="2.6"') + ekCir(0, 12, 5, '#ff6f8f') + ekCir(-8, 4, 2.4, '#ffd166') + ekCir(8, 4, 2.4, '#ffd166');
+      case 'uniform': return ekPath('M-18 -18 h36 l8 12 l-8 6 v24 h-36 v-24 l-8 -6 Z', '#ffffff') + ekPath('M-6 -18 v14 h12 v-14', '#8fc9ff') + ekPath('M0 0 v24', 'none', ' stroke="#c9d6e2" stroke-width="1.6"') + ekCir(-2, 6, 1.6, '#5a6a8a');
+      case 'raincoat': return ekPath('M-20 -20 h40 l6 12 l-6 6 v28 h-20 v-20 h-0 v20 h-20 v-28 l-6 -6 Z', '#ffd166') + ekPath('M-14 -20 q14 -8 28 0', 'none', ' stroke="#e8b840" stroke-width="3"') + ekPath('M0 -6 v26', 'none', ' stroke="#e8b840" stroke-width="1.6"');
+      case 'sweater': return ekPath('M-22 -16 h44 l8 10 l-8 8 v22 h-44 v-22 l-8 -8 Z', '#f2a0b8') + ekPath('M-22 -16 q22 12 44 0', 'none', ' stroke="#e08aa4" stroke-width="3"') + ekPath('M-14 4 h28 M-14 14 h28', 'none', ' stroke="#e08aa4" stroke-width="1.8"');
+      case 'jacket': return ekPath('M-20 -18 h40 l8 12 l-8 6 v26 h-16 v-18 h-8 v18 h-16 v-26 l-8 -6 Z', '#6f86a8') + ekPath('M-4 -18 v14 M4 -18 v14', 'none', ' stroke="#4a5a72" stroke-width="2.4"') + ekRect(-2, 8, 4, 12, 2, '#c9d6e2');
+      case 'helmet': return ekPath('M-20 8 q0 -26 20 -26 q20 0 20 26 Z', '#f26d6d') + ekPath('M-20 8 h40 v5 h-40 Z', '#d95a5a') + ekPath('M-12 -2 q12 -6 24 0', 'none', ' stroke="#ffffff" stroke-width="3"');
+      default: return ekPath('M-18 -14 h36 l6 10 l-6 6 v22 h-36 v-22 l-6 -6 Z', '#8fc9ff');
+    }
+  }
+
+  /* ---------- furniture and house things ---------- */
+  function ekFurni(kind) {
+    switch (kind) {
+      case 'chair': return ekRect(-14, -16, 28, 30, 4, '#c9a06b') + ekRect(-18, -22, 36, 8, 4, '#b8905c') + ekRect(-20, 12, 40, 8, 3, '#b8905c') + ekRect(-16, 20, 5, 8, 2, '#b8905c') + ekRect(11, 20, 5, 8, 2, '#b8905c');
+      case 'sofa': return ekPath('M-30 -6 q0 -16 8 -16 h44 q8 0 8 16 v6 h-60 Z', '#a8b8d8') + ekRect(-32, 0, 64, 14, 5, '#96a8cc') + ekRect(-26, -6, 52, 8, 3, '#b8c8e4') + ekRect(-30, 14, 6, 8, 2, '#7f90b4') + ekRect(24, 14, 6, 8, 2, '#7f90b4');
+      case 'lamp': return ekPath('M-14 -10 h28 l-6 -18 h-16 Z', '#ffd166') + ekPath('M-12 -10 h24 l-2 6 h-20 Z', '#f0b840') + ekRect(-2, -4, 4, 22, 2, '#a9825a') + ekEll(0, 20, 14, 4, '#a9825a') + ekPath('M-20 16 q20 8 40 0', 'none', ' stroke="#ffe08a" stroke-width="2" opacity=".8"');
+      case 'window': return ekRect(-24, -24, 48, 44, 4, '#dff0fb') + ekRect(-24, -24, 48, 44, 4, 'none', ' stroke="#c9a06b" stroke-width="5"') + ekPath('M0 -24 v44 M-24 0 h48', 'none', ' stroke="#c9a06b" stroke-width="4"') + ekCir(-12, -12, 4, '#ffe27a');
+      case 'mirror': return ekEll(0, -2, 20, 24, '#e8f1f8') + ekEll(0, -2, 20, 24, 'none', ' stroke="#c9a06b" stroke-width="4"') + ekPath('M-8 -14 q6 -4 8 2', 'none', ' stroke="#ffffff" stroke-width="3" stroke-linecap="round"');
+      case 'fridge': return ekRect(-18, -32, 36, 62, 4, '#f2f6fa') + ekPath('M-18 -4 h36', 'none', ' stroke="#c9d6e2" stroke-width="3"') + ekRect(10, -26, 3, 16, 1.5, '#c9d6e2') + ekRect(10, 2, 3, 20, 1.5, '#c9d6e2') + ekCir(-10, -14, 5, '#8fc9ff');
+      case 'tv': return ekRect(-28, -22, 56, 36, 5, '#4a5568') + ekRect(-24, -18, 48, 28, 3, '#dff0fb') + ekPath('M-10 -22 l-4 -8 h28 l-4 8', 'none', ' stroke="#4a5568" stroke-width="3"') + ekRect(-2, 14, 4, 8, 1, '#4a5568') + ekRect(-14, 22, 28, 4, 2, '#4a5568');
+      case 'computer': return ekRect(-22, -18, 44, 30, 3, '#4a5568') + ekRect(-18, -14, 36, 22, 2, '#dff0fb') + ekRect(-26, 14, 52, 5, 2, '#c9d6e2') + ekRect(-6, 12, 12, 3, 1, '#8fa6bb');
+      case 'phone': return ekRect(-11, -24, 22, 48, 5, '#4a5568') + ekRect(-8, -18, 16, 34, 2, '#dff0fb') + ekCir(0, 17, 2.4, '#8fa6bb') + ekCir(-4, -10, 3, '#8fc9ff');
+      case 'towel': return ekRect(-18, -16, 36, 34, 4, '#ffd1dd') + ekRect(-18, -16, 36, 8, 4, '#f2a0b8') + ekPath('M-12 2 h24 M-12 10 h24', 'none', ' stroke="#f2a0b8" stroke-width="2"') + ekPath('M-10 2 v8 M0 2 v8 M10 2 v8', 'none', ' stroke="#f2a0b8" stroke-width="1.4"');
+      case 'soap': return ekRect(-16, -8, 32, 20, 8, '#dff0fb') + ekCir(-6, -2, 3, '#ffffff') + ekCir(3, 1, 2.4, '#ffffff') + ekCir(-2, 6, 2.4, '#ffffff') + ekPath('M10 -14 q6 -8 0 -12', 'none', ' stroke="#bfe4f7" stroke-width="2.4"');
+      case 'toothbrush': return ekRect(-3, -18, 7, 34, 3, '#8fc9ff') + ekRect(-5, -28, 11, 12, 4, '#ffffff') + ekPath('M-3 -28 v-6 M1 -28 v-6 M5 -28 v-6', 'none', ' stroke="#c9d6e2" stroke-width="2"');
+      case 'pillow': return ekPath('M-24 4 q-4 -18 10 -20 q18 -3 36 2 q8 2 6 18 Z', '#ffffff') + ekPath('M-20 0 q16 -6 34 -2', 'none', ' stroke="#dfe8f0" stroke-width="2"') + ekCir(0, -4, 4, '#ffd1dd');
+      case 'blanket': return ekPath('M-24 -8 h48 v22 q-24 8 -48 0 Z', '#c8a0e0') + ekPath('M-24 -8 h48 v6 h-48 Z', '#b088cc') + ekPath('M-8 -2 v20 M8 -2 v20', 'none', ' stroke="#b088cc" stroke-width="1.6"');
+      case 'wardrobe': return ekRect(-22, -34, 44, 64, 3, '#c9a06b') + ekPath('M0 -34 v64', 'none', ' stroke="#b8905c" stroke-width="3"') + ekCir(-4, 0, 1.8, '#8a6a4a') + ekCir(4, 0, 1.8, '#8a6a4a') + ekPath('M-18 -26 h14 M4 -26 h14', 'none', ' stroke="#b8905c" stroke-width="2"');
+      case 'sink': return ekRect(-22, -2, 44, 14, 4, '#dff0fb') + ekPath('M-22 -2 q22 -8 44 0', 'none', ' stroke="#c9d6e2" stroke-width="3"') + ekPath('M-2 -2 v-18 q0 -6 8 -6 q6 0 6 6', 'none', ' stroke="#8fa6bb" stroke-width="4" stroke-linecap="round"') + ekPath('M12 -20 v6', 'none', ' stroke="#8fc9ff" stroke-width="3"');
+      case 'pot': return ekRect(-18, -10, 36, 24, 4, '#a8b8c8') + ekRect(-22, -14, 44, 6, 3, '#96a8b8') + ekRect(-24, -20, 6, 4, 2, '#96a8b8') + ekRect(18, -20, 6, 4, 2, '#96a8b8') + ekPath('M-8 -16 q6 -12 0 -18', 'none', ' stroke="#cfe3ef" stroke-width="3"');
+      case 'pan': return ekEll(0, 2, 22, 12, '#a8b8c8') + ekEll(0, 0, 18, 9, '#8fa6bb') + ekRect(18, -2, 20, 5, 2.5, '#8a6a4a') + ekCir(0, 0, 4, '#f2c94c');
+      case 'kettle': return ekPath('M-16 0 q-2 -18 16 -18 q18 0 16 18 Z', '#f2a0b8') + ekPath('M-16 -2 q-8 0 -8 -8 q0 -6 6 -6', 'none', ' stroke="#f2a0b8" stroke-width="4"') + ekPath('M16 -6 l8 -8', 'none', ' stroke="#e08aa4" stroke-width="4" stroke-linecap="round"') + ekPath('M-6 -18 q6 -6 12 0', 'none', ' stroke="#8fa6bb" stroke-width="3"');
+      case 'frame': return ekRect(-22, -20, 44, 36, 3, '#ffffff') + ekRect(-22, -20, 44, 36, 3, 'none', ' stroke="#c9a06b" stroke-width="4"') + ekPath('M-16 8 l10 -14 l8 10 l6 -6 l8 10 Z', '#a8dfb4') + ekCir(8, -8, 4, '#ffe27a');
+      case 'vase': return ekPath('M-10 -18 q-6 18 0 30 q10 6 20 0 q6 -12 0 -30 Z', '#a8d4e8') + ekPath('M-10 -18 h20', 'none', ' stroke="#8fc0d8" stroke-width="3"') + ekPath('M-2 -20 q-8 -12 0 -16 q8 -4 6 6', 'none', ' stroke="#8fd4a0" stroke-width="3"') + ekCir(2, -34, 5, '#f26d6d');
+      case 'candle': return ekRect(-7, -16, 14, 30, 3, '#fff6e8') + ekPath('M0 -16 q6 -10 0 -16 q-6 6 0 16 Z', '#ffb347') + ekPath('M-7 -6 q7 -4 14 0', 'none', ' stroke="#ffd1dd" stroke-width="2.4"');
+      case 'fork': return ekRect(-2, -10, 4, 28, 2, '#b8c4cf') + ekPath('M-7 -26 v12 q0 6 5 6 h4 q5 0 5 -6 v-12 M-7 -26 v10 M0 -26 v10 M7 -26 v10', 'none', ' stroke="#b8c4cf" stroke-width="2.2"');
+      case 'knife': return ekPath('M-3 -8 h6 l2 26 h-10 Z', '#b8c4cf') + ekPath('M-4 -8 q-2 -18 8 -18 q0 12 -4 18 Z', '#dff0fb') + ekRect(-6, 18, 12, 5, 2, '#8a5a3a');
+      case 'chopsticks': return ekPath('M-6 20 L2 -24 M6 20 L12 -22', 'none', ' stroke="#c9a06b" stroke-width="4" stroke-linecap="round"');
+      case 'jar': return ekRect(-14, -14, 28, 32, 6, '#dff0fb', ' opacity=".85"') + ekRect(-16, -19, 32, 7, 3, '#c9a06b') + ekCir(0, 2, 7, '#f2c94c');
+      case 'stairs': return ekPath('M-30 20 h14 v-10 h14 v-10 h14 v-10 h14 v30 Z', '#e0cbab') + ekPath('M-30 20 h14 v-10 h14 v-10 h14 v-10 h14', 'none', ' stroke="#c9a06b" stroke-width="2"');
+      case 'fan': return ekCir(0, -4, 18, '#dff0fb') + ekPath('M0 -4 q0 -16 12 -16 q10 0 10 12 q0 8 -22 4 M0 -4 q0 16 -12 14 q-10 -2 -8 -14', 'none', ' stroke="#8fc9ff" stroke-width="3"') + ekRect(-3, 12, 6, 12, 2, '#c9d6e2') + ekEll(0, 24, 12, 4, '#c9d6e2');
+      case 'elevator': return ekRect(-20, -30, 40, 58, 3, '#dff0fb') + ekPath('M-20 -30 h40 v58 h-40 Z', 'none', ' stroke="#8fa6bb" stroke-width="3"') + ekPath('M0 -30 v58', 'none', ' stroke="#c9d6e2" stroke-width="2"') + ekPath('M-8 0 l4 -6 l4 6 M8 2 l-4 6 l-4 -6', 'none', ' stroke="#5a6a8a" stroke-width="2.4"');
+      case 'doll': return ekCir(0, -22, 11, '#f7c9a3') + ekPath('M-11 -24 a11 11 0 0 1 22 0 q-11 -7 -22 0', '#8a5a3a') + ekPath('M-10 -10 h20 l4 20 h-28 Z', '#ffb3c7') + ekRect(-7, 10, 5, 12, 2.5, '#f7c9a3') + ekRect(2, 10, 5, 12, 2.5, '#f7c9a3') + ekCir(-4, -22, 1.6, '#4a3728') + ekCir(4, -22, 1.6, '#4a3728') + ekPath('M-4 -17 q4 4 8 0', 'none', ' stroke="#c98f6e" stroke-width="1.6"');
+      case 'mat': return ekRect(-26, -6, 52, 14, 3, '#c8b8a0') + ekPath('M-20 -2 h40 M-20 2 h40', 'none', ' stroke="#b0a08a" stroke-width="1.6"') + ekPath('M-24 -4 q6 6 0 10', 'none', ' stroke="#b0a08a" stroke-width="1.6"');
+      default: return ekRect(-18, -14, 36, 28, 4, '#e0cbab');
+    }
+  }
+
+  /* ---------- body parts ---------- */
+  function ekBod(kind) {
+    switch (kind) {
+      case 'head': return ekCir(0, 0, 22, '#f7c9a3') + ekPath('M-20 -10 q4 -20 20 -20 q16 0 20 20 q-10 -8 -20 -6 q-10 -2 -20 6 Z', '#4a3728') + ekCir(-8, 0, 2.4, '#4a3728') + ekCir(8, 0, 2.4, '#4a3728') + ekPath('M-6 10 q6 5 12 0', 'none', ' stroke="#c98f6e" stroke-width="2.2" stroke-linecap="round"');
+      case 'face': return ekCir(0, 0, 23, '#f7c9a3') + ekCir(-9, -4, 3.2, '#4a3728') + ekCir(9, -4, 3.2, '#4a3728') + ekPath('M-7 9 q7 7 14 0', 'none', ' stroke="#b06a76" stroke-width="2.6" stroke-linecap="round"') + ekCir(-14, 8, 4, '#ffb3c7', ' opacity=".7"') + ekCir(14, 8, 4, '#ffb3c7', ' opacity=".7"');
+      case 'eye': return ekEll(0, 0, 24, 14, '#ffffff') + ekCir(0, 0, 9, '#7fb2e5') + ekCir(0, 0, 4.4, '#3c3644') + ekCir(3, -3, 2, '#ffffff') + ekPath('M-24 0 q24 -18 48 0 q-24 18 -48 0 Z', 'none', ' stroke="#4a3728" stroke-width="2.6"');
+      case 'nose': return ekPath('M0 -18 q-6 12 -10 22 q-2 8 10 8 q12 0 10 -8 q-4 -10 -10 -22 Z', '#f7c9a3') + ekCir(-5, 8, 1.8, '#c98f6e') + ekCir(5, 8, 1.8, '#c98f6e');
+      case 'mouth': return ekPath('M-22 -4 q22 26 44 0 q-22 12 -44 0 Z', '#f26d6d') + ekPath('M-18 -4 q18 6 36 0', 'none', ' stroke="#c94f5f" stroke-width="2"') + ekPath('M-10 -4 h20', 'none', ' stroke="#ffffff" stroke-width="3"');
+      case 'hand': return ekPath('M-16 14 q-6 -22 2 -26 q6 -2 8 4 q0 -16 8 -16 q8 0 8 16 q2 -14 8 -12 q6 2 4 16 q2 -6 6 -2 q4 6 0 14 q-4 12 -16 14 q-14 2 -20 -8 Z', '#f7c9a3') + ekPath('M-10 2 v-10 M-2 4 v-12 M6 6 v-8', 'none', ' stroke="#e8b48c" stroke-width="1.6"');
+      case 'finger': return ekPath('M-6 20 v-34 q0 -6 6 -6 q6 0 6 6 v34 Z', '#f7c9a3') + ekPath('M-6 -6 q-4 -6 0 -10', 'none', ' stroke="#e8c09a" stroke-width="2"') + ekPath('M-8 6 h8 M-8 14 h8', 'none', ' stroke="#e8c09a" stroke-width="1.6"');
+      case 'arm': return ekPath('M-4 -26 q10 0 10 10 l2 20 q10 8 4 16 q-8 8 -18 -2 q-8 -8 -6 -22 Z', '#f7c9a3') + ekCir(2, 12, 10, '#f7c9a3') + ekPath('M-2 -26 h8', 'none', ' stroke="#c98f6e" stroke-width="3"');
+      case 'leg': return ekPath('M-8 -28 h16 l2 26 l-2 26 h-12 l-2 -26 Z', '#f7c9a3') + ekPath('M-10 20 q12 4 20 0', 'none', ' stroke="#e8b48c" stroke-width="2"') + ekPath('M-14 -28 h28', 'none', ' stroke="#8fc9ff" stroke-width="6"');
+      case 'foot': return ekPath('M-14 10 q-2 -16 8 -18 q10 -2 10 8 q6 -2 8 4 q2 6 -4 8 h-18 Z', '#f7c9a3') + ekPath('M-10 -8 q4 8 0 18', 'none', ' stroke="#e8b48c" stroke-width="1.8"') + ekCir(4, -8, 2, '#e8b48c');
+      case 'hair': return ekPath('M-24 4 q-2 -30 24 -30 q26 0 24 30 q-4 -14 -10 -16 q-4 8 -14 8 q-10 0 -14 -8 q-6 2 -10 16 Z', '#4a3728') + ekPath('M-18 4 q-4 16 0 22 M18 4 q4 16 0 22', 'none', ' stroke="#4a3728" stroke-width="5" stroke-linecap="round"');
+      case 'tooth': return ekPath('M-16 -12 q0 -12 16 -12 q16 0 16 12 q0 16 -6 26 q-4 6 -8 0 q-2 -8 -2 -8 q0 0 -2 8 q-4 6 -8 0 q-6 -10 -6 -26 Z', '#ffffff') + ekPath('M-10 -8 q10 -4 20 0', 'none', ' stroke="#dfe8f0" stroke-width="2"');
+      case 'neck': return ekRect(-9, -14, 18, 26, 5, '#f7c9a3') + ekPath('M-9 -14 q9 6 18 0', 'none', ' stroke="#e8b48c" stroke-width="2"') + ekRect(-14, 8, 28, 8, 4, '#8fc9ff');
+      case 'shoulder': return ekPath('M-20 12 q0 -22 20 -22 q20 0 20 22 Z', '#f7c9a3') + ekPath('M-20 12 q20 -8 40 0', 'none', ' stroke="#e8b48c" stroke-width="2"') + ekCir(-14, 4, 5, '#e8b48c', ' opacity=".5"') + ekCir(14, 4, 5, '#e8b48c', ' opacity=".5"');
+      case 'knee': return ekPath('M-12 -24 h24 v20 q0 10 -12 10 q-12 0 -12 -10 Z', '#f7c9a3') + ekCir(0, -2, 9, '#e8b48c', ' opacity=".55"') + ekPath('M-12 6 v14 M12 6 v14', 'none', ' stroke="#f7c9a3" stroke-width="8"');
+      case 'tongue': return ekPath('M0 -14 q14 4 12 16 q-2 12 -12 12 q-10 0 -12 -12 q-2 -12 12 -16 Z', '#f28b9c') + ekPath('M0 -6 v14', 'none', ' stroke="#d96a80" stroke-width="2"') + ekPath('M-12 -14 q12 -6 24 0', 'none', ' stroke="#c94f5f" stroke-width="3"');
+      case 'stomach': return ekPath('M-6 -18 q18 0 18 16 q0 16 -14 16 q-16 0 -14 -18 q0 -14 10 -14 Z', '#ffc1a8') + ekPath('M-2 -16 q-8 10 -2 20 q6 10 2 16', 'none', ' stroke="#e8a08a" stroke-width="2.4"') + ekPath('M10 -18 q8 -6 4 -12', 'none', ' stroke="#f7c9a3" stroke-width="5"');
+      case 'back': return ekPath('M-12 -24 q12 -4 24 0 v40 q-12 6 -24 0 Z', '#f7c9a3') + ekPath('M0 -20 v34', 'none', ' stroke="#e8b48c" stroke-width="2"') + ekPath('M-8 -10 q8 4 16 0 M-8 0 q8 4 16 0 M-8 10 q8 4 16 0', 'none', ' stroke="#e8b48c" stroke-width="1.6"');
+      case 'bone': return ekPath('M-8 -18 q-8 -6 -4 -10 q4 -4 8 2 q4 -6 8 -2 q4 4 -4 10 v36 q8 6 4 10 q-4 4 -8 -2 q-4 6 -8 2 q-4 -4 4 -10 Z', '#ffffff', ' stroke="#dfe8f0"');
+      case 'skin': return ekEll(0, 0, 24, 18, '#f7c9a3') + ekPath('M-12 4 q6 6 12 0 M-6 -6 q6 4 12 0', 'none', ' stroke="#e8b48c" stroke-width="2"') + ekCir(10, -8, 2, '#e8b48c');
+      case 'blood': return ekPath('M0 -20 q14 18 14 28 q0 14 -14 14 q-14 0 -14 -14 q0 -10 14 -28 Z', '#f26d6d') + ekCir(-5, 8, 3, '#ffffff', ' opacity=".45"') + ekPath('M-20 12 q-6 6 0 12', 'none', ' stroke="#f26d6d" stroke-width="4" stroke-linecap="round"');
+      case 'lip': return ekPath('M-20 0 q10 -10 20 -4 q10 -6 20 4 q-10 10 -20 10 q-10 0 -20 -10 Z', '#f28b9c') + ekPath('M-20 0 q20 4 40 0', 'none', ' stroke="#d96a80" stroke-width="2"');
+      default: return ekCir(0, 0, 20, '#f7c9a3');
+    }
+  }
+
+  /* ---------- places ---------- */
+  function ekPlace(kind) {
+    const bldg = (w, h, fill, roof) => ekRect(-w / 2, -h, w, h, 3, fill) + ekPath('M' + (-w / 2 - 4) + ' ' + (-h) + ' h' + (w + 8) + ' l-6 -10 h-' + (w - 4) + ' Z', roof || '#c9a06b');
+    switch (kind) {
+      case 'park': return ekEll(0, 16, 42, 8, '#c8e6c0') + ekRect(-14, 2, 28, 6, 3, '#c9a06b') + ekRect(-12, 8, 4, 8, 2, '#b8905c') + ekRect(8, 8, 4, 8, 2, '#b8905c') + '<g transform="translate(-30 6) scale(.62)">' + '<path d="M0 0 v-14" stroke="#a9825a" stroke-width="5"/><circle cx="0" cy="-24" r="12" fill="#8fd4a0"/></g>' + '<g transform="translate(30 6) scale(.62)">' + '<path d="M0 0 v-14" stroke="#a9825a" stroke-width="5"/><circle cx="0" cy="-24" r="12" fill="#7fc48f"/></g>';
+      case 'zoo': return ekRect(-34, 6, 68, 6, 3, '#c9a06b') + ekPath('M-34 6 v-16 M-22 6 v-16 M-10 6 v-16 M2 6 v-16 M14 6 v-16 M26 6 v-16', 'none', ' stroke="#c9a06b" stroke-width="3"') + ekRect(-34, -14, 68, 4, 2, '#c9a06b') + '<g transform="translate(4 -6) scale(.55)">' + ekAnimal('giraffe') + '</g>' + ekPath('M-34 -6 h68', 'none', ' stroke="#c9a06b" stroke-width="2"');
+      case 'bank': return bldg(58, 26, '#f2f6fa') + ekPath('M-32 -26 h64 l-8 -8 h-48 Z', '#e8f1f8') + ekPath('M-26 -26 v-6 M-12 -26 v-6 M12 -26 v-6 M26 -26 v-6', 'none', ' stroke="#c9d6e2" stroke-width="6"') + ekRect(-24, -22, 48, 22, 0, '#e8f1f8') + ekPath('M-18 -22 v22 M-6 -22 v22 M6 -22 v22 M18 -22 v22', 'none', ' stroke="#c9d6e2" stroke-width="5"') + ekCir(0, -10, 4, '#ffd166');
+      case 'store': return bldg(60, 28, '#fff6e8') + ekPath('M-34 -28 q6 -8 12 0 q6 -8 12 0 q6 -8 12 0 q6 -8 12 0 h-48 Z', '#f26d6d') + ekRect(-20, -18, 40, 18, 2, '#dff0fb') + ekRect(-20, -8, 40, 3, 1, '#c9a06b') + ekCir(0, 8, 4, '#8fd4a0');
+      case 'market': return ekPath('M-34 -18 h68 v6 h-68 Z', '#8fc9ff') + ekPath('M-34 -18 h8 v6 h-8 Z M-18 -18 h8 v6 h-8 Z M-2 -18 h8 v6 h-8 Z M14 -18 h8 v6 h-8 Z M30 -18 h4 v6 h-4 Z', '#ffffff') + ekRect(-30, -4, 26, 22, 2, '#e8b46b') + ekRect(4, -4, 26, 22, 2, '#e8b46b') + ekCir(-20, 4, 5, '#f26d6d') + ekCir(-8, 6, 4, '#ffd166') + ekCir(12, 4, 5, '#8fd4a0') + ekCir(24, 6, 4, '#ffb457');
+      case 'hospital': return bldg(56, 52, '#ffffff') + ekRect(-24, -46, 48, 46, 0, '#f2f6fa') + ekRect(-6, -38, 12, 26, 2, '#ffffff') + ekRect(-13, -31, 26, 12, 2, '#ffffff') + ekRect(-5, -37, 10, 24, 1, '#f26d6d') + ekRect(-12, -30, 24, 10, 1, '#f26d6d') + ekRect(-8, -12, 16, 12, 2, '#dff0fb');
+      case 'library': return bldg(58, 40, '#fff8ee') + ekRect(-20, -34, 40, 24, 2, '#f2f6fa') + ekPath('M-14 -30 q14 -8 28 0 v16 q-14 -6 -28 0 Z', '#8fc9ff') + ekPath('M0 -30 v16', 'none', ' stroke="#5f9ed8" stroke-width="1.6"') + ekPath('M-14 -30 q14 -6 28 0', 'none', ' stroke="#ffffff" stroke-width="2"');
+      case 'museum': return bldg(62, 24, '#f2e6d0') + ekPath('M-30 -24 q30 -22 60 0 Z', '#e8d3b0') + ekPath('M-26 -24 v-4 M-13 -24 v-4 M0 -24 v-4 M13 -24 v-4 M26 -24 v-4', 'none', ' stroke="#c9a06b" stroke-width="5"') + ekPath('M-22 -22 v22 M-8 -22 v22 M8 -22 v22 M22 -22 v22', 'none', ' stroke="#e0cbab" stroke-width="6"');
+      case 'station': return ekRect(-34, 8, 68, 6, 3, '#c9d6e2') + ekPath('M-34 8 v-30 h68 v30', 'none', ' stroke="#8fa6bb" stroke-width="3"') + '<g transform="translate(0 -10) scale(.55)">' + ekRide('subway') + '</g>' + ekRect(-20, -26, 16, 8, 2, '#ffd166') + ekRect(4, -26, 16, 8, 2, '#ffd166');
+      case 'airport': return ekRect(-34, 10, 68, 6, 3, '#c9d6e2') + ekPath('M-30 10 v-18 q0 -6 6 -6 h48 q6 0 6 6 v18 Z', '#dff0fb') + ekPath('M-24 -14 h48 v6 h-48 Z', '#8fc9ff') + '<g transform="translate(-2 -34) scale(.5)">' + '<path d="M-26 0 l20 -6 l30 -2 l6 6 l-56 2 Z" fill="#ffffff"/></g>';
+      case 'farm': return ekPath('M-28 -6 h56 v34 h-56 Z', '#f26d6d') + ekPath('M-32 -6 l32 -22 l32 22 Z', '#c94f5f') + ekRect(-8, 10, 16, 18, 2, '#fff6e8') + ekRect(-14, 4, 12, 8, 1, '#ffffff') + ekRect(4, 4, 12, 8, 1, '#ffffff') + ekRect(22, -6, 14, 30, 2, '#e8e0d0') + ekPath('M22 -6 q7 -12 14 0', '#c9d6e2');
+      case 'beach': return ekEll(0, 14, 46, 10, '#f7e0b0') + ekPath('M-46 -2 q16 -6 32 0 q16 6 32 0 v8 h-64 Z', '#8fc9ff') + ekPath('M12 4 v-26', 'none', ' stroke="#c9a06b" stroke-width="3"') + ekPath('M12 -22 q-20 2 -18 12 h20 Z', '#f26d6d') + ekPath('M12 -22 q20 2 18 12 h-20 Z', '#ffd166') + ekCir(-20, 12, 4, '#ffb457');
+      case 'sea': return ekPath('M-48 0 q12 -8 24 0 q12 8 24 0 q12 -8 24 0 q12 8 24 0 v22 h-96 Z', '#8fc9ff') + ekPath('M-48 8 q12 -8 24 0 q12 8 24 0 q12 -8 24 0 q12 8 24 0', 'none', ' stroke="#bfe4f7" stroke-width="3"') + ekPath('M-14 -2 l4 -12 h20 l4 12 Z', '#f2a03c') + ekPath('M0 -14 v-14 l12 8 Z', '#ffffff');
+      case 'post': return bldg(50, 30, '#f2f6fa') + ekRect(-18, -24, 36, 20, 2, '#ffffff') + ekPath('M-18 -24 l18 12 l18 -12', 'none', ' stroke="#8fc9ff" stroke-width="3"') + ekRect(-24, -8, 48, 8, 2, '#8fc9ff');
+      case 'restaurant': return bldg(52, 30, '#fff6e8') + ekPath('M-30 -30 h60 v6 h-60 Z', '#8fd4a0') + ekRect(-18, -22, 36, 16, 2, '#dff0fb') + ekPath('M-12 -6 v-10 M-12 -16 v4 M-8 -16 v4 M-4 -16 v4', 'none', ' stroke="#8a6a4a" stroke-width="1.8"') + ekPath('M8 -16 q2 10 -4 10 q-6 0 -4 -10 Z', '#b8c4cf');
+      case 'playground': return ekEll(0, 18, 44, 8, '#c8e6c0') + ekPath('M-24 16 v-26 h4 v26', 'none', ' stroke="#c9a06b" stroke-width="4"') + ekPath('M-24 -10 q16 14 26 26', 'none', ' stroke="#8fc9ff" stroke-width="6"') + ekPath('M6 -10 h16 M6 -10 v26 M22 -10 v26', 'none', ' stroke="#c9a06b" stroke-width="3"') + ekRect(6, 4, 16, 3, 1.5, '#f26d6d');
+      case 'factory': return ekRect(-30, 8, 60, -34, 2, '#c9d6e2') + ekPath('M-30 -26 l14 -10 v10 l14 -10 v10 l14 -10 v36 h-56 Z', '#b8c8d8') + ekRect(-24, -14, 10, 8, 1, '#ffffff') + ekRect(-8, -14, 10, 8, 1, '#ffffff') + ekRect(8, -14, 10, 8, 1, '#ffffff') + ekPath('M-22 -40 q6 -10 -2 -16 M-6 -42 q6 -12 -2 -18', 'none', ' stroke="#c9d6e2" stroke-width="4" stroke-linecap="round"');
+      case 'church': return ekRect(-24, 8, 48, -28, 2, '#fff6e8') + ekPath('M-4 -20 h8 v-16 h-8 Z', '#e8d3b0') + ekPath('M0 -36 v-10 M-4 -41 h8', 'none', ' stroke="#c9a06b" stroke-width="3"') + ekPath('M-8 8 v-14 q8 -10 16 0 v14 Z', '#c9a06b') + ekRect(-20, -18, 8, 10, 3, '#dff0fb') + ekRect(12, -18, 8, 10, 3, '#dff0fb');
+      case 'tower': return ekPath('M-14 16 h28 l-4 -56 h-20 Z', '#e8d3b0') + ekPath('M-18 -40 h36 v-6 h-36 Z', '#c9a06b') + ekPath('M-14 -46 q14 -18 28 0 Z', '#f26d6d') + ekCir(0, -14, 6, '#dff0fb') + ekCir(0, 0, 5, '#dff0fb');
+      case 'apartment': return ekRect(-26, 16, 52, -58, 3, '#dff0fb') + ekPath('M-26 -42 h52 v-4 h-52 Z', '#c9d6e2') + [[-18, -32], [-4, -32], [10, -32], [-18, -20], [-4, -20], [10, -20], [-18, -8], [-4, -8], [10, -8]].map(p => ekRect(p[0], p[1], 8, 8, 1, '#8fc9ff')).join('');
+      case 'cinema': return bldg(58, 34, '#f2f6fa') + ekRect(-22, -28, 44, 8, 4, '#f26d6d') + ekCir(0, -10, 10, '#4a5568') + ekCir(-3, -12, 2.4, '#dff0fb') + ekCir(3, -8, 2.4, '#dff0fb') + ekCir(-3, -8, 2.4, '#dff0fb') + ekCir(3, -12, 2.4, '#dff0fb');
+      case 'aquarium': return bldg(58, 36, '#dff0fb') + ekPath('M-22 -28 q0 -8 22 -8 q22 0 22 8 v20 q0 8 -22 8 q-22 0 -22 -8 Z', '#8fc9ff') + '<g transform="translate(-2 -16) scale(.8)">' + ekSea('dolphin') + '</g>' + ekCir(16, -26, 2, '#ffffff');
+      case 'castle': return ekRect(-28, 16, 56, -28, 2, '#e8d3b0') + ekRect(-32, -12, 12, -30, 2, '#e8d3b0') + ekRect(20, -12, 12, -30, 2, '#e8d3b0') + ekPath('M-32 -42 h12 v4 h-4 v4 h-4 v-4 h-4 Z', '#c9a06b') + ekPath('M20 -42 h12 v4 h-4 v4 h-4 v-4 h-4 Z', '#c9a06b') + ekPath('M-6 16 v-16 q6 -8 12 0 v16 Z', '#c9a06b') + ekPath('M0 -42 v-12 l14 6 Z', '#f26d6d');
+      case 'office': return bldg(52, 44, '#e8f1f8') + [[-20, -36], [-6, -36], [8, -36], [-20, -22], [-6, -22], [8, -22], [-20, -8], [-6, -8], [8, -8]].map(p => ekRect(p[0], p[1], 10, 9, 1, '#8fc9ff')).join('') + ekRect(-8, 4, 16, 8, 2, '#c9d6e2');
+      case 'garden': return ekEll(0, 16, 44, 8, '#c8e6c0') + ekPath('M-30 12 v-14 M-14 12 v-14 M2 12 v-14 M18 12 v-14 M30 12 v-14', 'none', ' stroke="#c9a06b" stroke-width="2.4"') + ekRect(-32, -4, 66, 3, 1.5, '#c9a06b') + ekCir(-18, 4, 5, '#f26d6d') + ekCir(-4, 8, 5, '#ffd166') + ekCir(10, 3, 5, '#a8a0e0') + ekCir(24, 8, 5, '#ffb3c7');
+      default: return bldg(50, 34, '#f2f6fa');
+    }
+  }
+
+  /* ---------- vehicles ---------- */
+  function ekRide(kind) {
+    switch (kind) {
+      case 'car': return ekPath('M-30 4 q0 -12 8 -14 l6 -12 h32 l6 12 q8 2 8 14 Z', '#f26d6d') + ekPath('M-18 -10 l5 -10 h10 v10 Z', '#dff0fb') + ekPath('M-1 -10 v-10 h10 l5 10 Z', '#dff0fb') + ekCir(-18, 8, 7, '#4a5568') + ekCir(18, 8, 7, '#4a5568') + ekCir(-18, 8, 3, '#c9d6e2') + ekCir(18, 8, 3, '#c9d6e2') + ekRect(-28, -2, 6, 4, 2, '#ffd166');
+      case 'bus': return ekRect(-32, -24, 64, 30, 4, '#ffd166') + ekRect(-28, -20, 56, 12, 2, '#dff0fb') + ekPath('M-18 -20 v12 M-6 -20 v12 M6 -20 v12 M18 -20 v12', 'none', ' stroke="#e8c040" stroke-width="2"') + ekRect(-28, -2, 56, 6, 2, '#e8c040') + ekCir(-20, 8, 7, '#4a5568') + ekCir(20, 8, 7, '#4a5568') + ekRect(-32, -28, 64, 5, 2, '#f2a03c');
+      case 'bike': return ekCir(-18, 8, 12, 'none', ' stroke="#4a5568" stroke-width="3"') + ekCir(18, 8, 12, 'none', ' stroke="#4a5568" stroke-width="3"') + ekPath('M-18 8 l10 -16 h14 l-6 16 M-8 -8 h16 M8 -8 l10 16', 'none', ' stroke="#8fc9ff" stroke-width="4" stroke-linejoin="round"') + ekPath('M-22 -14 h10 M18 -14 h8', 'none', ' stroke="#5a6a8a" stroke-width="3" stroke-linecap="round"') + ekRect(-14, -20, 12, 4, 2, '#4a5568');
+      case 'subway': return ekRect(-30, -20, 60, 32, 6, '#8fa6bb') + ekRect(-24, -16, 48, 14, 3, '#dff0fb') + ekPath('M-24 -9 h48', 'none', ' stroke="#8fa6bb" stroke-width="2"') + ekRect(-20, 2, 10, 6, 2, '#ffd166') + ekRect(10, 2, 10, 6, 2, '#ffd166') + ekPath('M-18 12 l-6 8 M18 12 l6 8', 'none', ' stroke="#5a6a8a" stroke-width="4" stroke-linecap="round"');
+      case 'helicopter': return ekEll(0, -6, 26, 16, '#8fd4a0') + ekPath('M-30 -16 h60', 'none', ' stroke="#5a6a8a" stroke-width="4" stroke-linecap="round"') + ekRect(-2, -16, 4, 10, 2, '#5a6a8a') + ekPath('M22 -2 l16 6 v-10 Z', '#7fc48f') + ekPath('M-26 6 v10 M26 6 v10', 'none', ' stroke="#5a6a8a" stroke-width="3"') + ekPath('M-30 16 h60', 'none', ' stroke="#5a6a8a" stroke-width="3"') + ekCir(12, -8, 8, '#dff0fb');
+      case 'rocket': return ekPath('M0 -34 q12 12 12 30 l-4 16 h-16 l-4 -16 q0 -18 12 -30 Z', '#ffffff') + ekPath('M0 -26 q7 10 7 22 h-14 q0 -12 7 -22 Z', '#8fc9ff') + ekPath('M-8 4 l-10 12 h10 Z', '#f26d6d') + ekPath('M8 4 l10 12 h-10 Z', '#f26d6d') + ekPath('M-5 12 q5 18 5 22 q0 -4 5 -22 Z', '#ffb457') + ekCir(0, -6, 4, '#c9d6e2');
+      case 'motorcycle': return ekCir(-18, 8, 11, 'none', ' stroke="#4a5568" stroke-width="4"') + ekCir(18, 8, 11, 'none', ' stroke="#4a5568" stroke-width="4"') + ekPath('M-18 8 l12 -14 h14 l-8 14 M-6 -6 h16 M10 -6 l8 14', 'none', ' stroke="#f26d6d" stroke-width="5" stroke-linejoin="round"') + ekRect(-6, -18, 18, 6, 3, '#4a5568') + ekPath('M-22 -12 h10', 'none', ' stroke="#5a6a8a" stroke-width="3"');
+      case 'scooter': return ekCir(-16, 10, 8, 'none', ' stroke="#4a5568" stroke-width="3.4"') + ekCir(16, 10, 8, 'none', ' stroke="#4a5568" stroke-width="3.4"') + ekRect(-14, 2, 30, 5, 2, '#8fd4a0') + ekPath('M16 2 v-26 h8', 'none', ' stroke="#8fa6bb" stroke-width="4" stroke-linecap="round"') + ekPath('M12 -24 h12', 'none', ' stroke="#5a6a8a" stroke-width="3" stroke-linecap="round"');
+      case 'ambulance': return ekRect(-32, -22, 64, 28, 4, '#ffffff') + ekRect(-28, -18, 36, 12, 2, '#dff0fb') + ekRect(-8, -18, 36, 12, 2, '#ffffff') + ekRect(-2, -20, 8, 14, 1, '#f26d6d') + ekRect(-8, -14, 20, 6, 1, '#f26d6d') + ekCir(-20, 8, 7, '#4a5568') + ekCir(20, 8, 7, '#4a5568') + ekPath('M-32 -26 h64 v5 h-64 Z', '#f26d6d');
+      case 'firetruck': return ekRect(-32, -18, 64, 24, 3, '#f26d6d') + ekRect(-26, -14, 20, 10, 2, '#dff0fb') + ekRect(-32, -22, 64, 5, 2, '#c94f5f') + ekPath('M-2 -10 l24 -16 M2 -12 l22 -14 M6 -14 l20 -12', 'none', ' stroke="#c9d6e2" stroke-width="3" stroke-linecap="round"') + ekCir(-20, 8, 7, '#4a5568') + ekCir(20, 8, 7, '#4a5568');
+      case 'van': return ekRect(-30, -24, 60, 30, 4, '#a8d4e8') + ekRect(-24, -18, 26, 12, 2, '#dff0fb') + ekPath('M2 -24 v30', 'none', ' stroke="#8fc0d8" stroke-width="2"') + ekCir(-18, 8, 7, '#4a5568') + ekCir(18, 8, 7, '#4a5568') + ekRect(4, -6, 20, 6, 2, '#8fc0d8');
+      case 'sled': return ekPath('M-24 -6 h44 q8 0 8 6 h-52 Z', '#f26d6d') + ekPath('M-24 4 q-6 0 -6 6 h58', 'none', ' stroke="#8fa6bb" stroke-width="3" stroke-linecap="round"') + ekPath('M-10 -6 v-10 h20 v10', 'none', ' stroke="#c9a06b" stroke-width="3"');
+      case 'sailboat': return ekPath('M-26 4 h52 l-6 10 h-40 Z', '#c9a06b') + ekPath('M0 -30 v34', 'none', ' stroke="#8a6a4a" stroke-width="3"') + ekPath('M0 -28 l18 26 h-18 Z', '#ffffff') + ekPath('M0 -24 l-14 22 h14 Z', '#8fc9ff') + ekPath('M-26 16 q13 6 26 0 q13 -6 26 0', 'none', ' stroke="#8fc9ff" stroke-width="3"');
+      case 'wagon': return ekRect(-18, -10, 36, 16, 3, '#e8b46b') + ekPath('M-18 -10 h36', 'none', ' stroke="#c9a06b" stroke-width="3"') + ekCir(-12, 8, 6, '#8a6a4a') + ekCir(12, 8, 6, '#8a6a4a') + ekPath('M18 -6 h10 v-12 h6', 'none', ' stroke="#c9a06b" stroke-width="3" stroke-linecap="round"');
+      case 'taxi2': return ekPath('M-30 4 q0 -12 8 -14 l6 -12 h32 l6 12 q8 2 8 14 Z', '#ffd166') + ekPath('M-18 -10 l5 -10 h10 v10 Z', '#dff0fb') + ekPath('M-1 -10 v-10 h10 l5 10 Z', '#dff0fb') + ekRect(-10, -30, 20, 5, 2, '#ffffff') + ekCir(-18, 8, 7, '#4a5568') + ekCir(18, 8, 7, '#4a5568');
+      default: return ekRide('car');
+    }
+  }
+
+  /* ---------- sports / hobbies ---------- */
+  function ekSport(kind) {
+    switch (kind) {
+      case 'soccer2': return ekCir(0, 0, 20, '#ffffff') + ekPath('M0 -12 l10 6 l-4 12 h-12 l-4 -12 Z', '#3c3644') + ekPath('M0 -20 v8 M18 -6 l-8 4 M10 16 l-6 -10 M-10 16 l6 -10 M-18 -6 l8 4', 'none', ' stroke="#3c3644" stroke-width="2"');
+      case 'basketball': return ekCir(0, 0, 20, '#f2a03c') + ekPath('M-20 0 h40 M0 -20 v40', 'none', ' stroke="#c97a2a" stroke-width="2"') + ekPath('M-14 -14 q14 14 0 28 M14 -14 q-14 14 0 28', 'none', ' stroke="#c97a2a" stroke-width="2"') + ekPath('M20 -20 h14 v4 h-14 Z', '#c94f5f') + ekPath('M20 -16 h14 l-2 10 h-10 Z', 'none', ' stroke="#c94f5f" stroke-width="2"');
+      case 'baseball': return ekCir(-6, 2, 16, '#ffffff') + ekPath('M-18 -4 q8 8 0 14 M6 -4 q8 8 0 14', 'none', ' stroke="#f26d6d" stroke-width="2"') + ekPath('M8 -16 q6 -6 12 -6 l4 6 q-6 2 -8 10 Z', '#c9a06b') + ekPath('M10 -18 q6 -4 10 -4', 'none', ' stroke="#a9825a" stroke-width="2"');
+      case 'tennis': return ekEll(-6, -4, 16, 20, 'none', ' stroke="#8fd4a0" stroke-width="4" transform="rotate(-20 -6 -4)"') + ekPath('M-14 -14 l-12 -12 M-24 -20 l-6 -6', 'none', ' stroke="#c9a06b" stroke-width="5" stroke-linecap="round"') + ekCir(16, 8, 8, '#dff0a8') + ekPath('M10 4 q10 6 0 12', 'none', ' stroke="#ffffff" stroke-width="2"');
+      case 'badminton': return ekEll(-6, -2, 14, 18, 'none', ' stroke="#8fc9ff" stroke-width="4" transform="rotate(-18 -6 -2)"') + ekPath('M-12 -12 l-10 -12', 'none', ' stroke="#c9a06b" stroke-width="4" stroke-linecap="round"') + ekPath('M14 4 l8 -14 l6 4 l-6 14 Z', '#ffffff') + ekPath('M14 4 q8 -8 14 0', 'none', ' stroke="#c9d6e2" stroke-width="2"');
+      case 'volleyball': return ekCir(0, 0, 18, '#ffffff') + ekPath('M-16 -8 q16 10 32 -2 M-4 -18 q6 18 2 36', 'none', ' stroke="#8fc9ff" stroke-width="2.4"') + ekPath('M-26 -14 v-10 M26 -14 v-10 M-26 -18 h52', 'none', ' stroke="#5a6a8a" stroke-width="2"') + ekPath('M-26 -14 h52 v14 h-52 Z', 'none', ' stroke="#8fa6bb" stroke-width="1.4" opacity=".7"');
+      case 'pingpong': return ekEll(-8, -4, 12, 16, '#f26d6d') + ekPath('M-16 -12 l-10 -12', 'none', ' stroke="#c9a06b" stroke-width="4" stroke-linecap="round"') + ekCir(16, 10, 5, '#ffffff') + ekRect(-6, 14, 30, 4, 2, '#8fd4a0');
+      case 'golf': return ekPath('M-14 16 q0 -6 8 -6 q8-14 8 -20', 'none', ' stroke="#8fa6bb" stroke-width="4" stroke-linecap="round"') + ekPath('M2 -10 l14 2', 'none', ' stroke="#8fa6bb" stroke-width="4"') + ekCir(2, 16, 4, '#ffffff') + ekPath('M20 -6 v-22', 'none', ' stroke="#c9a06b" stroke-width="2.4"') + ekPath('M20 -26 h12 l-12 8 Z', '#f26d6d');
+      case 'ski': return ekPath('M-26 16 l50 -14', 'none', ' stroke="#8fc9ff" stroke-width="5" stroke-linecap="round"') + ekPath('M-24 22 l50 -14', 'none', ' stroke="#f26d6d" stroke-width="5" stroke-linecap="round"') + ekPath('M-6 8 l-6 -18 M6 4 l-4 -18', 'none', ' stroke="#c9a06b" stroke-width="3"') + ekPath('M-12 -10 l-6 -6 M2 -14 l-4 -6', 'none', ' stroke="#8fa6bb" stroke-width="2"');
+      case 'skate': return ekRect(-22, 2, 44, 6, 3, '#f2a03c') + ekCir(-14, 12, 5, '#4a5568') + ekCir(14, 12, 5, '#4a5568') + ekPath('M-22 2 q-6 -6 0 -10', 'none', ' stroke="#f2a03c" stroke-width="4"') + ekPath('M-6 -2 l8 -12 h-10', 'none', ' stroke="#8fc9ff" stroke-width="3"');
+      case 'jumprope': return ekPath('M-24 -14 q24 34 48 0', 'none', ' stroke="#f26d6d" stroke-width="3"') + '<g transform="translate(0 -2) scale(.6)">' + ekPose('jump', '#8fc9ff') + '</g>';
+      case 'boxing': return ekPath('M-14 -4 q0 -14 12 -14 q12 0 12 14 v10 q0 8 -12 8 q-12 0 -12 -8 Z', '#f26d6d') + ekPath('M-14 -8 h24', 'none', ' stroke="#c94f5f" stroke-width="3"') + ekPath('M-4 8 v10 h6 v-10', '#f26d6d') + ekPath('M18 -10 h8 v12 h-8 Z', '#8fa6bb');
+      case 'fishing': return ekPath('M-24 -24 l14 30', 'none', ' stroke="#c9a06b" stroke-width="3" stroke-linecap="round"') + ekPath('M-10 6 q4 14 14 10', 'none', ' stroke="#8fa6bb" stroke-width="1.6"') + ekPath('M4 16 q6 -8 12 0 q-6 8 -12 0 Z', '#8fc9ff') + ekPath('M8 20 h6', 'none', ' stroke="#8fc9ff" stroke-width="2"');
+      case 'archery': return ekCir(6, 0, 20, '#ffffff') + ekCir(6, 0, 13, '#8fc9ff') + ekCir(6, 0, 6, '#f26d6d') + ekPath('M-24 -18 q10 18 0 36', 'none', ' stroke="#c9a06b" stroke-width="3"') + ekPath('M-24 -18 l0 36', 'none', ' stroke="#e8d3b0" stroke-width="1.4"') + ekPath('M-24 0 h26', 'none', ' stroke="#8fa6bb" stroke-width="1.8"');
+      case 'bowling': return ekPath('M-8 -18 q6 0 6 10 q0 8 4 16 h-20 q4 -8 4 -16 q0 -10 6 -10 Z', '#ffffff') + ekPath('M-11 -12 h-2 M-5 -12 h-2 M-8 -6 h-2', 'none', ' stroke="#f26d6d" stroke-width="2.4" stroke-linecap="round"') + ekCir(16, 12, 9, '#4a5568') + ekCir(13, 9, 1.6, '#8fa6bb') + ekCir(19, 9, 1.6, '#8fa6bb') + ekCir(16, 15, 1.6, '#8fa6bb');
+      case 'chess': return ekPath('M-10 12 h20 v-6 h-16 v-16 q6 -4 4 -12 h-8 q0 8 4 12 v16 h-16 Z', '#e8d3b0') + ekCir(0, -24, 5, '#f2e6d0') + ekPath('M-22 16 h44 v4 h-44 Z', '#c9a06b');
+      case 'puzzle': return ekPath('M-16 -16 h12 q0 8 8 8 q8 0 8 -8 h4 v32 h-32 Z', '#8fd4a0') + ekPath('M-16 -16 h12 q0 8 8 8 q8 0 8 -8', 'none', ' stroke="#7fc48f" stroke-width="2"');
+      case 'kite': return ekPath('M0 -20 l16 16 l-16 20 l-16 -20 Z', '#f26d6d') + ekPath('M0 -20 v36 M-16 -4 h32', 'none', ' stroke="#ffd166" stroke-width="1.6"') + ekPath('M0 16 q-8 10 4 14 q-10 4 -2 10', 'none', ' stroke="#8fc9ff" stroke-width="2"');
+      case 'swing': return ekPath('M-26 -20 v-14 h52 v14', 'none', ' stroke="#c9a06b" stroke-width="3"') + ekPath('M-8 -20 v18 M8 -20 v18', 'none', ' stroke="#8fa6bb" stroke-width="2"') + ekRect(-14, -2, 28, 4, 2, '#f26d6d');
+      case 'slide': return ekPath('M-24 -20 v-10 h6 v10', 'none', ' stroke="#c9a06b" stroke-width="3"') + ekPath('M-18 -30 q22 10 30 40', 'none', ' stroke="#8fc9ff" stroke-width="7" stroke-linecap="round"') + ekPath('M-18 -30 q20 10 28 38', 'none', ' stroke="#a8d8f0" stroke-width="3" stroke-linecap="round"');
+      default: return ekCir(0, 0, 18, '#ffffff');
+    }
+  }
+
+  /* ---------- musical instruments ---------- */
+  function ekMusic(kind) {
+    switch (kind) {
+      case 'piano': return ekRect(-28, -8, 56, 24, 3, '#4a5568') + ekRect(-26, -6, 52, 8, 1, '#ffffff') + ekPath('M-18 -6 v8 M-10 -6 v8 M2 -6 v8 M10 -6 v8 M18 -6 v8', 'none', ' stroke="#4a5568" stroke-width="2"') + ekRect(-28, -20, 56, 12, 2, '#8a6a4a') + ekRect(-24, 16, 6, 6, 2, '#4a5568') + ekRect(18, 16, 6, 6, 2, '#4a5568');
+      case 'guitar': return ekCir(-2, 4, 17, '#e8a05c') + ekCir(-2, -12, 12, '#e8a05c') + ekCir(-2, 2, 6, '#8a5a3a') + ekRect(-4, -40, 5, 30, 2, '#c9a06b') + ekRect(-8, -46, 13, 7, 2, '#8a5a3a') + ekPath('M-6 -32 v30 M4 -30 v28', 'none', ' stroke="#fff6e8" stroke-width="1"');
+      case 'violin': return ekEll(0, 6, 13, 16, '#c98f5e') + ekEll(0, -8, 10, 12, '#c98f5e') + ekPath('M-2 -14 v-22', 'none', ' stroke="#8a5a3a" stroke-width="3"') + ekPath('M-6 -34 h8 v-4 h-8 Z', '#4a3728') + ekPath('M-4 -30 v26 M3 -28 v24', 'none', ' stroke="#fff6e8" stroke-width="1"') + ekRect(-12, 12, 14, 3, 1.5, '#4a3728');
+      case 'flute': return ekRect(-30, -4, 60, 8, 4, '#c9d6e2') + ekCir(-12, 0, 2, '#8fa6bb') + ekCir(-2, 0, 2, '#8fa6bb') + ekCir(8, 0, 2, '#8fa6bb') + ekRect(-32, -6, 6, 12, 3, '#a8b8c8');
+      case 'trumpet': return ekPath('M-24 -2 h30 v10 h-30 Z', '#ffd166') + ekPath('M6 -8 q10 0 12 12 q2 12 -6 14', 'none', ' stroke="#ffd166" stroke-width="4"') + ekPath('M12 -6 l10 -6 v12 Z', '#f0b840') + ekRect(-24, -10, 6, 6, 2, '#f0b840') + ekPath('M-14 -2 v-8 h10 v8', 'none', ' stroke="#f0b840" stroke-width="3"');
+      case 'recorder': return ekRect(-4, -28, 9, 50, 4, '#fff6e8') + ekCir(-1, -18, 1.6, '#c9a06b') + ekCir(-1, -10, 1.6, '#c9a06b') + ekCir(-1, -2, 1.6, '#c9a06b') + ekCir(-1, 6, 1.6, '#c9a06b') + ekPath('M-6 -28 h13', 'none', ' stroke="#e8d3b0" stroke-width="3"');
+      case 'xylophone': return ekRect(-30, -4, 60, 8, 3, '#c9a06b') + [0, 1, 2, 3, 4].map(i => ekRect(-26 + i * 11, -14 + i * 2, 9, 14 - i * 2, 2, ['#f26d6d', '#ffb457', '#ffd166', '#8fd4a0', '#8fc9ff'][i])).join('') + ekPath('M-10 4 v10 M10 4 v10', 'none', ' stroke="#8a6a4a" stroke-width="3"');
+      case 'harp': return ekPath('M-16 16 q0 -40 26 -40 q8 0 8 8', 'none', ' stroke="#e8d3b0" stroke-width="6"') + ekPath('M-16 16 h30 v4 h-30 Z', '#c9a06b') + ekPath('M-10 -14 v28 M-4 -20 v34 M2 -24 v38 M8 -26 v40', 'none', ' stroke="#f2e6d0" stroke-width="1.6"');
+      case 'cymbal': return ekCir(-10, -2, 18, '#ffd166') + ekCir(-10, -2, 6, '#f0b840') + ekCir(16, 6, 14, '#f2c94c') + ekCir(16, 6, 4, '#d8a92a') + ekPath('M-10 -2 l16 6', 'none', ' stroke="#c9a06b" stroke-width="2" opacity=".6"');
+      case 'sax': return ekPath('M-6 -22 q10 0 10 12 q0 18 12 22 q10 4 8 12', 'none', ' stroke="#ffd166" stroke-width="8" stroke-linecap="round"') + ekPath('M-8 -26 h10', 'none', ' stroke="#4a5568" stroke-width="5"') + ekPath('M20 24 q6 4 10 0', 'none', ' stroke="#f0b840" stroke-width="6" stroke-linecap="round"') + ekCir(-2, -6, 2, '#4a5568') + ekCir(-2, 2, 2, '#4a5568');
+      case 'mic': return ekEll(0, -6, 9, 13, '#8fa6bb') + ekPath('M-4 -14 v14 M4 -14 v14', 'none', ' stroke="#c9d6e2" stroke-width="1.4"') + ekPath('M-12 2 q12 12 24 0', 'none', ' stroke="#5a6a8a" stroke-width="2.4"') + ekRect(-2, 10, 4, 12, 2, '#5a6a8a') + ekRect(-8, 22, 16, 4, 2, '#5a6a8a');
+      default: return ekCir(0, 0, 16, '#ffd166');
+    }
+  }
+
+  /* ---------- a child in any pose (feet on the ground line) ---------- */
+  const POSE = {
+    stand: { armL: [-24, -30], armR: [24, -30], legL: -8, legR: 8 },
+    walk:  { armL: [-22, -26], armR: [22, -34], legL: -12, legR: 12, knee: 4 },
+    run:   { armL: [-26, -44], armR: [26, -20], legL: -18, legR: 16, knee: 10, tilt: 6 },
+    jump:  { armL: [-28, -74], armR: [28, -74], legL: -10, legR: 10, tuck: 12 },
+    sit:   { armL: [-20, -18], armR: [20, -18], legL: -22, legR: 4, sit: true },
+    wave:  { armL: [-24, -30], armR: [30, -76], legL: -8, legR: 8 },
+    point: { armL: [-20, -34], armR: [34, -54], legL: -8, legR: 8 },
+    reach: { armL: [-26, -56], armR: [26, -56], legL: -8, legR: 8 },
+    hold:  { armL: [-16, -40], armR: [16, -40], legL: -8, legR: 8 },
+    up:    { armL: [-28, -78], armR: [28, -78], legL: -8, legR: 8 },
+    kick:  { armL: [-26, -40], armR: [22, -28], legL: -8, legR: 30, knee: 8 },
+    climb: { armL: [-18, -78], armR: [18, -78], legL: -14, legR: 6, knee: 12 },
+    dance: { armL: [-32, -70], armR: [30, -64], legL: -14, legR: 12, tilt: -6 },
+    bend:  { armL: [-18, -10], armR: [18, -10], legL: -10, legR: 10, tilt: 16 },
+    kneel: { armL: [-20, -26], armR: [20, -26], legL: -16, legR: 8, sit: true },
+    swim:  { armL: [-30, -58], armR: [30, -44], legL: -14, legR: 10, tilt: 26 }
+  };
+
+  function ekPose(pose, shirt, opts) {
+    const p = POSE[pose] || POSE.stand;
+    const o = opts || {};
+    const skin = o.skin || '#f7c9a3';
+    const hair = o.hair || '#4a3728';
+    const pants = o.pants || '#5a6f93';
+    const tilt = p.tilt || 0;
+    let out = '<g transform="rotate(' + tilt + ')">';
+    // legs
+    if (p.sit) {
+      out += ekRect(-6, -36, 9, 32, 4.5, pants) + ekRect(2, -36, 9, 32, 4.5, pants);
+      out += ekRect(-8, -8, 22, 9, 4.5, pants) + ekRect(0, -8, 22, 9, 4.5, pants);
+      out += ekEll(14, -2, 9, 4.5, '#e8563f') + ekEll(22, -2, 9, 4.5, '#e8563f');
+    } else {
+      out += ekRect(p.legL - 4, -36, 9, 32 + (p.tuck ? -p.tuck : 0), 4.5, pants);
+      out += ekRect(p.legR - 5, -36, 9, 32 + (p.tuck ? -p.tuck : 0), 4.5, pants);
+      out += ekEll(p.legL - 1, p.tuck ? -6 : -4, 9, 4.5, '#e8563f') + ekEll(p.legR - 1, p.tuck ? -6 : -4, 9, 4.5, '#e8563f');
+    }
+    // body
+    out += ekRect(-15, -64, 30, 32, 14, shirt);
+    if (o.apron) out += ekRect(-11, -50, 22, 18, 6, o.apron);
+    // arms
+    const arm = (hand) => '<path d="M' + (hand[0] > 0 ? 13 : -13) + ' -58 C' + (hand[0] * .8) + ' ' + ((hand[1] - 58) / 2) + ' ' + hand[0] + ' ' + (hand[1] + 6) + ' ' + hand[0] + ' ' + hand[1] + '" fill="none" stroke="' + skin + '" stroke-width="8" stroke-linecap="round"/>' + ekCir(hand[0], hand[1], 5.5, skin);
+    out += arm(p.armL) + arm(p.armR);
+    // head
+    out += ekCir(0, -78, 15, skin);
+    out += '<path d="M-15 -80 a15 15 0 0 1 30 0 q-15 -9 -30 0" fill="' + hair + '"/>';
+    if (o.hat) out += o.hat;
+    if (o.glasses) out += ekCir(-5, -79, 5, 'none', ' stroke="#5a6a8a" stroke-width="1.8"') + ekCir(5, -79, 5, 'none', ' stroke="#5a6a8a" stroke-width="1.8"') + ekPath('M0 -79 h0', 'none', ' stroke="#5a6a8a" stroke-width="1.8"');
+    if (o.eyes === 'closed') out += '<path d="M-8 -81 q4 -4 7 0 M2 -81 q4 -4 7 0" fill="none" stroke="#4a3728" stroke-width="1.8" stroke-linecap="round"/>';
+    else out += ekCir(-5, -79, 2.2, '#4a3728') + ekCir(5, -79, 2.2, '#4a3728');
+    if (o.mouth === 'open') out += ekEll(0, -71, 4, 3.4, '#c94f5f');
+    else if (o.mouth === 'sad') out += '<path d="M-5 -69 q5 -4 10 0" fill="none" stroke="#4a3728" stroke-width="2" stroke-linecap="round"/>';
+    else out += '<path d="M-5 -70 q5 6 10 0" fill="none" stroke="#4a3728" stroke-width="2" stroke-linecap="round"/>';
+    if (o.tears) out += '<path d="M-7 -76 q-3 8 0 12 M7 -76 q3 8 0 12" fill="none" stroke="#8fc9ff" stroke-width="2.4" stroke-linecap="round"/>';
+    if (o.wings) out += ekPath('M-14 -56 q-18 6 -12 22 q12 -2 14 -10 Z', '#ffffff') + ekPath('M14 -56 q18 6 12 22 q-12 -2 -14 -10 Z', '#ffffff');
+    if (o.cape) out += ekPath('M-13 -62 q8 26 4 30 q-16 4 -20 -4 q6 -14 16 -26 Z', o.cape);
+    out += '</g>';
+    return out;
+  }
+
+  /* ---------- people at work ---------- */
+  function ekWorker(kind) {
+    const hat = (c, brim) => ekPath('M-15 -88 q0 -16 15 -16 q15 0 15 16 Z', c) + ekRect(-19, -89, 38, 5, 2.5, brim || c);
+    const chefHat = ekRect(-12, -104, 24, 16, 6, '#ffffff') + ekCir(-8, -102, 8, '#ffffff') + ekCir(0, -106, 9, '#ffffff') + ekCir(8, -102, 8, '#ffffff');
+    switch (kind) {
+      case 'teacher': return ekPose('point', '#c8a0e0', { glasses: true }) + ekRect(-4, -84, 26, 4, 2, '#8a6a4a');
+      case 'student': return ekPose('hold', '#8fc9ff', { hat: hat('#8fc9ff') }) + '<g transform="translate(0 -44) scale(.5)">' + '<path d="M-14 -8 q14 -8 28 0 v16 q-14 -6 -28 0 Z" fill="#ffffff" stroke="#c9d6e2" stroke-width="2"/>' + '</g>';
+      case 'nurse': return ekPose('stand', '#ffffff', { apron: '#dff0fb' }) + ekPath('M-11 -96 h22 v-6 h-22 Z', '#ffffff') + ekPath('M-2 -100 h4 v10 h-4 Z', '#f26d6d') + ekPath('M-6 -96 h12 v3 h-12 Z', '#f26d6d');
+      case 'police': return ekPose('stand', '#5a7fc0', { hat: hat('#4a6fb0', '#3c5a96') }) + ekCir(9, -48, 5, '#ffd166') + ekPath('M9 -51 l1 2 l2 -2 l-2 3 Z', '#8a6a4a');
+      case 'cook': return ekPose('hold', '#ffffff', { apron: '#ffffff', hat: chefHat }) + '<g transform="translate(0 -44) scale(.55)">' + ekFurni('pan') + '</g>';
+      case 'farmer': return ekPose('stand', '#8fd4a0', { hat: ekEll(0, -90, 24, 5, '#e8c878') + ekPath('M-12 -90 q0 -14 12 -14 q12 0 12 14 Z', '#e8c878') }) + ekPath('M-22 -40 v-30 M-22 -70 h-6 M-22 -70 h6 M-22 -62 h-5 M-22 -62 h5', 'none', ' stroke="#c9a06b" stroke-width="2.4"');
+      case 'singer': return ekPose('point', '#f2a0b8', { mouth: 'open' }) + '<g transform="translate(22 -60) scale(.7)">' + ekMusic('mic') + '</g>' + ekCir(-30, -80, 3, '#ffd166');
+      case 'artist': return ekPose('hold', '#ffffff', { apron: '#f2e6d0' }) + ekEll(-16, -40, 12, 9, '#e8d3b0') + ekCir(-20, -42, 3, '#f26d6d') + ekCir(-12, -44, 3, '#8fc9ff') + '<g transform="translate(14 -40) scale(.5) rotate(20)"><rect x="-2" y="-16" width="5" height="26" rx="2" fill="#c9a06b"/><path d="M-2 10 h5 l-2.5 6 Z" fill="#4a5568"/></g>';
+      case 'scientist': return ekPose('hold', '#ffffff', { glasses: true }) + '<g transform="translate(18 -44) scale(.8)">' + ekPath('M-8 -14 h16 l2 10 q2 6 -6 8 h-8 q-8 -2 -6 -8 Z', '#dff0fb') + ekEll(0, 0, 7, 5, '#8fd4a0') + ekRect(-3, -20, 6, 8, 2, '#dff0fb') + '</g>';
+      case 'pilot': return ekPose('stand', '#4a5568', { hat: hat('#2f3a4a') }) + ekPath('M-4 -60 l4 4 l4 -4', 'none', ' stroke="#ffd166" stroke-width="2"');
+      case 'driver': return ekPose('sit', '#8fa6bb') + ekCir(0, -34, 12, 'none', ' stroke="#4a5568" stroke-width="4"') + ekPath('M0 -46 v-0 M-12 -34 h24', 'none', ' stroke="#4a5568" stroke-width="3"');
+      case 'baker': return ekPose('hold', '#ffffff', { apron: '#ffffff', hat: chefHat }) + '<g transform="translate(0 -44) scale(.6)">' + ekFood('bread') + '</g>';
+      case 'mailman': return ekPose('walk', '#8fc9ff', { hat: hat('#5f9ed8') }) + ekRect(12, -44, 20, 14, 2, '#c9a06b') + '<g transform="translate(20 -38) scale(.4)">' + G.envelope + '</g>';
+      case 'firefighter': return ekPose('stand', '#f26d6d', { hat: hat('#c94f5f', '#b04040') }) + ekPath('M-24 -30 q-10 -6 -16 4 q10 4 16 6', 'none', ' stroke="#c9d6e2" stroke-width="4"');
+      case 'soldier': return ekPose('stand', '#8fa08a', { hat: ekEll(0, -90, 17, 12, '#7f9070') }) + ekPath('M-10 -96 q10 -4 20 0', 'none', ' stroke="#6a7a5a" stroke-width="2"');
+      case 'writer': return ekPose('sit', '#c8a0e0') + '<g transform="translate(-12 -30) scale(.5)"><rect x="-16" y="-10" width="32" height="22" rx="2" fill="#ffffff" stroke="#c9d6e2" stroke-width="2"/></g>' + '<g transform="translate(16 -40) scale(.5) rotate(24)"><rect x="-2" y="-14" width="5" height="22" rx="2" fill="#ffd166"/></g>';
+      case 'dancer': return ekPose('dance', '#ffb3c7') + ekPath('M-14 -56 q-6 20 0 26 q16 6 22 -2 q-8 -12 -22 -24 Z', '#f2a0b8');
+      case 'magician': return ekPose('point', '#4a4a6a', { hat: hat('#3c3c56', '#2f2f46') }) + '<g transform="translate(30 -54) scale(.5) rotate(-30)"><rect x="-2" y="-16" width="4" height="32" rx="2" fill="#ffffff"/></g>' + ekCir(36, -66, 4, '#ffd166');
+      case 'dentist': return ekPose('stand', '#ffffff', { apron: '#dff0fb' }) + '<g transform="translate(18 -44) scale(.6)">' + ekBod('tooth') + '</g>';
+      case 'fisherman': return ekPose('stand', '#8fa6bb', { hat: hat('#e8c878', '#d8b868') }) + '<g transform="translate(20 -40) scale(.7)">' + ekSport('fishing') + '</g>';
+      case 'engineer': return ekPose('hold', '#ffd166', { hat: hat('#f2c94c', '#e0b840') }) + '<g transform="translate(0 -44) scale(.5)">' + '<circle cx="0" cy="0" r="14" fill="none" stroke="#8fa6bb" stroke-width="5"/></g>';
+      case 'waiter': return ekPose('point', '#ffffff', { apron: '#fff6e8' }) + ekRect(28, -58, 24, 4, 2, '#c9a06b') + ekEll(40, -64, 6, 4, '#ffffff');
+      case 'king': return ekPose('stand', '#c8a0e0', { hat: '<path d="M-14 -92 l4 -14 l8 8 l6 -12 l6 12 l8 -8 l4 14 Z" fill="#ffd166"/>', cape: '#f2c94c' }) + ekCir(28, -66, 3, '#ffd166');
+      case 'queen': return ekPose('stand', '#ffb3c7', { hat: '<path d="M-12 -92 l2 -12 l8 6 l4 -10 l4 10 l8 -6 l2 12 Z" fill="#ffd166"/>' }) + ekCir(-26, -84, 2.4, '#ffd166') + ekCir(26, -84, 2.4, '#ffd166');
+      case 'prince': return ekPose('point', '#8fc9ff', { hat: '<path d="M-9 -92 l2 -10 l6 6 l4 -8 l2 12 Z" fill="#ffd166"/>' });
+      case 'princess': return ekPose('dance', '#ffb3c7', { hat: '<path d="M-8 -92 l2 -10 l6 6 l4 -8 l2 12 Z" fill="#ffd166"/>' });
+      case 'hero': return ekPose('up', '#5a7fc0', { cape: '#f26d6d' }) + ekPath('M0 -64 l3 7 l8 1 l-6 6 l2 8 l-7 -4 l-7 4 l2 -8 l-6 -6 l8 -1 Z', '#ffd166');
+      case 'adult': return ekPose('stand', '#8fa6bb', { hair: '#3a2f28' });
+      case 'kid2': return ekPose('stand', '#8fd4a0');
+      default: return ekPose('stand', '#8fc9ff');
+    }
+  }
+
+  /* ---------- place words: where a thing is ---------- */
+  function ekWhere(kind) {
+    const box = (x, y, w, h) => ekRect(x - w / 2, y - h, w, h, 3, '#e0cbab') + ekRect(x - w / 2, y - h, w, 6, 3, '#d4bd99') + ekPath('M' + (x - 6) + ' ' + (y - h + 9) + ' v' + (h - 12) + ' M' + (x + 6) + ' ' + (y - h + 9) + ' v' + (h - 12), 'none', ' stroke="#d4bd99" stroke-width="2"');
+    const ball = (x, y, r) => ekCir(x, y, r || 8, '#f26d6d') + ekCir(x - (r || 8) * .3, y - (r || 8) * .3, (r || 8) * .28, '#ff9d8c');
+    const arr = (x1, y1, x2, y2) => ekPath('M' + x1 + ' ' + y1 + ' L' + x2 + ' ' + y2, 'none', ' stroke="#8fa6bb" stroke-width="3" stroke-dasharray="5 5" stroke-linecap="round"') + ekPath('M' + x2 + ' ' + y2 + ' l-6 -3 l2 6 Z', '#8fa6bb');
+    const floor = ekRect(-40, 16, 80, 4, 2, '#d4bd99');
+    switch (kind) {
+      case 'above': return floor + box(0, 16, 34, 20) + ball(0, -22) + arr(0, -4, 0, -14);
+      case 'below': return floor + box(0, -6, 34, 20) + ball(0, 14) + arr(0, 2, 0, 8);
+      case 'beside': return floor + box(-16, 16, 30, 24) + ball(18, 8) + arr(-2, 8, 8, 8);
+      case 'between': return floor + box(-22, 16, 24, 22) + box(22, 16, 24, 22) + ball(0, 8);
+      case 'infront': return floor + box(6, 6, 30, 18) + ball(-12, 10, 9);
+      case 'behind': return floor + ball(6, 0, 8) + box(0, 16, 34, 24);
+      case 'around': return floor + box(0, 16, 26, 18) + '<ellipse cx="0" cy="2" rx="30" ry="18" fill="none" stroke="#8fa6bb" stroke-width="2.4" stroke-dasharray="6 6"/>' + ball(-30, 2, 5) + ball(30, 2, 5);
+      case 'along': return floor + ekPath('M-36 6 h72', 'none', ' stroke="#c9a06b" stroke-width="6" stroke-dasharray="8 8"') + ball(-8, -4, 7) + ball(14, -4, 7);
+      case 'across': return floor + ekPath('M-36 8 h72', 'none', ' stroke="#8fc9ff" stroke-width="6"') + ball(-8, -2, 7) + ball(14, -2, 7) + arr(-6, -4, 12, -4);
+      case 'through': return floor + ekRect(-24, -10, 48, 26, 6, '#e0cbab') + ekEll(0, 3, 10, 8, '#fdfcf6') + ekPath('M-32 3 h18', 'none', ' stroke="#f26d6d" stroke-width="4"') + arr(14, 3, 32, 3);
+      case 'over': return floor + box(0, 16, 30, 18) + ekPath('M-26 -6 Q0 -38 26 -6', 'none', ' stroke="#8fa6bb" stroke-width="3" stroke-dasharray="5 5"') + ekPath('M26 -6 l-7 1 l4 5 Z', '#8fa6bb') + ball(0, -34, 6);
+      case 'under': return floor + box(0, -2, 34, 20) + ekPath('M-26 14 Q0 40 26 14', 'none', ' stroke="#8fa6bb" stroke-width="3" stroke-dasharray="5 5"') + ekPath('M26 14 l-7 -2 l1 6 Z', '#8fa6bb') + ball(0, 22, 6);
+      case 'up': return floor + ball(0, 6) + arr(0, -2, 0, -30) + ekCir(0, -30, 4, '#8fd4a0');
+      case 'down': return floor + ball(0, -26) + arr(0, -18, 0, 10) + ekCir(0, 10, 4, '#8fd4a0');
+      case 'into': return floor + ekRect(-22, -14, 44, 30, 4, '#e0cbab') + ekRect(-10, -14, 20, 8, 2, '#d4bd99') + arr(-36, 2, -8, 2) + ball(-8, 2, 6);
+      case 'outof': return floor + ekRect(-10, -14, 44, 30, 4, '#e0cbab') + ekRect(-10, -14, 20, 8, 2, '#d4bd99') + arr(10, 2, 34, 2) + ball(4, 2, 6);
+      case 'near': return floor + box(12, 16, 26, 20) + ball(-6, 8, 9) + arr(-16, 8, -6, 8);
+      case 'far': return floor + box(28, 16, 16, 14) + ball(-30, 10, 5) + ekPath('M-18 8 h30', 'none', ' stroke="#8fa6bb" stroke-width="2" stroke-dasharray="4 6"');
+      case 'middle': return floor + ball(-24, 6, 7) + ball(0, 6, 9) + ball(24, 6, 7) + ekPath('M0 20 v6', 'none', ' stroke="#8fd4a0" stroke-width="3"');
+      case 'corner': return ekRect(-28, -20, 56, 40, 4, '#e0cbab') + ekPath('M-28 -20 v40 h56', 'none', ' stroke="#c9a06b" stroke-width="4"') + ball(-18, -10, 6);
+      case 'left': return floor + ball(-14, 4) + arr(-2, 4, -26, 4);
+      case 'right': return floor + ball(14, 4) + arr(2, 4, 26, 4);
+      case 'inside': return ekRect(-26, -18, 52, 36, 5, '#fdf6e8') + ekRect(-26, -18, 52, 36, 5, 'none', ' stroke="#c9a06b" stroke-width="3"') + ball(0, 2, 7);
+      case 'outside': return ekRect(-16, -14, 34, 28, 5, '#fdf6e8') + ekRect(-16, -14, 34, 28, 5, 'none', ' stroke="#c9a06b" stroke-width="3"') + ball(26, 10, 7);
+      case 'top': return ekRect(-16, -6, 32, 20, 3, '#d4bd99') + ekRect(-16, -26, 32, 20, 3, '#f7d9b0') + ekPath('M-8 -22 l8 -6 l8 6', 'none', ' stroke="#f26d6d" stroke-width="3" stroke-linecap="round"');
+      case 'bottom': return ekRect(-16, -26, 32, 20, 3, '#d4bd99') + ekRect(-16, -6, 32, 20, 3, '#f7d9b0') + ekPath('M-8 10 l8 6 l8 -6', 'none', ' stroke="#f26d6d" stroke-width="3" stroke-linecap="round"');
+      case 'front': return floor + '<g transform="translate(-6 -18) scale(.5)">' + ekPose('stand', '#8fc9ff') + '</g>' + ekRect(-34, -6, 24, 22, 3, '#e0cbab');
+      case 'back': return floor + ekRect(-6, -16, 30, 26, 3, '#e0cbab') + '<g transform="translate(20 -20) scale(.45)">' + ekPose('stand', '#8fd4a0') + '</g>';
+      case 'straight': return ekRect(-40, 8, 80, 14, 3, '#c9d6e2') + ekPath('M-30 15 h52', 'none', ' stroke="#ffffff" stroke-width="2" stroke-dasharray="6 6"') + ekPath('M28 15 l-8 -4 v8 Z', '#ffffff');
+      case 'toward': return floor + '<g transform="translate(22 -16) scale(.5)">' + ekPose('stand', '#ffd166') + '</g>' + arr(-32, 2, 10, 2);
+      default: return floor + box(0, 16, 30, 20) + ball(0, -6);
+    }
+  }
+
+  /* ---------- nature ---------- */
+  function ekNature(kind) {
+    switch (kind) {
+      case 'rainbow': return ekPath('M-40 22 a40 40 0 0 1 80 0', 'none', ' stroke="#f26d6d" stroke-width="7"') + ekPath('M-32 22 a32 32 0 0 1 64 0', 'none', ' stroke="#ffb457" stroke-width="7"') + ekPath('M-24 22 a24 24 0 0 1 48 0', 'none', ' stroke="#ffd166" stroke-width="7"') + ekPath('M-16 22 a16 16 0 0 1 32 0', 'none', ' stroke="#8fd4a0" stroke-width="7"') + ekPath('M-8 22 a8 8 0 0 1 16 0', 'none', ' stroke="#8fc9ff" stroke-width="7"') + cloud(-30, 14, .9) + cloud(30, 14, .9);
+      case 'fire': return ekPath('M0 -30 q14 14 10 26 q-2 10 -10 10 q-8 0 -10 -10 q-4 -12 10 -26 Z', '#f26d6d') + ekPath('M0 -14 q8 8 6 16 q-2 6 -6 6 q-4 0 -6 -6 q-2 -8 6 -16 Z', '#ffd166') + ekPath('M-20 6 q6 -8 10 0 M20 6 q-6 -8 -10 0', 'none', ' stroke="#f26d6d" stroke-width="3" stroke-linecap="round"');
+      case 'ice': return ekRect(-18, -14, 36, 32, 6, '#dff0fb', ' opacity=".9"') + ekPath('M-18 -6 h36 M-6 -14 v32 M8 -14 v32', 'none', ' stroke="#bfe4f7" stroke-width="2"') + ekPath('M-14 -8 l4 4 M10 4 l4 4', 'none', ' stroke="#ffffff" stroke-width="2.4"');
+      case 'leaf': return ekPath('M-2 16 q-18 -10 -14 -26 q14 -10 26 2 q8 12 -12 24 Z', '#8fd4a0') + ekPath('M-10 12 q6 -12 14 -18', 'none', ' stroke="#5f9e70" stroke-width="2"');
+      case 'grass': return ekPath('M-22 12 q-4 -14 2 -20 q4 8 2 20 M-8 12 q-2 -18 4 -24 q4 10 0 24 M6 12 q0 -16 6 -20 q2 10 -2 20 M20 12 q-2 -12 4 -16 q2 10 0 16', 'none', ' stroke="#8fd4a0" stroke-width="2.6" stroke-linecap="round') + ekRect(-26, 12, 52, 5, 2.5, '#a8dfb4');
+      case 'sand': return ekEll(0, 10, 30, 10, '#f7e0b0') + ekCir(-12, 6, 1.6, '#e0c890') + ekCir(4, 8, 1.6, '#e0c890') + ekCir(14, 4, 1.6, '#e0c890') + ekCir(-2, 2, 1.6, '#e0c890');
+      case 'mud': return ekEll(0, 8, 26, 11, '#a9825a') + ekEll(-8, 4, 6, 4, '#8a6a4a') + ekEll(10, 6, 7, 4, '#8a6a4a') + ekPath('M-14 -2 q-4 -8 4 -10 M6 0 q6 -8 12 -4', 'none', ' stroke="#a9825a" stroke-width="3" stroke-linecap="round"');
+      case 'seed': return ekEll(0, 8, 24, 8, '#8a6a4a') + ekEll(0, 2, 7, 9, '#c9a06b') + ekPath('M0 -6 q-4 -8 2 -10', 'none', ' stroke="#8fd4a0" stroke-width="2.4"');
+      case 'root': return ekRect(-3, -26, 6, 24, 3, '#8fd4a0') + ekPath('M-18 -18 q18 -10 36 0', 'none', ' stroke="#8fd4a0" stroke-width="6" stroke-linecap="round"') + ekPath('M0 0 v18 M0 8 q-10 4 -16 12 M0 10 q10 4 16 12', 'none', ' stroke="#c9a06b" stroke-width="3" stroke-linecap="round"');
+      case 'stone': return ekEll(-8, 6, 13, 9, '#c8ccd4') + ekEll(10, 8, 9, 6, '#b8bcc4') + ekEll(0, -6, 7, 5, '#d8dce4');
+      case 'storm': return cloud(0, -6, 1.1) + ekPath('M-2 8 l10 0 l-8 12 l10 0', 'none', ' stroke="#ffd166" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"') + G.rain(-20, 0, .8);
+      case 'fog': return cloud(-8, 0, 1) + ekPath('M-28 14 h56 M-22 22 h44', 'none', ' stroke="#dbe6f0" stroke-width="5" stroke-linecap="round"');
+      case 'shadow': return ekEll(0, 14, 24, 6, '#b0a8c0', ' opacity=".55"') + '<g transform="translate(0 -20) scale(.5)">' + ekPose('stand', '#8fa6bb') + '</g>' + ekCir(-16, -30, 10, '#ffe27a', ' opacity=".55"');
+      case 'light': return ekCir(0, -8, 13, '#ffd166') + ekPath('M-2 -20 v-6 M-2 -8 q-6 0 -6 -6 M14 -8 h6 M-16 -8 h-6 M8 -18 l5 -5 M-12 -18 l-5 -5', 'none', ' stroke="#f0b840" stroke-width="3" stroke-linecap="round"') + ekRect(-6, 4, 12, 12, 3, '#c9d6e2');
+      case 'heat': return ekCir(0, -14, 12, '#ffb457') + ekPath('M-20 4 q4 -8 0 -14 M-8 6 q4 -8 0 -14 M8 6 q4 -8 0 -14 M20 4 q4 -8 0 -14', 'none', ' stroke="#f2a03c" stroke-width="3" stroke-linecap="round"');
+      case 'air': return ekPath('M-26 -10 q10 -12 18 -2 q8 10 20 2 M-22 4 q10 -12 18 -2 q8 10 20 2 M-14 16 q8 -10 16 -2', 'none', ' stroke="#b9cfe6" stroke-width="3.4" stroke-linecap="round"');
+      case 'gas': return ekRect(-12, -18, 24, 34, 8, '#f2a03c') + ekRect(-6, -24, 12, 8, 3, '#c97a2a') + ekPath('M-4 -8 h8 M-4 2 h8', 'none', ' stroke="#ffffff" stroke-width="2"') + ekPath('M12 0 q8 6 4 14', 'none', ' stroke="#c97a2a" stroke-width="3"');
+      case 'oil': return ekEll(0, -6, 20, 8, '#8a8a96') + ekRect(-20, -6, 40, 24, 4, '#7a7a86') + ekPath('M-8 -10 v-8 M8 -10 v-8', 'none', ' stroke="#5a5a66" stroke-width="3"') + ekPath('M0 10 q6 8 0 14 q-6 -6 0 -14 Z', '#ffd166');
+      case 'gold': return ekPath('M-20 12 l6 -12 h24 l6 12 Z', '#ffd166') + ekPath('M-20 12 h40 v6 h-40 Z', '#f0b840') + ekPath('M-8 -6 l4 -8 h20 l4 8 Z', '#ffe08a') + ekPath('M-14 2 h28 v5 h-28 Z', '#f5cf6a');
+      case 'space': return ekCir(-14, -8, 12, '#8fb0d8') + ekEll(-14, -8, 20, 5, 'none', ' stroke="#ffe08a" stroke-width="2" opacity=".8"') + G.star(18, -20, .6) + G.star(-26, -26, .4) + G.star(24, 6, .5) + G.sparkle(4, -28, .5);
+      case 'planet': return ekCir(0, -4, 20, '#8fc9a0') + ekEll(0, -4, 32, 8, 'none', ' stroke="#e8d3b0" stroke-width="3"') + ekEll(-6, -10, 7, 5, '#7fb08f') + ekEll(6, 2, 5, 4, '#7fb08f');
+      case 'hill': return ekPath('M-44 18 q22 -34 44 -8 q22 -26 44 8 Z', '#a8dfb4') + ekPath('M-10 10 q6 -10 12 -4', 'none', ' stroke="#8fd4a0" stroke-width="2"');
+      case 'island': return ekPath('M-34 16 q34 -14 68 0 Z', '#f7e0b0') + ekPath('M-2 12 v-26', 'none', ' stroke="#a9825a" stroke-width="4"') + ekPath('M-2 -14 q-16 -4 -18 -14 q14 -2 18 8 q4 -12 18 -12 q-2 12 -18 18 Z', '#8fd4a0') + ekPath('M-34 18 q16 -6 34 0 q16 6 34 0', 'none', ' stroke="#8fc9ff" stroke-width="3"');
+      case 'lake': return ekEll(0, 6, 38, 12, '#8fc9ff') + ekPath('M-20 6 q6 -4 12 0 M4 10 q6 -4 12 0', 'none', ' stroke="#bfe4f7" stroke-width="2.4"') + ekPath('M-40 6 q-4 -12 4 -16 M-36 2 q-4 -10 4 -14', 'none', ' stroke="#8fd4a0" stroke-width="2.6" stroke-linecap="round"');
+      case 'field': return ekPath('M-44 18 q44 -16 88 0 Z', '#c8e6a0') + ekPath('M-34 12 h68 M-30 6 h60 M-24 0 h48', 'none', ' stroke="#a8d47f" stroke-width="2"') + ekPath('M-10 -2 v-10 M-6 -12 l6 4', 'none', ' stroke="#8fd4a0" stroke-width="2"');
+      case 'ground': return ekRect(-44, 0, 88, 18, 0, '#8a6a4a') + ekRect(-44, -6, 88, 8, 0, '#a8dfb4') + ekPath('M-20 6 q4 -4 8 0 M8 10 q4 -4 8 0', 'none', ' stroke="#6a4a30" stroke-width="2"') + ekPath('M-30 2 v-6 M0 2 v-8 M24 2 v-6', 'none', ' stroke="#8fd4a0" stroke-width="2"');
+      case 'wood': return ekRect(-24, -8, 48, 18, 6, '#a9825a') + ekEll(24, 1, 6, 9, '#c9a06b') + ekPath('M20 1 a3 5 0 0 1 0 0', 'none', ' stroke="#8a5a3a" stroke-width="1.6"') + ekPath('M-16 -4 h28 M-16 4 h22', 'none', ' stroke="#8a5a3a" stroke-width="1.4"');
+      case 'rose': return ekPath('M0 -6 v22', 'none', ' stroke="#5f9e70" stroke-width="3"') + ekPath('M0 4 q-10 0 -12 -8 q10 0 12 8 Z', '#8fd4a0') + ekCir(0, -14, 11, '#f26d6d') + ekPath('M-5 -16 q5 -6 10 0 q-5 6 -10 0 M-3 -12 q3 -4 6 0', 'none', ' stroke="#c94f5f" stroke-width="1.8"');
+      case 'fence': return ekPath('M-32 12 v-20 M-16 12 v-20 M0 12 v-20 M16 12 v-20 M32 12 v-20', 'none', ' stroke="#c9a06b" stroke-width="4"') + ekRect(-34, -6, 68, 4, 2, '#e8d3b0') + ekRect(-34, 2, 68, 4, 2, '#e8d3b0');
+      case 'soil': return ekEll(0, 6, 30, 10, '#8a6a4a') + ekCir(-12, 4, 1.8, '#6a4a30') + ekCir(6, 6, 1.8, '#6a4a30') + ekCir(16, 2, 1.4, '#6a4a30') + ekCir(-2, 0, 1.4, '#6a4a30') + ekPath('M-20 -2 q6 -8 12 -4', 'none', ' stroke="#a8dfb4" stroke-width="2.4"');
+      case 'sky': return ekRect(-40, -24, 80, 44, 0, '#dff0fb') + cloud(-16, -14, .8) + cloud(16, -4, .7) + ekCir(-26, -18, 5, '#ffe27a');
+      case 'snow2': return G.snowcloud(0, -8, 1.1) + ekEll(0, 16, 34, 6, '#ffffff');
+      case 'wind2': return G.wind(0, -2, 1.5) + ekPath('M-8 12 q18 8 32 -2', 'none', ' stroke="#cfe3ef" stroke-width="3"');
+      default: return ekCir(0, 0, 16, '#8fd4a0');
+    }
+  }
+
+  /* ---------- tools and things ---------- */
+  function ekTool(kind) {
+    switch (kind) {
+      case 'pen': return ekPath('M-14 12 h20 v-4 h-20 Z', '#4a5568') + ekPath('M6 12 l6 -8 v-16 h-4 v16 Z', '#8fc9ff') + ekPath('M12 -12 l-2 -10 l4 0 l2 10 Z', '#4a5568') + ekPath('M-6 8 h12', 'none', ' stroke="#8fa6bb" stroke-width="2"');
+      case 'eraser': return ekRect(-16, -6, 32, 16, 3, '#ffb3c7') + ekRect(-16, -6, 32, 7, 3, '#8fc9ff') + ekPath('M-8 4 h12', 'none', ' stroke="#ffffff" stroke-width="2"');
+      case 'scissors': return ekCir(-14, 10, 7, 'none', ' stroke="#8fa6bb" stroke-width="3"') + ekCir(-14, -10, 7, 'none', ' stroke="#8fa6bb" stroke-width="3"') + ekPath('M-8 8 l26 -18 M-8 -8 l26 18', 'none', ' stroke="#8fa6bb" stroke-width="3" stroke-linecap="round"');
+      case 'glue': return ekRect(-10, -12, 20, 28, 4, '#ffffff') + ekRect(-6, -20, 12, 8, 2, '#f2a03c') + ekPath('M0 -20 v-6', 'none', ' stroke="#f2a03c" stroke-width="3"') + ekPath('M-4 0 h8 M-4 8 h8', 'none', ' stroke="#c9d6e2" stroke-width="2"');
+      case 'notebook': return ekRect(-18, -20, 36, 40, 3, '#fff6e8') + ekRect(-18, -20, 6, 40, 2, '#8fc9ff') + ekPath('M-6 -10 h18 M-6 0 h18 M-6 10 h12', 'none', ' stroke="#c9d6e2" stroke-width="2"');
+      case 'chalk': return ekRect(-16, -4, 32, 9, 4, '#ffffff') + ekRect(-16, -4, 32, 4, 2, '#e8eef2') + ekPath('M-10 12 q8 4 16 0 M-4 18 q6 3 12 0', 'none', ' stroke="#dbe6f0" stroke-width="2"');
+      case 'tape': return ekCir(0, 0, 16, '#ffd1dd') + ekCir(0, 0, 6, '#ffffff') + ekPath('M16 0 h16', 'none', ' stroke="#ffb3c7" stroke-width="6"');
+      case 'flashlight': return ekRect(-18, -8, 26, 16, 4, '#8fa6bb') + ekPath('M8 -12 l10 -4 v32 l-10 -4 Z', '#c9d6e2') + ekPath('M18 -6 l18 -8 v28 l-18 -8 Z', '#ffe08a', ' opacity=".7"');
+      case 'wallet': return ekRect(-18, -10, 36, 22, 4, '#a97e5b') + ekPath('M-18 -2 h36', 'none', ' stroke="#8a5a3a" stroke-width="2"') + ekRect(6, 0, 14, 8, 2, '#ffd166');
+      case 'card': return ekRect(-18, -12, 36, 24, 3, '#8fc9ff') + ekRect(-18, -6, 36, 5, 0, '#5f9ed8') + ekRect(-12, 4, 12, 4, 1, '#ffffff');
+      case 'ticket': return ekPath('M-20 -8 h40 v6 q-6 0 -6 6 q0 6 6 6 v6 h-40 v-6 q6 0 6 -6 q0 -6 -6 -6 Z', '#ffd166') + ekPath('M2 -8 v28', 'none', ' stroke="#e0b840" stroke-width="1.6" stroke-dasharray="3 3"') + ekCir(-8, 0, 3, '#f26d6d');
+      case 'rope': return ekCir(0, 2, 16, 'none', ' stroke="#c9a06b" stroke-width="5"') + ekCir(0, 2, 8, 'none', ' stroke="#c9a06b" stroke-width="4"') + ekPath('M16 2 q12 8 6 18', 'none', ' stroke="#c9a06b" stroke-width="4" stroke-linecap="round"');
+      case 'hammer': return ekRect(-2, -12, 22, 5, 2, '#8fa6bb') + ekRect(-18, -8, 8, 8, 2, '#8fa6bb') + ekRect(-16, -8, 5, 26, 2, '#c9a06b') + ekPath('M-18 -6 h-4', 'none', ' stroke="#8fa6bb" stroke-width="6"');
+      case 'nail': return ekRect(-2, -6, 4, 26, 2, '#b8c4cf') + ekPath('M-6 -12 h12 v6 h-12 Z', '#a8b8c8') + ekPath('M0 20 l-2 -4 h4 Z', '#a8b8c8');
+      case 'saw': return ekPath('M-20 -6 h34 l6 6 l-6 6 h-34 Z', '#c9d6e2') + ekPath('M-18 6 l3 5 l3 -5 l3 5 l3 -5 l3 5 l3 -5 l3 5 l3 -5 l3 5 l3 -5', 'none', ' stroke="#8fa6bb" stroke-width="2"') + ekRect(14, -4, 12, 5, 2, '#e8563f');
+      case 'axe': return ekRect(-2, -4, 4, 26, 2, '#c9a06b') + ekPath('M2 -18 q14 2 12 14 q-8 2 -12 -2 Z', '#b8c4cf') + ekPath('M2 -14 q8 2 6 8', 'none', ' stroke="#ffffff" stroke-width="2"');
+      case 'net': return ekEll(0, 0, 18, 14, 'none', ' stroke="#8fa6bb" stroke-width="3"') + ekPath('M-14 -8 L14 8 M-14 8 L14 -8 M0 -14 v28 M-18 0 h36', 'none', ' stroke="#c9d6e2" stroke-width="1.4"') + ekPath('M14 -10 l12 -12', 'none', ' stroke="#c9a06b" stroke-width="4" stroke-linecap="round"');
+      case 'brush': return ekRect(-3, -4, 6, 26, 2, '#8fc9ff') + ekRect(-8, 22, 16, 8, 3, '#c9d6e2') + ekPath('M-6 22 l2 8 M0 22 l0 8 M6 22 l-2 8', 'none', ' stroke="#4a5568" stroke-width="1.6"');
+      case 'pin': return ekCir(0, -8, 5, '#f26d6d') + ekPath('M0 -3 v18', 'none', ' stroke="#8fa6bb" stroke-width="2"');
+      case 'needle': return ekPath('M-2 16 L2 -14', 'none', ' stroke="#b8c4cf" stroke-width="2.4" stroke-linecap="round"') + ekPath('M2 -14 a3 3 0 0 1 0 6', 'none', ' stroke="#b8c4cf" stroke-width="2.4"') + ekPath('M2 -8 q14 4 10 14 q-2 8 -10 8', 'none', ' stroke="#f26d6d" stroke-width="1.6"');
+      case 'thread': return ekPath('M-20 12 q10 -16 20 -4 q10 12 20 -4', 'none', ' stroke="#f26d6d" stroke-width="2.4" stroke-linecap="round"') + ekCircle2();
+      case 'button': return ekCir(0, 0, 14, '#8fc9ff') + ekCir(-4, -4, 2, '#4a5568') + ekCir(4, -4, 2, '#4a5568') + ekCir(-4, 4, 2, '#4a5568') + ekCir(4, 4, 2, '#4a5568');
+      case 'ribbon': return ekPath('M0 0 q-16 -12 -20 -2 q-4 12 20 2 q16 12 20 2 q4 -12 -20 -2 Z', '#f26d6d') + ekPath('M-6 4 l-8 16 l8 -4 l4 6 Z', '#e05a5a') + ekPath('M6 4 l8 16 l-8 -4 l-4 6 Z', '#e05a5a');
+      case 'stamp': return ekPath('M-12 12 h24 v-6 h-24 Z', '#c9a06b') + ekPath('M-8 -3 h16 q0 -6 3 -9 q3 -4 -3 -6 q-6 -2 -8 4 q-2 -6 -8 -4 q-6 2 -3 8 q3 3 3 7 Z', '#e8d3b0') + ekPath('M-6 12 v4 h12 v-4', 'none', ' stroke="#a9825a" stroke-width="2"');
+      case 'money': return ekRect(-20, -10, 40, 22, 3, '#a8dfb4') + ekRect(-20, -10, 40, 22, 3, 'none', ' stroke="#7fc48f" stroke-width="2"') + ekCir(0, 1, 7, '#ffffff', ' opacity=".8"') + ekCir(0, 1, 4, '#7fc48f');
+      case 'thermometer': return ekRect(-4, -22, 8, 36, 4, '#ffffff') + ekRect(-4, -22, 8, 36, 4, 'none', ' stroke="#c9d6e2" stroke-width="1.6"') + ekCir(0, 16, 7, '#f26d6d') + ekRect(-2, 0, 4, 16, 2, '#f26d6d') + ekPath('M-8 -18 h6 M-8 -10 h6 M-8 -2 h6', 'none', ' stroke="#c9d6e2" stroke-width="1.6"');
+      case 'medicine': return ekRect(-9, -16, 18, 34, 4, '#ffffff') + ekRect(-9, -16, 18, 8, 3, '#f26d6d') + ekCir(0, 4, 6, '#ffd166') + ekPath('M-3 4 h6 M0 1 v6', 'none', ' stroke="#fff6e8" stroke-width="1.6"');
+      case 'calendar': return ekRect(-18, -16, 36, 34, 3, '#ffffff') + ekRect(-18, -16, 36, 9, 3, '#f26d6d') + ekPath('M-8 -16 v-6 M8 -16 v-6', 'none', ' stroke="#c9d6e2" stroke-width="3" stroke-linecap="round"') + ekCir(0, 6, 4, '#8fc9ff');
+      case 'photo': return ekRect(-18, -14, 36, 28, 2, '#ffffff') + ekRect(-14, -10, 28, 20, 1, '#dff0fb') + ekPath('M-14 8 l8 -12 l6 8 l4 -4 l6 8 Z', '#a8dfb4') + ekCir(6, -4, 3, '#ffe27a');
+      case 'tissue': return ekRect(-12, -10, 24, 22, 3, '#dff0fb') + ekPath('M-6 -10 q0 -12 6 -14 q6 2 6 14 Z', '#ffffff') + ekPath('M-6 2 h12', 'none', ' stroke="#bfe4f7" stroke-width="2"');
+      case 'comb': return ekRect(-18, -6, 36, 8, 3, '#8fc9ff') + ekPath('M-14 2 v10 M-8 2 v12 M-2 2 v10 M4 2 v12 M10 2 v10 M16 2 v8', 'none', ' stroke="#8fc9ff" stroke-width="2.4" stroke-linecap="round"');
+      case 'bowl2': return ekPath('M-17 -2 q0 16 17 16 q17 0 17 -16 Z', '#ffffff') + ekEll(0, -2, 17, 4, '#e8f1f8') + ekPath('M-17 -2 q17 6 34 0', 'none', ' stroke="#c9d6e2" stroke-width="2"');
+      case 'dish': return ekEll(0, 2, 22, 8, '#ffffff') + ekEll(0, 2, 15, 5, '#f2f6fa') + ekEll(0, -1, 10, 4, '#ffb457');
+      case 'glass2': return ekPath('M-9 -14 h18 l-2 24 q-1 4 -7 4 q-6 0 -7 -4 Z', '#e8f6fb') + ekPath('M-8 0 h16 l-1 10 q-1 3 -7 3 q-6 0 -7 -3 Z', '#8fc9ff');
+      case 'gift': return ekRect(-16, -8, 32, 24, 4, '#ffb3c7') + ekRect(-18, -14, 36, 8, 3, '#f79ab0') + ekPath('M0 -14 v-10 M-8 -22 q8 -6 16 0 q-8 6 -16 0 Z', '#f26d6d') + ekPath('M-16 0 h32', 'none', ' stroke="#f79ab0" stroke-width="3"');
+      case 'backpack': return ekRect(-14, -12, 28, 26, 6, '#8fc9ff') + ekPath('M-14 -6 q0 -12 14 -12 q14 0 14 12', 'none', ' stroke="#8fc9ff" stroke-width="4"') + ekRect(-8, 2, 16, 8, 2, '#5f9ed8') + ekRect(-2, -10, 4, 8, 2, '#5f9ed8');
+      case 'lunchbox': return ekRect(-16, -8, 32, 18, 4, '#8fd4a0') + ekPath('M-8 -8 q0 -8 8 -8 q8 0 8 8', 'none', ' stroke="#7fc48f" stroke-width="3"') + ekPath('M-16 0 h32', 'none', ' stroke="#7fc48f" stroke-width="2"');
+      case 'waterbottle': return ekRect(-8, -18, 16, 34, 6, '#8fc9ff') + ekRect(-4, -24, 8, 7, 3, '#f2a03c') + ekRect(-8, -6, 16, 16, 4, '#dff0fb');
+      default: return ekCir(0, 0, 14, '#8fc9ff');
+    }
+  }
+  const ekCircle2 = () => '<circle cx="20" cy="8" r="4" fill="none" stroke="#f26d6d" stroke-width="1.6"/>';
+
+
+  /* ---------- plain shapes for colour and shape words ---------- */
+  function ekShape(kind) {
+    const ink = '#8fa6bb';
+    switch (kind) {
+      case 'circle2': return ekCir(0, 0, 24, 'none', ' stroke="' + ink + '" stroke-width="6"');
+      case 'square': return ekRect(-21, -21, 42, 42, 4, 'none', ' stroke="' + ink + '" stroke-width="6"');
+      case 'triangle': return ekPath('M0 -24 L25 20 H-25 Z', 'none', ' stroke="' + ink + '" stroke-width="6" stroke-linejoin="round"');
+      case 'line2': return ekPath('M-30 0 H30', 'none', ' stroke="' + ink + '" stroke-width="6" stroke-linecap="round"');
+      case 'star2': return ekPath('M0 -24 L7 -6 L26 -6 L11 5 L17 24 L0 13 L-17 24 L-11 5 L-26 -6 L-7 -6 Z', 'none', ' stroke="' + ink + '" stroke-width="5" stroke-linejoin="round"');
+      case 'heart2': return ekPath('M0 20 C-26 2 -22 -20 -8 -20 C-2 -20 0 -14 0 -12 C0 -14 2 -20 8 -20 C22 -20 26 2 0 20 Z', 'none', ' stroke="' + ink + '" stroke-width="5"');
+      case 'oval': return ekEll(0, 0, 26, 16, 'none', ' stroke="' + ink + '" stroke-width="6"');
+      default: return ekCir(0, 0, 24, 'none', ' stroke="' + ink + '" stroke-width="6"');
+    }
+  }
+
+  /* ---------- wire the new pictures into the art kit ---------- */
+  const ELEM_KIT = {
+    critter: (x, gy, s, kind) => gWrap(x, gy, s, ekAnimal(kind)),
+    birdie: (x, gy, s, kind) => gWrap(x, gy, s, ekBird(kind)),
+    seabuddy: (x, y, s, kind) => gWrap(x, y, s, ekSea(kind)),
+    buggy: (x, y, s, kind) => gWrap(x, y, s, ekBug(kind)),
+    lizard: (x, gy, s, kind) => gWrap(x, gy, s, ekReptile(kind)),
+    food2: (x, y, s, kind) => gWrap(x, y, s, ekFood(kind)),
+    wear: (x, gy, s, kind) => gWrap(x, gy, s, ekWear(kind)),
+    furni: (x, gy, s, kind) => gWrap(x, gy, s, ekFurni(kind)),
+    bod: (x, y, s, kind) => gWrap(x, y, s, ekBod(kind)),
+    place2: (x, gy, s, kind) => gWrap(x, gy, s, ekPlace(kind)),
+    ride: (x, gy, s, kind) => gWrap(x, gy, s, ekRide(kind)),
+    sportkit: (x, y, s, kind) => gWrap(x, y, s, ekSport(kind)),
+    music2: (x, y, s, kind) => gWrap(x, y, s, ekMusic(kind)),
+    worker: (x, gy, s, kind, shirt) => gWrap(x, gy, s, ekWorker(kind)),
+    pose: (x, gy, s, pose, shirt, opts) => gWrap(x, gy, s, ekPose(pose, shirt, opts)),
+    where2: (x, y, s, kind) => gWrap(x, y, s, ekWhere(kind)),
+    nature2: (x, y, s, kind) => gWrap(x, y, s, ekNature(kind)),
+    tool2: (x, y, s, kind) => gWrap(x, y, s, ekTool(kind)),
+    shape: (x, y, s, kind) => gWrap(x, y, s, ekShape(kind)),
+    glass: (x, y, s, r) => glass(x, y, s, r),
+    paperSheet: (x, y, s, rot) => paperSheet(x, y, s, rot),
+    feather: (x, y, s, rot) => feather(x, y, s, rot),
+    bottle: (x, y, s, w) => bottle(x, y, s, w),
+    drop: (x, y, s, c) => drop(x, y, s, c),
+    bin: (x, y, s, c) => bin(x, y, s, c),
+    can: (x, y, s) => can(x, y, s),
+    trashBag: (x, y, s, c) => trashBag(x, y, s, c)
+  };
+  Object.assign(G, ELEM_KIT);
+
+
   const artScene = (kind, parts, cap) => ({
     html: artSvg(artBg(kind) + (parts || []).map(p => {
       const fn = G[p[0]];
@@ -2762,465 +3744,6 @@
     }).join('')),
     cap: cap || ''
   });
-
-  /* =========================================================================
-     Grade packs — 초1 ~ 초6
-     참고: 2022 개정 영어과 교육과정 기본 어휘(초등 800단어)를 학년 수준에 맞게
-     나누었습니다. 교육과정상 영어는 3학년부터 시작하므로 초1·초2 팩은 그 목록의
-     기초·생활 어휘로 구성했습니다.
-     ========================================================================= */
-  const GRADE_PACK_DEFS = [
-    {
-      id: 'g1', label: '초1 기초', short: '초1', emoji: '🐣',
-      words: [
-        {
-          word: 'apple', pos: 'noun', en: 'A round fruit that grows on a tree', ko: '사과',
-          art: [
-            ['meadow', [['tree', 104, 142, 1.25], ['apple', 88, 102, .42], ['apple', 112, 94, .45], ['apple', 96, 120, .38], ['basket', 234, 148, .95], ['apple', 228, 132, .34], ['apple', 243, 134, .32], ['sparkle', 272, 82, .7]], '사과나무에 빨간 사과가 열렸어요'],
-            ['indoor', [['apple', 160, 108, 2.6], ['sparkle', 238, 62, .9], ['sparkle', 86, 70, .6], ['heart', 254, 140, 1.2, '#ffb3c7']], '동글동글 빨간 사과, 달콤해요']
-          ]
-        },
-        {
-          word: 'cat', pos: 'noun', en: 'A small animal with soft fur that says meow', ko: '고양이',
-          art: [
-            ['meadow', [['cat', 132, 122, 1.2], ['butterfly', 244, 78, 1], ['flower', 58, 148, '#ffb3c7'], ['sparkle', 278, 130, .7]], '고양이가 야옹 하고 울어요'],
-            ['room', [['cushion', 152, 146, 1.3], ['cat', 152, 138, .95], ['zzz', 210, 92, 1.1], ['sparkle', 92, 108, .6]], '낮잠 자는 고양이']
-          ]
-        },
-        {
-          word: 'dog', pos: 'noun', en: 'A friendly animal that says woof', ko: '개, 강아지',
-          art: [
-            ['meadow', [['dog', 126, 122, 1.15], ['ball', 250, 148, 1, '#ff8f8f'], ['kidStand', 274, 156, .6, '#8fc9ff', { arms: 'up' }], ['sparkle', 198, 70, .7]], '강아지가 꼬리를 흔들며 반가워해요'],
-            ['indoor', [['dog', 116, 124, 1.05], ['bowl', 236, 148, 1.1], ['heart', 266, 92, 1.1, '#ffb3c7']], '강아지가 밥그릇 앞에 앉았어요']
-          ]
-        },
-        {
-          word: 'red', pos: 'adjective', en: 'The color of a ripe tomato', ko: '빨간색의',
-          art: [
-            ['paper', [['apple', 84, 112, 1.7], ['strawberry', 160, 112, 1.9], ['heart', 236, 110, 2.4, '#ff6f6f'], ['sparkle', 196, 56, .7], ['sparkle', 118, 58, .6]], '빨간 사과, 빨간 딸기, 빨간 하트'],
-            ['paper', [['crayon', 116, 112, 1.7, '#ff6f6f'], ['swatch', 212, 112, 1.7, '#ff6f6f'], ['sparkle', 164, 56, .7]], '빨간 크레용으로 색칠해요']
-          ]
-        },
-        {
-          word: 'blue', pos: 'adjective', en: 'The color of the sky on a clear day', ko: '파란색의',
-          art: [
-            ['paper', [['balloon', 92, 106, 1.7, '#7fb2e5'], ['drop', 168, 108, 2, '#5ca8dd'], ['fish', 246, 110, 1.25, '#5ca8dd'], ['sparkle', 134, 52, .7]], '파란 풍선, 파란 물방울, 파란 물고기'],
-            ['sky', [['cloud', 88, 52, 1.2], ['cloud', 224, 42, 1], ['bird', 158, 84], ['kidStand', 252, 156, .65, '#7fb2e5', { arms: 'up' }]], '맑은 날 하늘은 파래요']
-          ]
-        },
-        {
-          word: 'sun', pos: 'noun', en: 'The bright star that gives us light and heat', ko: '태양, 해',
-          art: [
-            ['sky', [['sun', 158, 82, 2.6], ['cloud', 62, 50, .8], ['bird', 238, 58], ['kidStand', 254, 158, .58, '#ffd166', { arms: 'up' }], ['flower', 54, 150, '#ffb3c7']], '해님이 하늘에서 환하게 비춰요'],
-            ['meadow', [['mountains', 160, 150, 1], ['sun', 160, 54, 1.4], ['bird', 86, 64], ['flower', 210, 150, '#ffffff']], '해가 산 위로 올라와요']
-          ]
-        },
-        {
-          word: 'moon', pos: 'noun', en: 'The round light you see in the night sky', ko: '달',
-          art: [
-            ['night', [['moon', 224, 70, 1.6], ['star', 96, 52, .7], ['star', 140, 32, .5], ['star', 272, 42, .6], ['house', 96, 150, 1], ['tree', 274, 150, .9]], '밤하늘에 달님이 떠 있어요'],
-            ['night', [['moon', 250, 58, 1.2], ['zzz', 198, 104, 1.2], ['sleepyhead', 148, 150, 1.1], ['star', 86, 50, .6]], '달님을 보며 잠이 와요']
-          ]
-        },
-        {
-          word: 'book', pos: 'noun', en: 'Pages with words that you read', ko: '책',
-          art: [
-            ['indoor', [['openbook', 176, 116, 2], ['kidStand', 62, 156, .8, '#ffd166', {}], ['sparkle', 272, 64, .8]], '책을 펼치면 이야기가 시작돼요'],
-            ['room', [['shelf', 108, 118, 1.1], ['openbook', 240, 122, 1.5]], '책장에 책이 가득해요']
-          ]
-        },
-        {
-          word: 'big', pos: 'adjective', en: 'Very large in size', ko: '큰',
-          art: [
-            ['meadow', [['elephant', 110, 130, 1.3], ['mouse', 252, 150, 1.4], ['sparkle', 196, 58, .7]], '코끼리는 아주 커요'],
-            ['meadow', [['tree', 108, 150, 1.7], ['tree', 248, 152, .55], ['flower', 190, 152, '#ffd166']], '큰 나무와 작은 나무']
-          ]
-        },
-        {
-          word: 'happy', pos: 'adjective', en: 'Feeling glad and smiling inside', ko: '행복한, 기쁜',
-          art: [
-            ['meadow', [['kidStand', 150, 156, 1, '#ffb3c7', { arms: 'up' }], ['heart', 92, 64, 1.2], ['heart', 230, 56, 1], ['sparkle', 194, 94, .8], ['sun', 276, 42, 1]], '기분이 좋아 팔짝팔짝 뛰어요'],
-            ['paper', [['smiley', 160, 102, 2.4, 'happy'], ['sparkle', 92, 58, .8], ['sparkle', 230, 60, .9]], '입이 귀에 걸려요']
-          ]
-        }
-      ]
-    },
-    {
-      id: 'g2', label: '초2 일상', short: '초2', emoji: '🌱',
-      words: [
-        {
-          word: 'run', pos: 'verb', en: 'To move fast on your feet', ko: '달리다',
-          art: [
-            ['meadow', [['runner', 140, 156, 1], ['speed', 84, 112, .9], ['flag', 272, 142, 1.1], ['bird', 212, 52]], '발을 빠르게 움직여요'],
-            ['meadow', [['runner', 108, 156, .85], ['runner', 198, 156, .9, '#8fc9ff'], ['speed', 64, 118, .7]], '친구와 함께 달려요']
-          ]
-        },
-        {
-          word: 'jump', pos: 'verb', en: 'To push off the ground with both feet', ko: '뛰어오르다, 점프하다',
-          art: [
-            ['meadow', [['arc', 150, 128, 1], ['kidJump', 150, 110, 1], ['flower', 52, 150, '#ffb3c7'], ['sparkle', 232, 74, .8]], '두 발로 힘껏 뛰어올라요'],
-            ['meadow', [['puddle', 160, 152, 1.2], ['kidJump', 160, 96, 1, '#8fc9ff'], ['sparkle', 94, 70, .7]], '물웅덩이를 넘어 뛰어요']
-          ]
-        },
-        {
-          word: 'swim', pos: 'verb', en: 'To move through water with your arms and legs', ko: '수영하다, 헤엄치다',
-          art: [
-            ['water', [['swimmer', 156, 132, 1.2], ['fish', 56, 166, 1], ['fish', 268, 168, .85]], '팔과 다리를 저어 물을 나아가요'],
-            ['water', [['swimmer', 118, 130, 1], ['swimmer', 216, 140, .9, '#8fc9ff'], ['sparkle', 168, 80, .7]], '친구와 함께 수영해요']
-          ]
-        },
-        {
-          word: 'eat', pos: 'verb', en: 'To put food in your mouth and chew it', ko: '먹다',
-          art: [
-            ['indoor', [['table', 172, 138, 1.15], ['bowl', 172, 126, 1.3], ['spoon', 214, 120, .9, -18], ['kidStand', 68, 156, .75, '#8fc9ff', {}]], '밥을 한 숟가락 먹어요'],
-            ['indoor', [['bowl', 146, 118, 1.8], ['spoon', 212, 110, 1.1], ['heart', 254, 70, 1, '#ffb3c7']], '맛있게 냠냠']
-          ]
-        },
-        {
-          word: 'sleep', pos: 'verb', en: 'To rest with your eyes closed at night', ko: '자다, 잠을 자다',
-          art: [
-            ['night', [['bed', 156, 140, 1.3], ['sleepyhead', 134, 126, 1.1], ['zzz', 236, 82, 1.2], ['moon', 274, 42, 1]], '밤에는 푹 자요'],
-            ['room', [['bed', 150, 132, 1.2], ['sleepyhead', 130, 120, 1], ['zzz', 218, 74, 1], ['star', 264, 48, .7]], '이불을 덮고 잠이 들어요']
-          ]
-        },
-        {
-          word: 'family', pos: 'noun', en: 'The people who live together and care for each other', ko: '가족',
-          art: [
-            ['meadow', [['house', 160, 120, 1], ['kidStand', 84, 156, .72, '#8fc9ff', {}], ['kidStand', 148, 158, .88, '#ffb3c7', {}], ['kidStand', 208, 156, .7, '#ffd166', {}], ['heart', 160, 60, 1.1]], '가족은 서로를 아껴요'],
-            ['indoor', [['heart', 160, 100, 2.8], ['kidStand', 92, 158, .6, '#8fc9ff', { arms: 'up' }], ['kidStand', 220, 158, .6, '#ffb3c7', { arms: 'up' }]], '우리는 한 가족']
-          ]
-        },
-        {
-          word: 'friend', pos: 'noun', en: 'Someone you like to play with', ko: '친구',
-          art: [
-            ['meadow', [['kidStand', 114, 156, .85, '#8fc9ff', {}], ['kidStand', 188, 156, .85, '#ffb3c7', {}], ['heart', 150, 72, 1], ['ball', 252, 148, .9, '#ffd166']], '친구와 손잡고 놀아요'],
-            ['indoor', [['kidStand', 96, 158, .75, '#8fc9ff', {}], ['kidStand', 224, 158, .75, '#ffb3c7', {}], ['openbook', 160, 134, 1.1]], '같이 책을 봐요']
-          ]
-        },
-        {
-          word: 'rain', pos: 'noun', en: 'Water that falls from clouds', ko: '비',
-          art: [
-            ['sky', [['rain', 108, 56, 1.6], ['umbrella', 236, 118, 1.3, '#ff8fae'], ['kidStand', 236, 158, .65, '#ffb3c7', {}], ['puddle', 96, 170, 1]], '비가 주룩주룩 내려요'],
-            ['meadow', [['rain', 160, 52, 1.8], ['tree', 84, 150, 1], ['flower', 240, 152, '#8fc9ff'], ['puddle', 160, 172, 1.1]], '비를 맞은 풀과 나무가 촉촉해요']
-          ]
-        },
-        {
-          word: 'snow', pos: 'noun', en: 'Soft white flakes that fall when it is cold', ko: '눈',
-          art: [
-            ['night', [['snowcloud', 100, 52, 1.2], ['snowman', 244, 140, 1.3], ['snowflake', 58, 118, .8], ['snowflake', 168, 94, .7], ['snowflake', 288, 62, .7]], '눈이 소복소복 내려요'],
-            ['sky', [['pine', 84, 152, 1.2], ['pine', 242, 152, 1], ['snowflake', 150, 58, .7], ['snowflake', 198, 94, .8], ['kidJump', 150, 112, .8, '#8fc9ff']], '눈을 손으로 받아요']
-          ]
-        },
-        {
-          word: 'school', pos: 'noun', en: 'The place where children learn', ko: '학교',
-          art: [
-            ['city', [['school', 160, 128, 1.1], ['kidStand', 56, 158, .68, '#ffb3c7', {}], ['kidStand', 264, 158, .68, '#8fc9ff', {}], ['tree', 300, 152, .7]], '학교에서 친구를 만나요'],
-            ['indoor', [['openbook', 142, 122, 1.8], ['bag', 246, 138, 1.2, '#8fc9ff'], ['sparkle', 84, 70, .7]], '책과 가방을 챙겨요']
-          ]
-        }
-      ]
-    },
-    {
-      id: 'g3', label: '초3 필수', short: '초3', emoji: '🌿',
-      words: [
-        {
-          word: 'animal', pos: 'noun', en: 'A living thing that can move, like a dog or a bird', ko: '동물',
-          art: [
-            ['meadow', [['cat', 76, 128, .95], ['dog', 168, 128, 1], ['rabbit', 254, 130, 1], ['butterfly', 160, 58, .9]], '고양이, 강아지, 토끼는 모두 동물이에요'],
-            ['water', [['fish', 96, 152, 1.2], ['fish', 236, 168, .9], ['bird', 208, 66], ['butterfly', 262, 112, .9], ['rabbit', 62, 118, .8]], '물고기와 새, 토끼도 모두 동물이에요']
-          ]
-        },
-        {
-          word: 'breakfast', pos: 'noun', en: 'The first meal you eat in the morning', ko: '아침 식사',
-          art: [
-            ['indoor', [['breakfast', 126, 128, 1.4], ['cup', 212, 116, 1.1, '#ffe0b8'], ['clock', 254, 54, 1.2]], '아침에 먹는 첫 끼니예요'],
-            ['indoor', [['table', 148, 140, 1.2], ['breakfast', 132, 128, 1.05], ['cup', 208, 122, .95], ['kidStand', 268, 156, .55, '#ffb3c7', {}]], '아침을 맛있게 먹어요']
-          ]
-        },
-        {
-          word: 'clean', pos: 'verb', en: 'To make something neat with no dirt', ko: '청소하다, 깨끗하게 하다',
-          art: [
-            ['indoor', [['broom', 112, 122, 1.2, -18], ['sparkle', 196, 86, .9], ['sparkle', 250, 68, .7], ['bucket', 216, 148, 1]], '빗자루로 바닥을 쓸어요'],
-            ['room', [['sparkle', 112, 84, .9], ['shelf', 152, 118, 1.1], ['heart', 268, 88, 1]], '방이 반짝반짝 깨끗해졌어요']
-          ]
-        },
-        {
-          word: 'draw', pos: 'verb', en: 'To make a picture with a pencil or crayon', ko: '그리다',
-          art: [
-            ['indoor', [['easel', 148, 122, 1.3], ['pencil', 232, 122, 1.2, '#f2a93b', -20], ['crayon', 76, 150, 1, '#ff8f8f']], '연필로 종이에 그림을 그려요'],
-            ['room', [['kidStand', 96, 156, .75, '#ffd166', {}], ['easel', 214, 126, 1.1], ['sun', 258, 60, 1], ['sparkle', 158, 72, .7]], '크레용으로 해를 그렸어요']
-          ]
-        },
-        {
-          word: 'listen', pos: 'verb', en: 'To pay attention with your ears', ko: '듣다, 귀 기울이다',
-          art: [
-            ['indoor', [['ear', 176, 100, 1.9], ['waves', 232, 100, 1.1], ['kidStand', 84, 156, .8, '#8fc9ff', {}]], '귀를 기울여 들어요'],
-            ['room', [['kidStand', 136, 156, .85, '#ffb3c7', {}], ['note', 226, 84, 1.4], ['waves', 264, 84, .9], ['ear', 84, 116, 1.2]], '선생님 말씀을 잘 들어요']
-          ]
-        },
-        {
-          word: 'morning', pos: 'noun', en: 'The early part of the day after the sun rises', ko: '아침',
-          art: [
-            ['sky', [['mountains', 160, 158, .9], ['sun', 160, 62, 1.8], ['bird', 84, 56], ['clock', 266, 50, 1]], '해가 떠오르는 아침이에요'],
-            ['indoor', [['bed', 132, 138, 1.1], ['kidStand', 238, 156, .8, '#ffd166', { arms: 'up' }], ['sun', 62, 50, 1.2], ['zzz', 170, 84, .9]], '아침에 일어나 기지개를 켜요']
-          ]
-        },
-        {
-          word: 'mountain', pos: 'noun', en: 'A very high hill of rock', ko: '산',
-          art: [
-            ['sky', [['mountains', 160, 150, 1], ['cloud', 78, 42, .9], ['flag', 160, 58, .7, '#ff8f8f'], ['snowflake', 240, 38, .5]], '높이 솟은 산이에요'],
-            ['meadow', [['mountains', 160, 146, 1], ['pine', 74, 158, .9], ['pine', 250, 158, .8], ['sun', 266, 42, 1]], '산 아래에는 나무가 자라요']
-          ]
-        },
-        {
-          word: 'music', pos: 'noun', en: 'Sounds made with voices or instruments', ko: '음악',
-          art: [
-            ['room', [['note', 112, 94, 1.6], ['note', 158, 74, 1.2, '#ff8fae'], ['drum', 236, 138, 1.2], ['waves', 196, 94, .9]], '소리와 리듬이 모여 음악이 돼요'],
-            ['room', [['kidStand', 116, 156, .85, '#ffd166', {}], ['note', 208, 78, 1.4], ['waves', 252, 90, .9], ['note', 84, 66, 1]], '노래를 부르면 음악이 흘러요']
-          ]
-        },
-        {
-          word: 'share', pos: 'verb', en: 'To give part of what you have to others', ko: '나누다, 함께 쓰다',
-          art: [
-            ['meadow', [['kidStand', 100, 156, .85, '#8fc9ff', {}], ['kidStand', 220, 156, .85, '#ffb3c7', {}], ['apple', 160, 102, 1.3], ['heart', 160, 56, .9]], '가진 것을 반씩 나눠요'],
-            ['indoor', [['kidStand', 94, 158, .75, '#ffb3c7', {}], ['kidStand', 226, 158, .75, '#8fc9ff', {}], ['openbook', 160, 132, 1.1]], '책도 함께 나눠 봐요']
-          ]
-        },
-        {
-          word: 'smile', pos: 'verb', en: 'To turn your mouth up to show you are glad', ko: '미소 짓다, 웃다',
-          art: [
-            ['paper', [['smiley', 160, 102, 2.6, 'happy'], ['sparkle', 90, 56, .8], ['sparkle', 234, 60, .9]], '입꼬리가 올라가요'],
-            ['meadow', [['kidStand', 150, 158, .95, '#ffd166', {}], ['heart', 92, 76, 1], ['sun', 258, 48, 1.1], ['flower', 58, 150, '#ffb3c7']], '웃는 얼굴이 참 좋아요']
-          ]
-        }
-      ]
-    },
-    {
-      id: 'g4', label: '초4 필수', short: '초4', emoji: '🌳',
-      words: [
-        {
-          word: 'arrive', pos: 'verb', en: 'To get to a place you were going to', ko: '도착하다',
-          art: [
-            ['city', [['house', 216, 128, 1.2], ['trail', 168, 168, 1], ['kidStand', 92, 158, .8, '#8fc9ff', {}], ['bag', 118, 148, .8]], '가고 싶던 곳에 다다라요'],
-            ['city', [['school', 176, 126, 1], ['kidStand', 62, 158, .7, '#ffb3c7', {}], ['flag', 286, 138, .8], ['clock', 288, 50, 1]], '학교에 도착했어요']
-          ]
-        },
-        {
-          word: 'brave', pos: 'adjective', en: 'Not afraid even when something is scary', ko: '용감한',
-          art: [
-            ['meadow', [['cape', 148, 132, 1.1], ['kidStand', 148, 158, 1, '#8fc9ff', { arms: 'up' }], ['star', 240, 70, .9], ['heart', 88, 80, 1]], '무서워도 씩씩하게 해내요'],
-            ['meadow', [['kidStand', 116, 158, .9, '#ffd166', {}], ['cloud', 226, 96, .9], ['smiley', 226, 112, .8, 'happy'], ['star', 178, 56, .8]], '무서운 것도 이겨 내요']
-          ]
-        },
-        {
-          word: 'bridge', pos: 'noun', en: 'A road built over a river or a road', ko: '다리',
-          art: [
-            ['water', [['bridge', 160, 122, 1.2], ['tree', 52, 150, .9], ['fish', 196, 168, 1], ['cloud', 254, 42, .9]], '강 위로 다리가 놓여 있어요'],
-            ['water', [['bridge', 160, 132, 1.4], ['kidStand', 160, 104, .6, '#ffb3c7', {}], ['bird', 90, 48]], '다리를 건너 반대편으로 가요']
-          ]
-        },
-        {
-          word: 'cloud', pos: 'noun', en: 'Soft white shapes that float in the sky', ko: '구름',
-          art: [
-            ['sky', [['cloud', 94, 62, 1.6], ['cloud', 238, 50, 1.1], ['cloud', 176, 108, .8], ['bird', 290, 118], ['sun', 52, 38, 1]], '구름이 하늘에 둥실둥실'],
-            ['sky', [['cloud', 160, 78, 2.6], ['bird', 78, 58], ['bird', 242, 66], ['plane', 252, 142, .9]], '구름 위로 비행기가 지나가요']
-          ]
-        },
-        {
-          word: 'decide', pos: 'verb', en: 'To choose one thing after thinking', ko: '결정하다, 정하다',
-          art: [
-            ['paper', [['signpost', 150, 122, 1.1], ['kidStand', 58, 158, .75, '#ffd166', {}], ['bubble', 244, 86, .9, '#ffffff'], ['qmark', 244, 86, .8]], '두 가지 중에 하나를 골라요'],
-            ['meadow', [['signpost', 160, 130, 1], ['flower', 92, 150, '#ffb3c7'], ['flower', 236, 150, '#8fc9ff'], ['qmark', 256, 68, 1]], '어느 길로 갈지 생각해요']
-          ]
-        },
-        {
-          word: 'healthy', pos: 'adjective', en: 'Strong and well because you eat and play right', ko: '건강한',
-          art: [
-            ['meadow', [['kidStand', 92, 158, .85, '#8fc9ff', { arms: 'up' }], ['carrot', 178, 132, 1.2, -15], ['tomato', 236, 138, 1.1], ['heart', 160, 58, 1.1]], '잘 먹고 많이 움직이면 건강해요'],
-            ['indoor', [['bowl', 114, 130, 1.5], ['broccoli', 198, 126, 1.3], ['apple', 256, 132, 1.1]], '채소와 과일을 골고루 먹어요']
-          ]
-        },
-        {
-          word: 'library', pos: 'noun', en: 'A place with many books you can borrow', ko: '도서관',
-          art: [
-            ['indoor', [['shelf', 92, 116, 1.2], ['shelf', 228, 116, 1.1], ['openbook', 160, 148, 1.1], ['sparkle', 160, 54, .8]], '도서관에는 책이 가득해요'],
-            ['room', [['shelf', 116, 114, 1.3], ['kidStand', 206, 158, .8, '#ffb3c7', {}], ['openbook', 258, 128, .9]], '책을 빌려 읽어요']
-          ]
-        },
-        {
-          word: 'season', pos: 'noun', en: 'One of the four parts of the year', ko: '계절',
-          art: [
-            ['paper', [['tree', 84, 80, .75, '#ffc2d1'], ['tree', 236, 80, .75, '#6cc08b'], ['tree', 84, 154, .75, '#f2a93b'], ['tree', 236, 154, .75, '#cfd8e3'], ['snowflake', 288, 152, .5], ['flower', 26, 154, '#ffb3c7']], '봄, 여름, 가을, 겨울 네 계절이 있어요'],
-            ['sky', [['mountains', 160, 150, 1], ['sun', 264, 42, 1.2], ['snowflake', 66, 56, .6], ['flower', 104, 150, '#ffb3c7'], ['tree', 226, 150, .9, '#f2a93b']], '계절마다 풍경이 달라져요']
-          ]
-        },
-        {
-          word: 'travel', pos: 'verb', en: 'To go to another place far away', ko: '여행하다, 여행 가다',
-          art: [
-            ['sky', [['plane', 148, 82, 1.6], ['cloud', 78, 50, 1], ['cloud', 250, 114, 1.1], ['sun', 266, 40, 1], ['pin', 66, 146, .9]], '비행기를 타고 멀리 가요'],
-            ['city', [['suitcase', 106, 146, 1.3], ['kidStand', 208, 158, .85, '#ffd166', {}], ['plane', 266, 52, 1]], '가방을 챙겨 여행을 떠나요']
-          ]
-        },
-        {
-          word: 'weather', pos: 'noun', en: 'What the sky is like: sunny, rainy or windy', ko: '날씨',
-          art: [
-            ['paper', [['sun', 76, 74, 1.5], ['rain', 236, 74, 1.2], ['snowflake', 76, 156, .9], ['wind', 236, 154, 1.2], ['sparkle', 158, 114, .6]], '맑음, 비, 눈, 바람이 있어요'],
-            ['sky', [['sun', 76, 58, 1.3], ['rain', 204, 66, 1.4], ['cloud', 140, 50, 1.1], ['umbrella', 262, 126, .95, '#8fc9ff']], '하늘 표정이 자주 바뀌어요']
-          ]
-        }
-      ]
-    },
-    {
-      id: 'g5', label: '초5 심화', short: '초5', emoji: '🍃',
-      words: [
-        {
-          word: 'agree', pos: 'verb', en: 'To have the same idea as someone else', ko: '동의하다',
-          art: [
-            ['room', [['kidStand', 92, 158, .85, '#8fc9ff', {}], ['kidStand', 220, 158, .85, '#ffb3c7', {}], ['bubble', 98, 92, .9, '#ffffff'], ['bubble', 214, 92, .9, '#eaf9ee'], ['heart', 156, 52, .9]], '생각이 같아요, 좋아요!'],
-            ['paper', [['bubble', 106, 100, 1.1, '#ffffff', false], ['bubble', 214, 100, 1.1, '#eaf9ee', false], ['check', 106, 100, 1.3], ['check', 214, 100, 1.3]], '두 사람 모두 같은 생각이에요']
-          ]
-        },
-        {
-          word: 'compare', pos: 'verb', en: 'To look at two things to see how they differ', ko: '비교하다',
-          art: [
-            ['paper', [['scale', 160, 112, 1.3], ['apple', 116, 94, .7], ['tomato', 204, 94, .7], ['magnifier', 258, 144, .9]], '두 가지를 나란히 놓고 살펴봐요'],
-            ['meadow', [['tree', 100, 150, 1.5], ['tree', 232, 152, .7], ['ruler', 160, 58, 1], ['magnifier', 288, 88, .7]], '어느 것이 더 큰지 비교해요']
-          ]
-        },
-        {
-          word: 'culture', pos: 'noun', en: 'The food, music and ways of life of a group of people', ko: '문화',
-          art: [
-            ['paper', [['earth', 96, 100, 34], ['note', 194, 82, 1.4, '#8f7ae0'], ['bowl', 244, 140, 1.2], ['sparkle', 152, 150, .7]], '사람들의 음식, 음악, 생활 방식이에요'],
-            ['indoor', [['table', 158, 140, 1.2], ['bowl', 126, 128, 1.1], ['cup', 198, 122, 1], ['earth', 268, 84, 22], ['note', 82, 82, 1.1]], '함께 먹고 함께 즐기는 문화']
-          ]
-        },
-        {
-          word: 'energy', pos: 'noun', en: 'The power that makes things work or move', ko: '에너지, 기운',
-          art: [
-            ['paper', [['bolt', 112, 100, 1.8], ['battery', 214, 108, 1.3], ['bulb', 88, 154, 1]], '무언가를 움직이게 하는 힘이에요'],
-            ['meadow', [['bolt', 92, 82, 1.2], ['runner', 214, 156, .9, '#ffd166'], ['sun', 268, 42, 1.1]], '에너지가 있으면 몸이 움직여요']
-          ]
-        },
-        {
-          word: 'explain', pos: 'verb', en: 'To make something clear so others understand', ko: '설명하다',
-          art: [
-            ['indoor', [['board', 168, 92, 1.3], ['kidStand', 54, 158, .78, '#8fc9ff', {}], ['bubble', 256, 146, .8, '#ffffff', false], ['bulb', 256, 144, .8]], '알기 쉽게 하나씩 알려 줘요'],
-            ['room', [['kidStand', 110, 158, .85, '#ffd166', {}], ['bubble', 216, 88, 1.1, '#ffffff'], ['bulb', 264, 142, 1]], '왜 그런지 말로 풀어 줘요']
-          ]
-        },
-        {
-          word: 'forest', pos: 'noun', en: 'A large place full of trees', ko: '숲',
-          art: [
-            ['meadow', [['tree', 70, 150, 1.1], ['tree', 152, 150, 1.25], ['tree', 232, 152, 1], ['pine', 294, 152, .9], ['mushroom', 108, 152, .9], ['butterfly', 182, 76, .8]], '나무가 빽빽한 숲이에요'],
-            ['meadow', [['tree', 58, 150, 1], ['pine', 130, 152, 1.1], ['tree', 204, 150, 1.1], ['pine', 280, 152, 1], ['rabbit', 168, 152, .9], ['sun', 160, 42, 1.1]], '숲에는 동물 친구가 살아요']
-          ]
-        },
-        {
-          word: 'memory', pos: 'noun', en: 'Something you remember from before', ko: '기억, 기억력',
-          art: [
-            ['paper', [['photo', 108, 92, 1.3, '#bfe3ff'], ['photo', 210, 106, 1.2, '#ffd8e4', 8], ['heart', 158, 154, 1.2], ['sparkle', 262, 58, .8]], '지난 일을 마음속에 담아 두는 힘이에요'],
-            ['room', [['kidStand', 92, 158, .85, '#ffd166', {}], ['bubble', 214, 92, 1.1, '#ffffff', false], ['photo', 214, 90, .8, '#ffd8e4'], ['star', 274, 58, .7]], '그때 그 일이 생각나요']
-          ]
-        },
-        {
-          word: 'practice', pos: 'verb', en: 'To do something many times to get better', ko: '연습하다',
-          art: [
-            ['paper', [['target', 138, 106, 1.4], ['ball', 228, 140, 1], ['loopArrow', 248, 62, 1]], '같은 동작을 여러 번 해요'],
-            ['meadow', [['target', 254, 108, 1], ['kidStand', 116, 158, .85, '#8fc9ff', {}], ['ball', 176, 126, .8, '#ffd166'], ['sparkle', 208, 64, .7]], '던지고 또 던지며 연습해요']
-          ]
-        },
-        {
-          word: 'useful', pos: 'adjective', en: 'Helpful for doing something', ko: '쓸모 있는, 유용한',
-          art: [
-            ['paper', [['toolbox', 128, 130, 1.2], ['hammer', 218, 118, 1.1, 12], ['check', 272, 68, 1.2]], '어떤 일을 할 때 도움이 돼요'],
-            ['room', [['pencil', 96, 122, 1.2, '#f2a93b', -12], ['openbook', 190, 130, 1.2], ['bulb', 268, 78, .9]], '쓰고 읽고 생각할 때 쓸모가 있어요']
-          ]
-        },
-        {
-          word: 'wonder', pos: 'verb', en: 'To think about something you want to know', ko: '궁금해하다',
-          art: [
-            ['night', [['kidStand', 114, 158, .85, '#ffb3c7', {}], ['qmark', 206, 84, 1.4], ['star', 262, 54, .8], ['moon', 274, 116, .9]], '왜 그럴까 궁금해져요'],
-            ['paper', [['qmark', 108, 98, 1.6], ['qmark', 188, 86, 1.2], ['magnifier', 246, 138, 1], ['bulb', 76, 152, .9]], '궁금한 것을 계속 생각해요']
-          ]
-        }
-      ]
-    },
-    {
-      id: 'g6', label: '초6 심화', short: '초6', emoji: '🌲',
-      words: [
-        {
-          word: 'achieve', pos: 'verb', en: 'To reach a goal after working hard', ko: '이루다, 성취하다',
-          art: [
-            ['sky', [['mountains', 160, 150, 1], ['flag', 160, 56, .8, '#ffd166'], ['kidStand', 160, 146, .78, '#ffb3c7', { arms: 'up' }], ['sparkle', 94, 66, .8], ['sparkle', 238, 60, .9]], '목표한 곳에 다다랐어요'],
-            ['paper', [['trophy', 126, 112, 1.6], ['medal', 224, 108, 1.3], ['star', 160, 54, .9], ['sparkle', 86, 64, .7]], '해내고 나면 상을 받아요']
-          ]
-        },
-        {
-          word: 'balance', pos: 'noun', en: 'Keeping steady without falling over', ko: '균형',
-          art: [
-            ['paper', [['scale', 160, 112, 1.4], ['apple', 122, 94, .7], ['apple', 198, 94, .7]], '양쪽 무게가 똑같아요'],
-            ['meadow', [['seesaw', 160, 150, 1.2], ['kidStand', 106, 141, .6, '#8fc9ff', {}], ['kidStand', 214, 141, .6, '#ffb3c7', {}]], '넘어지지 않게 균형을 잡아요']
-          ]
-        },
-        {
-          word: 'challenge', pos: 'noun', en: 'A hard task that tests you', ko: '도전, 힘든 과제',
-          art: [
-            ['meadow', [['climbwall', 152, 122, 1.15], ['kidStand', 62, 156, .78, '#ffb3c7', {}], ['star', 268, 62, .9], ['sparkle', 96, 74, .7]], '높은 벽을 한 칸씩 오르며 해내요'],
-            ['meadow', [['hurdle', 92, 150, 1.1], ['hurdle', 202, 150, 1.1], ['kidJump', 148, 106, .92, '#8fc9ff'], ['sun', 276, 44, 1]], '어려운 일에 맞서 도전해요']
-          ]
-        },
-        {
-          word: 'curious', pos: 'adjective', en: 'Wanting to know more about something', ko: '호기심 많은',
-          art: [
-            ['meadow', [['kidStand', 108, 158, .85, '#ffd166', {}], ['magnifier', 196, 116, 1.2], ['butterfly', 248, 82, .9], ['qmark', 158, 54, 1]], '자세히 들여다보고 싶어요'],
-            ['room', [['kidStand', 96, 158, .8, '#8fc9ff', {}], ['magnifier', 194, 114, 1], ['openbook', 254, 138, .9], ['qmark', 252, 68, 1]], '왜 그런지 알고 싶어요']
-          ]
-        },
-        {
-          word: 'describe', pos: 'verb', en: 'To tell what something is like in words', ko: '묘사하다, 설명하다',
-          art: [
-            ['room', [['kidStand', 92, 158, .85, '#8fc9ff', {}], ['bubble', 212, 88, 1.1, '#ffffff', false], ['photo', 212, 86, .75, '#ffd8e4'], ['pencil', 262, 138, 1]], '보이는 것을 말로 풀어 놓아요'],
-            ['paper', [['photo', 106, 102, 1.4, '#bfe3ff'], ['bubble', 232, 84, 1.1, '#ffffff'], ['sparkle', 160, 152, .8]], '그림을 보고 설명해요']
-          ]
-        },
-        {
-          word: 'express', pos: 'verb', en: 'To show your feelings or ideas', ko: '표현하다',
-          art: [
-            ['paper', [['smiley', 72, 102, 1.5, 'happy'], ['smiley', 160, 102, 1.5, 'sad'], ['smiley', 248, 102, 1.5, 'wow']], '기쁨, 슬픔, 놀람을 얼굴로 나타내요'],
-            ['room', [['kidStand', 106, 158, .85, '#ffb3c7', {}], ['bubble', 212, 88, 1.1, '#ffffff', false], ['heart', 212, 86, 1], ['note', 272, 136, 1]], '마음을 말과 몸짓으로 표현해요']
-          ]
-        },
-        {
-          word: 'improve', pos: 'verb', en: 'To become better than before', ko: '향상되다, 나아지다',
-          art: [
-            ['paper', [['chart', 140, 106, 1.6], ['star', 250, 66, .9]], '전보다 더 좋아졌어요'],
-            ['meadow', [['runner', 152, 156, .95, '#8fc9ff'], ['chart', 264, 108, .9], ['speed', 96, 112, .8]], '연습할수록 빨라져요']
-          ]
-        },
-        {
-          word: 'nature', pos: 'noun', en: 'Trees, rivers, animals and all things not made by people', ko: '자연',
-          art: [
-            ['meadow', [['tree', 76, 150, 1.1], ['river', 190, 108, 1.2], ['butterfly', 122, 76, .8], ['flower', 52, 150, '#ffb3c7'], ['sun', 276, 42, 1]], '나무, 강, 꽃은 사람이 만들지 않았어요'],
-            ['sky', [['mountains', 160, 150, 1], ['bird', 100, 56], ['fish', 84, 168, .8], ['butterfly', 240, 94, .9], ['cloud', 250, 46, .8]], '산과 강, 동물이 모두 자연이에요']
-          ]
-        },
-        {
-          word: 'respect', pos: 'verb', en: 'To treat someone with care and honor', ko: '존중하다',
-          art: [
-            ['meadow', [['kidStand', 104, 156, .85, '#8fc9ff', {}], ['kidStand', 216, 156, .85, '#ffb3c7', {}], ['heart', 160, 58, 1.1], ['sparkle', 160, 104, .7]], '서로를 소중히 여겨요'],
-            ['indoor', [['kidStand', 108, 158, .8, '#ffd166', {}], ['heart', 206, 86, 1.4], ['bubble', 214, 146, .8, '#ffffff', false], ['check', 214, 146, 1]], '고맙다고 인사해요']
-          ]
-        },
-        {
-          word: 'responsible', pos: 'adjective', en: 'Doing your jobs well and thinking of others', ko: '책임감 있는',
-          art: [
-            ['room', [['kidStand', 104, 158, .85, '#8fc9ff', {}], ['clipboard', 204, 116, 1.2], ['check', 258, 82, 1], ['clock', 276, 48, .9]], '맡은 일을 스스로 해요'],
-            ['indoor', [['bin', 108, 140, 1.1, '#6cc08b'], ['ball', 92, 106, .7, '#ffd166'], ['kidStand', 202, 158, .85, '#ffb3c7', {}], ['check', 262, 86, 1]], '장난감을 스스로 정리했어요']
-          ]
-        }
-      ]
-    }
-  ];
 
   /* =========================================================================
      Homework pack — 7-3 Spelling List, Test Date: November 26th, 2026
@@ -5165,7 +5688,6 @@
 
   /* The order below is the order the Home screen shows them in. */
   const PACKS = [buildGradePack(NOV26_DEF), buildSciencePack(NOV23_DEF), { id: '261120', label: '261120', short: '261120', emoji: '📸', words: BUILTIN }]
-    .concat(GRADE_PACK_DEFS.map(buildGradePack))
     .concat(MIDDLE_PACK_DEFS.map(buildGradePack))
     .concat(HIGH_PACK_DEFS.map(buildGradePack))
     .concat(TOEIC_PACK_DEFS.map(buildGradePack))
@@ -5202,6 +5724,79 @@
     return null;
   }
 
+  /* =========================================================================
+     초등단어 — 교육부 기본 어휘 800단어 (data/elem.json)
+     The six grade packs are big (~132–144 words each), so they are not baked
+     into this file: they are fetched once, in the background, and each grade
+     is split into Days of twelve words for Learn and Test.
+     ========================================================================= */
+  const ELEM_URL = 'data/elem.json';
+  const WORDS_PER_DAY = 12;
+  const elemLoad = { state: 'idle', note: '' };
+
+  function buildElemPack(g) {
+    return {
+      id: g.id,
+      label: g.label,
+      short: g.short || g.label,
+      emoji: g.emoji,
+      words: (g.words || []).map((w, i) => ({
+        id: g.id + '-' + String(w.word).replace(/[^a-z0-9]+/gi, '-').toLowerCase(),
+        builtin: true, pack: g.id, order: i + 1,
+        day: w.day || 1,
+        word: w.word, pos: w.pos, en: w.en, ko: w.ko,
+        fruit: FRUITS[i % FRUITS.length],
+        scenes: (w.scenes || []).map(sc => artScene(sc.bg, sc.parts, sc.cap))
+      }))
+    };
+  }
+
+  function loadElemPacks() {
+    if (elemLoad.state !== 'idle') return;
+    elemLoad.state = 'loading';
+    if (currentCategory().id === 'elem') renderHome();
+    fetch(ELEM_URL, { cache: 'force-cache' })
+      .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(data => {
+        const packs = (data.grades || []).map(buildElemPack);
+        packs.forEach(pk => PACKS.push(pk));
+        elemLoad.state = 'ready';
+        const cat = currentCategory();
+        if (cat && cat.id === 'elem' && (state.packId.indexOf('g') !== 0 || !packById(state.packId))) {
+          state.packId = cat.packs[0];
+          state.day = 1;
+          savePack(); saveDay();
+        }
+        renderHome();
+      })
+      .catch(err => {
+        elemLoad.state = 'error';
+        elemLoad.note = (err && err.message) || '불러오기 실패';
+        renderHome();
+        toast('초등 단어를 불러오지 못했어요. 잠시 뒤 다시 열어 주세요');
+      });
+  }
+
+  function elemReady() { return elemLoad.state === 'ready'; }
+
+  /* ---------- Days ---------- */
+  function dayTotal(pack) {
+    if (!pack || !pack.words.length) return 1;
+    let last = 1;
+    pack.words.forEach(w => { if (w.day && w.day > last) last = w.day; });
+    return Math.max(1, last);
+  }
+  function hasDays(pack) { return !!pack && pack.words.length > 15 && dayTotal(pack) > 1; }
+  function dayOfWord(pack, w) {
+    if (w.day) return w.day;
+    return Math.floor(pack.words.indexOf(w) / WORDS_PER_DAY) + 1;
+  }
+  function packDayWords(pack, day) {
+    if (!hasDays(pack)) return pack.words;
+    const d = clamp(day || 1, 1, dayTotal(pack));
+    return pack.words.filter(w => dayOfWord(pack, w) === d);
+  }
+
   const CUSTOM_EMOJI = ['✏️','📚','🍎','🐶','🚗','⭐','☀️','🌳','🏠','🎈','🍰','🐱','🚌','🌸','⚽','🦋','🐟','🎵'];
 
   function emojiSceneHTML(emoji) {
@@ -5211,6 +5806,7 @@
   /* ------------------------- state ------------------------- */
   const K_PACK = 'wg_pack_v1';
   const K_CAT = 'wg_cat_v1';
+  const K_DAY = 'wg_day_v1';
   const DEFAULT_PACK = '261126';
 
   /* older devices saved a pack name, not a yymmdd id */
@@ -5219,6 +5815,7 @@
   const state = {
     packId: DEFAULT_PACK,    // the pack picked on Home
     catId: 'homework',       // the big category picked on Home
+    day: 1,                  // which Day of a big pack is being studied
     custom: [],              // custom word records
     stickers: {},            // { wordId: {word, fruit, at, count} }
     score: 0,
@@ -5251,6 +5848,9 @@
     if (cat && cat.packs.length && cat.packs.indexOf(saved) === -1) saved = cat.packs[0];
     state.catId = savedCat;
     state.packId = saved;
+    const savedDays = store.get(K_DAY, {});
+    const d = (savedDays && typeof savedDays === 'object') ? Number(savedDays[saved]) : 1;
+    state.day = Number.isFinite(d) && d > 0 ? Math.floor(d) : 1;
     const c = store.get(K_WORDS, []);
     state.custom = Array.isArray(c) ? c.filter(w => w && w.word) : [];
     const s = store.get(K_STICKERS, {});
@@ -5262,6 +5862,12 @@
   function saveStickers() { store.set(K_STICKERS, state.stickers); }
   function saveScore() { store.set(K_SCORE, state.score); }
   function savePack() { store.set(K_PACK, state.packId); }
+  function saveDay() {
+    const all = store.get(K_DAY, {});
+    const map = (all && typeof all === 'object' && !Array.isArray(all)) ? all : {};
+    map[state.packId] = state.day;
+    store.set(K_DAY, map);
+  }
   function saveCat() { store.set(K_CAT, state.catId); }
 
   function currentCategory() {
@@ -5297,11 +5903,20 @@
     return out.concat(customWords());
   }
 
-  /* what the child is studying now: the picked pack, plus their own words */
+  /* what the child is studying now: the picked pack (or its Day), plus their own words */
   function activeWords() {
     const cat = currentCategory();
     if (!cat.packs.length) return [];   // a category with no pack yet has nothing to study
-    return currentPack().words.concat(customWords());
+    const pack = currentPack();
+    if (!pack) return [];
+    return packDayWords(pack, state.day).concat(customWords());
+  }
+
+  /* the words of the Day only, for counts and the Day picker */
+  function studyWords() {
+    const pack = currentPack();
+    if (!pack) return [];
+    return packDayWords(pack, state.day);
   }
 
   function freeFruit(word, used) {
@@ -5321,6 +5936,10 @@
   function go(name) {
     if ((name === 'learn' || name === 'test') && !activeWords().length) {
       const cat = currentCategory();
+      if (cat.id === 'elem' && !elemReady()) {
+        toast(elemLoad.state === 'error' ? '초등 단어를 불러오지 못했어요' : '초등 단어를 불러오는 중이에요');
+        return;
+      }
       toast(cat.soon || '이 팩에는 아직 단어가 없어요');
       return;
     }
@@ -5374,9 +5993,13 @@
     });
 
     const soon = $('#soonBox');
+    const waiting = cat.id === 'elem' && !elemReady();
     if (soon) {
       soon.classList.toggle('show', !list.length);
-      $$('.soon-text', soon).forEach(t => { t.textContent = cat.soon || '단어 팩을 준비하고 있어요'; });
+      const soonMsg = waiting
+        ? (elemLoad.state === 'error' ? '초등 단어를 불러오지 못했어요' : '초등 단어를 불러오는 중이에요…')
+        : (cat.soon || '단어 팩을 준비하고 있어요');
+      $$('.soon-text', soon).forEach(t => { t.textContent = soonMsg; });
       $$('.soon-emoji', soon).forEach(t => { t.textContent = cat.emoji; });
     }
     const head = $('#packHeadTitle');
@@ -5393,6 +6016,49 @@
       const pill = on.getBoundingClientRect();
       box.scrollLeft += (pill.left - strip.left) - (box.clientWidth - pill.width) / 2;
     }
+    renderDayPicker();
+  }
+
+  /* ---------- Day picker: only for packs with more than fifteen words ---------- */
+  function renderDayPicker() {
+    const box = $('#dayBox');
+    const strip = $('#dayScroll');
+    if (!box || !strip) return;
+    const pack = currentPack();
+    const total = hasDays(pack) ? dayTotal(pack) : 1;
+    box.hidden = total < 2;
+    if (total < 2) { strip.innerHTML = ''; return; }
+    state.day = clamp(state.day, 1, total);
+    strip.innerHTML = '';
+    for (let d = 1; d <= total; d++) {
+      const on = d === state.day;
+      const b = el('button', 'day-pill' + (on ? ' on' : ''));
+      b.type = 'button';
+      b.dataset.day = d;
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      b.innerHTML = '<b>Day ' + d + '</b><i>' + packDayWords(pack, d).length + '</i>';
+      strip.appendChild(b);
+    }
+    const hint = $('#dayHint');
+    if (hint) hint.textContent = '하루 ' + WORDS_PER_DAY + '단어 · 모두 ' + total + '일';
+    const on = $('.day-pill.on', strip);
+    if (on) {
+      const outer = strip.getBoundingClientRect();
+      const pill = on.getBoundingClientRect();
+      strip.scrollLeft += (pill.left - outer.left) - (outer.clientWidth - pill.width) / 2;
+    }
+  }
+
+  function selectDay(day) {
+    const pack = currentPack();
+    const total = hasDays(pack) ? dayTotal(pack) : 1;
+    const d = clamp(Number(day) || 1, 1, total);
+    if (d === state.day) return;
+    state.day = d;
+    saveDay();
+    resetRound();
+    sfx.pick();
+    renderHome();
   }
 
   /* while the app is open, a category remembers the pack last opened in it */
@@ -5410,7 +6076,8 @@
     const cat = categoryById(id);
     if (!cat || id === state.catId) return;
     state.catId = id;
-    saveCat();
+    state.day = 1;
+    saveCat(); saveDay();
     if (cat.packs.length) {
       const remembered = lastPackByCat[cat.id];
       state.packId = (remembered && cat.packs.indexOf(remembered) !== -1) ? remembered : cat.packs[0];
@@ -5425,8 +6092,9 @@
   function selectPack(id) {
     if (!packById(id) || id === state.packId) return;
     state.packId = id;
+    state.day = 1;
     lastPackByCat[state.catId] = id;
-    savePack();
+    savePack(); saveDay();
     resetRound();
     sfx.pick();
     renderHome();
@@ -5435,9 +6103,11 @@
   function renderHome() {
     refreshChrome();
     const cat = currentCategory();
-    const words = activeWords();
     const cur = currentPack();
-    const empty = !cat.packs.length;
+    const loading = cat.id === 'elem' && !elemReady();
+    const empty = !cat.packs.length || loading;
+    const dayWords = loading ? [] : studyWords();
+    const words = loading ? [] : activeWords();
     const pack = $('#homePack');
     pack.innerHTML = '';
     words.slice(0, 8).forEach(w => {
@@ -5450,9 +6120,18 @@
       c.textContent = '+' + (words.length - 8);
       pack.appendChild(c);
     }
-    const tag = empty
-      ? cat.emoji + ' ' + cat.label + ' · 준비 중이에요'
-      : cat.emoji + ' ' + cat.label + ' · ' + (cur.short || cur.label) + ' · 단어 ' + words.length + '개';
+    let tag;
+    if (loading) {
+      tag = cat.emoji + ' ' + cat.label + ' · ' + (elemLoad.state === 'error' ? '불러오지 못했어요' : '단어를 불러오는 중…');
+    } else if (!cat.packs.length) {
+      tag = cat.emoji + ' ' + cat.label + ' · 준비 중이에요';
+    } else {
+      const days = hasDays(cur) ? dayTotal(cur) : 0;
+      tag = cat.emoji + ' ' + cat.label + ' · ' + (cur.short || cur.label)
+        + (days ? ' · Day ' + clamp(state.day, 1, days) : '')
+        + ' · 단어 ' + dayWords.length + '개'
+        + (days > 1 ? ' (전체 ' + cur.words.length + '개)' : '');
+    }
     $('#homeTag').textContent = tag;
     $('#homeStickerDesc').textContent = '모은 과일 ' + Object.keys(state.stickers).length + '개';
     renderCategoryPicker();
@@ -5481,7 +6160,10 @@
 
     $('#learnPos').textContent = w.pos;
     $('#learnWord').textContent = w.word;
-    $('#learnSub').textContent = currentPack().emoji + ' ' + currentPack().label + ' · ' + (state.learnIndex + 1) + '/' + learnWords.length;
+    const lp = currentPack();
+    $('#learnSub').textContent = lp.emoji + ' ' + lp.label
+      + (hasDays(lp) ? ' · Day ' + clamp(state.day, 1, dayTotal(lp)) : '')
+      + ' · ' + (state.learnIndex + 1) + '/' + learnWords.length;
     $('#learnEn').textContent = w.en || '(영어 뜻을 넣어 주세요)';
     $('#learnKo').textContent = w.ko || '(한글 뜻을 넣어 주세요)';
     $('#learnKo').hidden = true;
@@ -6014,6 +6696,15 @@
     }
 
     // pack selector
+    const dayScroll = $('#dayScroll');
+    if (dayScroll) {
+      dayScroll.addEventListener('click', (ev) => {
+        const b = ev.target.closest('.day-pill');
+        if (!b) return;
+        selectDay(Number(b.dataset.day));
+      });
+    }
+
     const packScroll = $('#packScroll');
     if (packScroll) {
       packScroll.addEventListener('click', (ev) => {
@@ -6155,6 +6846,7 @@
     wire();
     renderHome();
     refreshChrome();
+    loadElemPacks();
 
     // no horizontal scroll, ever: keep the viewport honest on late layout
     document.documentElement.style.overflowX = 'hidden';

@@ -26,7 +26,13 @@ Open `index.html` (or the GitHub Pages URL) on a phone or tablet.
 
 `📝 261123` is the Jupiter Class November theme quiz (test date 11월 23일): Volcano, Magma, Lava, Ozone, Evaporation, Pollution, Oxygen, Conserve, Carbon Dioxide, Greenhouse Gas, in sheet order. It sits first in the pack strip and is the pack a device shows until another one is picked. Its twenty pictures are drawn by their own set of helpers (`sciSvg`, `sciBack`, `sciSmoke`, `sciSub`, `sciMol`, `sciTag`, plus the `SCI` scene table) because the science words that look alike on paper — magma/lava, ozone/oxygen, carbon dioxide/greenhouse gas — need two clearly different situations each. Gas formulas (`O₃`, `O₂`, `CO₂`) are drawn as separate `text` runs with an explicit subscript, not as a translatable word.
 
-`📸 오늘의 단어장` is the environment unit (Reduce ~ Waste). The six grade packs follow the 2022 revised curriculum elementary vocabulary, ten words each: 초1 기초 (apple ~ happy), 초2 일상 (run ~ school), 초3 필수 (animal ~ smile), 초4 필수 (arrive ~ weather), 초5 심화 (agree ~ wonder), 초6 심화 (achieve ~ responsible). English starts in grade 3 in the curriculum, so the 초1·초2 packs draw their words from the foundational, everyday part of that list.
+`📸 오늘의 단어장` is the environment unit (Reduce ~ Waste).
+
+`🌱 초등단어` now carries the whole 교육부 elementary vocabulary list: **800 words** from 교육부 고시 제2022-33호 [별책 14] 영어과 교육과정 [별표 3] 어휘 — the asterisked (`*`) 초등학교 권장 어휘 (the list also prints 1,200 `**` middle/high words and 1,000 unmarked ones; only the 800 `*` words are used here). The six grades split it up by difficulty: 초1·초2 hold the concrete everyday words, 초3·초4 the school, town, sports and health words, 초5·초6 the abstract nouns, school subjects and function words (above, because, however, myself …). Sixteen words that the packs already had but that are not on the 800 list (share, healthy, compare, practice, useful, wonder, achieve, balance, challenge, curious, describe, express, improve, respect, responsible, explain) are kept as they were, so the category holds 816 words.
+
+Every grade keeps its original ten hand-drawn words as **Day 1** (apple ~ happy, run ~ school, animal ~ smile, arrive ~ weather, agree ~ wonder, achieve ~ responsible), so the pictures that were already there and the stickers children collected still match. The rest follows in Days of twelve words: 초1–초4 have 11 Days (132 words each), 초5–초6 have 12 Days (144 words each). A Day row under the pack strip picks the twelve words that Learn Stage and Test Stage use, so a Test round stays a clean 3 × 4 words instead of 48 chips. Packs of 15 words or fewer (숙제단어, 중등단어, 고등단어, 토익단어, 여행단어) have no Day row and behave exactly as before.
+
+Because 816 words would bloat a single file, the elementary packs live in `data/elem.json` (about 350 KB) and are fetched once, in the background, the first time the page opens; `index.html` keeps the homework pack inline so `261126` still renders instantly. The Day is remembered per pack in `localStorage` (`wg_day_v1`).
 
 `📘 중등단어` (중1·중2·중3) and `🎓 고등단어` (고1·고2·고3) add thirty words each, ten per grade, drawn from the 2022 revised English curriculum vocabulary range for middle and high school and ordered by difficulty (adventure ~ prepare, achieve ~ honest, analyze ~ perspective, anticipate ~ verify, ambiguous ~ prevalent, alleviate ~ skeptical). Each grade pack is labelled with its short name in the strip (`중1`) and its theme in the hero (`중1 필수`).
 
@@ -46,7 +52,7 @@ Open `index.html` (or the GitHub Pages URL) on a phone or tablet.
 - `쇼핑` — receipt ~ bargain.
 - `응급` — pharmacy ~ police.
 
-Every word carries two inline SVG scenes, built from a shared set of flat-shape pieces (`artBg`, the `G` glyph library and `artScene`) so all 252 words stay crisp at phone size without external files. The business and travel pictures add their own pieces (`BIZ_KIT`: desk, laptop, contract, stamp, handshake, briefcase, truck, cargo ship, warehouse, gavel … and `TRAVEL_KIT`: passport, boarding pass, train, turnstile, key card, menu, receipt, curtain, pharmacy sign, embassy …), merged into `G` with `Object.assign` so one art description can name any piece.
+Every word carries two inline SVG scenes, built from a shared set of flat-shape pieces (`artBg`, the `G` glyph library and `artScene`) so all 1,068 words stay crisp at phone size without external files. The elementary pictures add their own family of builders (`ELEM_KIT`): one `critter` draws twenty-one four-legged animals from a parameter table, and `birdie`, `seabuddy`, `buggy`, `lizard`, `food2`, `wear`, `furni`, `bod`, `place2`, `ride`, `sportkit`, `music2`, `worker`, `pose`, `where2`, `nature2`, `tool2` and `shape` do the same for their own families. Inside one Day no two words may share a picture, otherwise the three-row picture match could not be solved, so the build checks that every Day's twelve pictures (both scenes) are distinct. The business and travel pictures add their own pieces (`BIZ_KIT`: desk, laptop, contract, stamp, handshake, briefcase, truck, cargo ship, warehouse, gavel … and `TRAVEL_KIT`: passport, boarding pass, train, turnstile, key card, menu, receipt, curtain, pharmacy sign, embassy …), merged into `G` with `Object.assign` so one art description can name any piece.
 
 ## The environment unit (📸 오늘의 단어장)
 
@@ -73,3 +79,14 @@ Every word carries two hand-drawn inline SVG scenes.
 - A word with no English definition never falls back to its Korean meaning on a 뜻 card; the card shows `한 버튼을 눌러 뜻을 봐요` and the Korean stays behind the 한 button.
 - `tl-ko` and `#learnKo` are hidden with the `hidden` attribute, `display:none !important` in CSS, and a state flag (`koOpen` / `showKo`) that resets on every new round, pack change and shuffle.
 - `#sceneCap` is Korean too (e.g. `다 쓴 유리병을 연필꽂이로 다시 써요`), so it lives under `#learnKo` in `.ko-row` and follows the same `showKo` flag: before `한글 뜻 보기` is pressed the back shows only the picture, the English definition and the button. Empty captions stay hidden even after the button is pressed.
+
+
+## Building the elementary packs
+
+The word data and the pictures are generated, not hand-copied into the page:
+
+- `build/elem_data.py` — the 816 words (word, part of speech, English meaning, Korean meaning, and a picture recipe of the form `background|piece@x,y,scale,name@…`).
+- `build/04-elem-kit.js` … `build/10-elem-misc.js` — the elementary picture kit, inserted into `index.html` by `build/assemble_elem.py`.
+- `build/build_elem.py` — writes `data/elem.json`, checking every word against the official 800 list and reporting anything missing or repeated.
+- `build/check_elem.py` — runs the page's own script headless (quickjs), draws every scene and fails if a scene is malformed, a Day holds fewer than 10 or more than 12 words, or two words in one Day look the same.
+- `build/elem_sheet.py g3 5 1` — renders one Day as a PNG contact sheet so the pictures can be looked at.
