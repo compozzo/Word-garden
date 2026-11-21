@@ -530,6 +530,28 @@
     color:var(--ink-soft);letter-spacing:-.3px;white-space:nowrap;
   }
   .seg button.on{background:#fff;color:#2f7a52;box-shadow:var(--shadow-sm)}
+  /* ---------- difficulty / scope pills inside a game ---------- */
+  .scope-select{margin-top:-4px;min-width:0}
+  .scope-scroll{
+    display:flex;gap:5px;overflow-x:auto;padding:1px 2px 5px;max-width:100%;
+    scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+  }
+  .scope-scroll::-webkit-scrollbar{display:none}
+  .scope-pill{
+    flex:0 0 auto;display:flex;align-items:center;gap:4px;
+    padding:6px 10px;border-radius:999px;background:#fff;border:1.5px solid var(--line);
+    box-shadow:var(--shadow-sm);font-size:11.5px;font-weight:800;color:var(--ink-soft);
+    scroll-snap-align:start;white-space:nowrap;line-height:1.1;
+  }
+  .scope-pill .em{font-size:12px;line-height:1}
+  .scope-pill .nm{letter-spacing:-.3px}
+  .scope-pill .ct{font-size:9.5px;font-weight:900;color:var(--ink-faint);background:#f1f6fa;border-radius:999px;padding:1px 5px}
+  .scope-pill.on{
+    background:linear-gradient(120deg,#eaf3ff,#f2fdf6);border-color:#a5c7e8;color:#2c6089;
+    box-shadow:0 5px 12px rgba(92,146,200,.16);
+  }
+  .scope-pill.on .ct{background:#dbeafe;color:#2c6089}
+  .scope-pill.loading{opacity:.55}
   .btn-row{display:flex;gap:8px}
   .btn{flex:1;padding:12px 8px;border-radius:14px;font-size:13.5px;font-weight:900;letter-spacing:-.2px}
   .btn.go{background:linear-gradient(120deg,#5cbf83,#3f9e63);color:#fff;box-shadow:0 6px 14px rgba(63,158,99,.26)}
@@ -831,6 +853,10 @@
       <button type="button" data-mode="type">주관식 (직접 입력)</button>
     </div>
 
+    <div class="scope-select" id="storyScopeBox">
+      <div class="scope-scroll" id="storyScope"></div>
+    </div>
+
     <div class="game-card">
       <div class="story-text game-en notranslate" id="storyText" translate="no"></div>
       <div class="choices game-en" id="storyChoices" translate="no"></div>
@@ -905,6 +931,10 @@
     <div class="seg" id="hangMode">
       <button type="button" data-hmode="ai" class="on">🤖 자동 출제</button>
       <button type="button" data-hmode="two">👥 2인 대결</button>
+    </div>
+
+    <div class="scope-select" id="hangScopeBox">
+      <div class="scope-scroll" id="hangScope"></div>
     </div>
 
     <div class="game-card" id="hangSetup" hidden>
@@ -5948,11 +5978,16 @@
   }
 
   /* ---- the two background fetches ---- */
+  /* Returns a promise that settles when the file is in PACKS (true) or has
+     failed (false); a second caller while it is in flight gets the same
+     promise instead of a second request. */
   function loadWordFile(url, listKey, bucket, catId) {
-    if (bucket.state !== 'idle') return;
+    if (bucket.state === 'ready') return Promise.resolve(true);
+    if (bucket.state === 'loading' && bucket.promise) return bucket.promise;
     bucket.state = 'loading';
+    bucket.note = '';
     if (currentCategory().id === catId) renderHome();
-    fetch(url)   // default cache mode: revalidate, so a new word list is picked up
+    bucket.promise = fetch(url)   // default cache mode: revalidate, so a new word list is picked up
       .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(data => {
         (data[listKey] || []).map(buildJsonPack).forEach(pk => {
@@ -5962,6 +5997,7 @@
           if (at >= 0) PACKS[at] = pk; else PACKS.push(pk);
         });
         bucket.state = 'ready';
+        bucket.promise = null;
         const cat = currentCategory();
         if (cat && cat.id === catId && !packById(state.packId)) {
           state.packId = cat.packs[0];
@@ -5969,17 +6005,27 @@
           savePack(); saveDay();
         }
         renderHome();
+        refreshScopeStrips();
+        return true;
       })
       .catch(err => {
         bucket.state = 'error';
+        bucket.promise = null;
         bucket.note = (err && err.message) || '불러오기 실패';
         renderHome();
+        refreshScopeStrips();
         toast((catId === 'elem' ? '초등' : '토익') + ' 단어를 불러오지 못했어요. 잠시 뒤 다시 열어 주세요');
+        return false;
       });
+    return bucket.promise;
   }
 
   function loadElemPacks() { loadWordFile(ELEM_URL, 'grades', elemLoad, 'elem'); }
   function loadToeicPacks() { loadWordFile(TOEIC_URL, 'packs', toeicLoad, 'toeic'); }
+
+  /* await-able versions: a scope that needs a big file calls these first */
+  function ensureElemLoaded() { return loadWordFile(ELEM_URL, 'grades', elemLoad, 'elem'); }
+  function ensureToeicLoaded() { return loadWordFile(TOEIC_URL, 'packs', toeicLoad, 'toeic'); }
 
   function elemReady() { return elemLoad.state === 'ready'; }
 
@@ -7348,6 +7394,143 @@
   }
 
   /* =========================================================================
+     🎚️ 난이도·범위 — 이야기 빈칸 and 단어 추리 each draw from one chosen scope
+     현재 팩 keeps the old behaviour (the picked pack or its Day, plus the
+     parent's own words) and is the default; the rest reach across packs and
+     wait for data/elem.json · data/toeic.json when they are not in memory yet.
+     ========================================================================= */
+  const K_STORY_SCOPE = 'wg_story_scope_v1';
+  const K_HM_SCOPE = 'wg_hm_scope_v1';
+
+  const SCOPES = [
+    { id: 'pack', label: '현재 팩', em: '📦' },
+    { id: 'elem', label: '초등 전체', em: '🌱' },
+    { id: 'mid', label: '중등 이하', em: '📘' },
+    { id: 'high', label: '고등 이하', em: '🎓' },
+    { id: 'toeic', label: '토익 600 이하', em: '💼' },
+    { id: 'all', label: '전체', em: '🌈' }
+  ];
+
+  function scopeById(id) {
+    for (let i = 0; i < SCOPES.length; i++) if (SCOPES[i].id === id) return SCOPES[i];
+    return SCOPES[0];
+  }
+  let scopeCountCache = {};
+  function savedScope(key) {
+    const v = store.get(key, 'pack');
+    return scopeById(typeof v === 'string' ? v : 'pack').id;
+  }
+  /* which game has which scope picked (각 게임 따로 기억) */
+  const SCOPE_SEL = { story: savedScope(K_STORY_SCOPE), hang: savedScope(K_HM_SCOPE) };
+
+  /* the Home categories a scope spans; 토익 600 이하 is 베이직 + 600 only */
+  function scopeCatIds(scopeId) {
+    if (scopeId === 'elem') return ['elem'];
+    if (scopeId === 'mid') return ['elem', 'mid'];
+    if (scopeId === 'high') return ['elem', 'mid', 'high'];
+    if (scopeId === 'toeic') return ['toeic'];
+    return [];
+  }
+  function scopePacks(scopeId) {
+    if (scopeId === 'all') return PACKS.slice();
+    const ids = [];
+    scopeCatIds(scopeId).forEach(cid => {
+      const cat = categoryById(cid);
+      if (!cat) return;
+      (cid === 'toeic' ? ['toeic1', 'toeic2'] : cat.packs).forEach(id => {
+        if (ids.indexOf(id) === -1) ids.push(id);
+      });
+    });
+    return ids.map(packById).filter(Boolean);
+  }
+  /* one entry per spelled word: 전체 mixes packs that share one (bill, delay) */
+  function uniqWords(list) {
+    const seen = {};
+    return (list || []).filter(w => {
+      const k = wgSquash(w && w.word) || wgNorm(w && w.word);
+      if (!k || seen[k]) return false;
+      seen[k] = 1;
+      return true;
+    });
+  }
+  function scopeWords(scopeId) {
+    if (!scopeId || scopeId === 'pack') return uniqWords(activeWords());
+    let out = [];
+    scopePacks(scopeId).forEach(p => { out = out.concat(p.words || []); });
+    if (scopeId === 'all') out = out.concat(customWords());
+    return uniqWords(out);
+  }
+  function scopeCount(scopeId) {
+    /* counts are rebuilt per pack/custom change, so a pill render stays cheap */
+    const key = scopeId + '|' + state.packId + '|' + state.day + '|' + state.custom.length + '|' + PACKS.length;
+    if (scopeCountCache[key] == null) scopeCountCache[key] = scopeWords(scopeId).length;
+    return scopeCountCache[key];
+  }
+  function scopeLabel(scopeId) { return scopeById(scopeId).label; }
+
+  /* the big word files a scope needs before it can be played */
+  function scopeNeeds(scopeId) {
+    const need = [];
+    if (scopeId === 'elem' || scopeId === 'mid' || scopeId === 'high' || scopeId === 'all') need.push('elem');
+    if (scopeId === 'toeic' || scopeId === 'all') need.push('toeic');
+    return need;
+  }
+  function scopeBucket(name) { return name === 'elem' ? elemLoad : toeicLoad; }
+  function scopeReady(scopeId) {
+    return scopeNeeds(scopeId).every(n => scopeBucket(n).state === 'ready');
+  }
+  function scopeWait(scopeId) {
+    return Promise.all(scopeNeeds(scopeId).map(n => loadWordFile(
+      n === 'elem' ? ELEM_URL : TOEIC_URL,
+      n === 'elem' ? 'grades' : 'packs',
+      scopeBucket(n), n)))
+      .then(ok => ok.every(Boolean));
+  }
+  function scopeLoadingNote(scopeId) {
+    return scopeNeeds(scopeId).map(n => (n === 'elem' ? '초등' : '토익')).join(' · ') + ' 단어를 불러오는 중…';
+  }
+  function screenActive(id) {
+    const s = $('#scr-' + id);
+    return !!(s && s.classList.contains('active'));
+  }
+
+  /* one pill bar, shared by both games; the picked pill is scrolled into sight */
+  function renderScopeStrip(boxSel, scopeId) {
+    const box = $(boxSel);
+    if (!box) return;
+    box.innerHTML = '';
+    SCOPES.forEach(sc => {
+      const on = sc.id === scopeId;
+      const n = scopeCount(sc.id);
+      const b = el('button', 'scope-pill' + (on ? ' on' : ''));
+      b.type = 'button';
+      b.dataset.scope = sc.id;
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      b.innerHTML = '<span class="em">' + sc.em + '</span>'
+        + '<span class="nm">' + escapeHTML(sc.label) + '</span>'
+        + '<span class="ct">' + (n || '…') + '</span>';
+      box.appendChild(b);
+    });
+    const on = $('.scope-pill.on', box);
+    if (on) {
+      try {
+        const strip = box.getBoundingClientRect();
+        const pill = on.getBoundingClientRect();
+        box.scrollLeft += (pill.left - strip.left) - (box.clientWidth - pill.width) / 2;
+      } catch (e) {}
+    }
+  }
+
+  /* called when a big word file arrives late, so the counts fill in */
+  function refreshScopeStrips() {
+    scopeCountCache = {};
+    try {
+      renderStoryScope();
+      renderHangScope();
+    } catch (e) { /* the game sections may not be built yet during boot */ }
+  }
+
+  /* =========================================================================
      1) 🔁 자동 복습미션 — 간격 반복
      ========================================================================= */
   const K_SRS = 'wg_srs_v1';
@@ -7514,7 +7697,7 @@
   /* =========================================================================
      2) 📖 이야기 빈칸 — 객관식 / 주관식
      ========================================================================= */
-  const STORY = { list: [], i: 0, mode: 'choice', ok: 0, state: 'ask', picked: '' };
+  const STORY = { list: [], pool: [], i: 0, mode: 'choice', ok: 0, state: 'ask', picked: '', req: 0 };
 
   function cleanDef(en) {
     let d = String(en || '').trim();
@@ -7523,30 +7706,141 @@
     if (d.charAt(d.length - 1) === '.') d = d.slice(0, -1);
     return d;
   }
+  /* does the sentence itself speak the answer? (a leak for a blank) */
+  function wgHasWord(text, word) {
+    const k = wgNorm(word);
+    if (!k) return false;
+    const t = ' ' + (wgNorm(text) || '') + ' ';
+    return t.indexOf(' ' + k + ' ') !== -1
+      || t.indexOf(' ' + k + 's ') !== -1
+      || t.indexOf(' ' + k + 'es ') !== -1;
+  }
+  /* a word the story can put in a blank: spelled out, not a single letter */
+  function wgClueWord(w) {
+    return !!w && wgWordy(w);
+  }
+  /* the category a riddle can name; 'other' words (the, of, one …) have none */
+  function hangTopic(w) {
+    const row = STORY_BANK[wgNorm(w && w.word)];
+    if (row && row[1]) return row[1];
+    if (!w || (w.pos || '') === 'other') return '낱말';
+    return wgPos(w.pos);
+  }
   function fallbackStory(w) {
     const key = wgNorm(w.word);
     let d = cleanDef(w.en);
-    if (d && key.length > 3 && d.indexOf(key) !== -1) d = '';   /* 뜻 안에 답이 있으면 빼요 */
-    const tail = d ? ' It means "' + d + '".' : '';
-    if (w.pos === 'verb') return 'In the picture, someone is about to [____].' + tail;
-    if (w.pos === 'adjective') return 'Look at the picture. The thing looks [____].' + tail;
-    return 'The picture shows one thing. The word for it is [____].' + tail;
+    if (d && wgHasWord(d, key)) d = '';   /* 뜻 안에 답이 있으면 빼요 */
+    /* neither the sentence nor the way it shows the meaning may say the answer */
+    const tails = d ? [' It means "' + d + '".', ' (' + d + ')'] : [''];
+    const heads = w.pos === 'verb'
+      ? ['In the picture, someone is about to [____].',
+         'Someone in this scene is going to [____].',
+         'The job here is going to [____].']
+      : w.pos === 'adjective'
+        ? ['Look at the picture. The thing looks [____].',
+           'The thing in this scene looks [____].',
+           'How does it look? It looks [____].']
+        : ['The picture shows one thing. The word for it is [____].',
+           'This scene shows one thing. The word is [____].',
+           'Here it is: [____].',
+           'Complete: [____].'];
+    for (let i = 0; i < heads.length; i++) {
+      for (let t = 0; t < tails.length; t++) {
+        const cand = heads[i] + tails[t];
+        if (!wgHasWord(cand, key)) return cand;
+      }
+    }
+    return '[____].' + (d ? ' (' + d + ')' : '');
   }
+
   function storyEntry(w) {
     const row = STORY_BANK[wgNorm(w.word)];
     if (row && row[0]) return { text: row[0], topic: row[1] || '' };
     return { text: fallbackStory(w), topic: '' };
   }
 
+  /* the words the current scope can put on a story card */
+  function storyPool() {
+    return uniqWords(scopeWords(SCOPE_SEL.story).filter(w => wgClueWord(w)));
+  }
+  function storySub() {
+    const sc = SCOPE_SEL.story;
+    if (sc === 'pack') {
+      const pack = currentPack();
+      const days = hasDays(pack) ? ' · Day ' + state.day : '';
+      return (pack ? (pack.short || pack.label) : '') + days + ' · 이야기 속 빈칸';
+    }
+    return scopeLabel(sc) + ' (' + scopeCount(sc) + '단어) · 이야기 속 빈칸';
+  }
+  function renderStoryScope() {
+    const box = $('#storyScopeBox');
+    if (box) box.hidden = false;
+    renderScopeStrip('#storyScope', SCOPE_SEL.story);
+  }
+  function storySetScope(id) {
+    const sc = scopeById(id).id;
+    if (SCOPE_SEL.story === sc) return;
+    SCOPE_SEL.story = sc;
+    store.set(K_STORY_SCOPE, sc);
+    startStory();
+  }
+
   function startStory() {
     if (!guardWords()) { go('home'); return; }
-    const pool = shuffle(activeWords().filter(w => w && w.word && wgWordy(w)));
+    renderStoryScope();
+    const token = (STORY.req = (STORY.req || 0) + 1);
+    const sc = SCOPE_SEL.story;
+    if (!scopeReady(sc)) {
+      /* the elementary or 토익 file is still on its way: say so, then play */
+      $('#storySub').textContent = scopeLoadingNote(sc);
+      const txt = $('#storyText');
+      if (txt) txt.textContent = '단어를 불러오는 중…';
+      $('#storyChoices').innerHTML = '';
+      $('#storyChoices').hidden = true;
+      $('#storyInput').hidden = true;
+      $('#btnStoryCheck').hidden = true;
+      $('#btnStoryHint').hidden = true;
+      $('#btnStoryNext').hidden = true;
+      const pill = $('#storyScope .scope-pill.on');
+      if (pill) pill.classList.add('loading');
+      scopeWait(sc).then((ok) => {
+        if (token !== STORY.req || !screenActive('story')) return;
+        renderStoryScope();
+        if (!ok) {
+          $('#storySub').textContent = '단어를 불러오지 못했어요';
+          if (txt) txt.textContent = '단어를 불러오지 못했어요. 잠시 뒤 다시 열어 주세요';
+          return;
+        }
+        if (SCOPE_SEL.story === sc) beginStory();
+      });
+      return;
+    }
+    beginStory();
+  }
+
+  function beginStory() {
+    const pool = shuffle(storyPool());
+    STORY.pool = pool;
+    if (!pool.length) { storyEmptyPool(); return; }
     STORY.list = pool.slice(0, Math.min(8, pool.length));
     STORY.i = 0; STORY.ok = 0; STORY.state = 'ask';
-    const pack = currentPack();
-    const days = hasDays(pack) ? ' · Day ' + state.day : '';
-    $('#storySub').textContent = (pack ? (pack.short || pack.label) : '') + days + ' · 이야기 속 빈칸';
+    $('#storySub').textContent = storySub();
     renderStory();
+  }
+
+  function storyEmptyPool() {
+    STORY.list = []; STORY.i = 0; STORY.ok = 0; STORY.state = 'finish';
+    $('#storySub').textContent = storySub();
+    $('#storyProg').textContent = '0 / 0';
+    $('#storyText').textContent = '고른 범위에 낼 단어가 없어요';
+    $('#storyChoices').innerHTML = '';
+    $('#storyChoices').hidden = true;
+    $('#storyInput').hidden = true;
+    $('#btnStoryCheck').hidden = true;
+    $('#btnStoryHint').hidden = true;
+    $('#btnStoryNext').hidden = true;
+    bannerShow('#storyBanner', 'plain', '다른 범위를 골라 주세요');
+    toast('이 범위에는 낼 단어가 없어요');
   }
 
   function renderStory() {
@@ -7571,8 +7865,13 @@
     const input = $('#storyInput');
     const checkBtn = $('#btnStoryCheck');
     if (STORY.mode === 'choice') {
-      const others = activeWords().filter(x => x.id !== w.id && wgNorm(x.word) !== wgNorm(w.word) && wgWordy(x));
-      const spare = others.length >= 3 ? others : STORY.list.filter(x => x.id !== w.id);
+      const base = (STORY.pool && STORY.pool.length) ? STORY.pool : storyPool();
+      const key = wgSquash(w.word);
+      const usable = base.filter(x => x && x.word && x.id !== w.id && wgSquash(x.word) !== key && wgClueWord(x));
+      /* 3 distractors from the same scope, same part of speech first */
+      const samePos = usable.filter(x => (x.pos || '') === (w.pos || ''));
+      const spare = samePos.length >= 3 ? samePos
+        : samePos.concat(usable.filter(x => samePos.indexOf(x) === -1));
       const opts = shuffle([w].concat(shuffle(spare).slice(0, 3)));
       wrap.innerHTML = '';
       opts.forEach(o => {
@@ -8310,7 +8609,7 @@
      ========================================================================= */
   const HANG = {
     mode: 'ai', word: '', topic: '', hint: '', riddle: '',
-    letters: {}, chances: 20, over: false, log: [], w: null
+    letters: {}, chances: 20, over: false, log: [], w: null, req: 0
   };
 
   function hangLetters(word) { return (String(word).match(/[a-zA-Z]/g) || []).length; }
@@ -8320,26 +8619,87 @@
   }
   function hangHas(ch) { return Object.prototype.hasOwnProperty.call(HANG.letters, ch); }
   function hangPickPool() {
-    return activeWords().filter(w => {
+    const all = uniqWords(scopeWords(SCOPE_SEL.hang).filter(w => {
       const k = wgNorm(w.word);
-      return k.replace(/[^a-z]/g, '').length >= 3 && /^[a-z' -]+$/.test(k);
-    });
+      return wgClueWord(w) && k.replace(/[^a-z]/g, '').length >= 3 && /^[a-z' -]+$/.test(k);
+    }));
+    /* a riddle needs a category, so a wide scope asks nouns, verbs, adjectives
+       and the bank's hands; a small Day keeps every word it has */
+    const clued = all.filter(w => hangTopic(w) !== '낱말');
+    return clued.length >= 20 ? clued : all;
+  }
+  function hangSub() {
+    const sc = SCOPE_SEL.hang;
+    if (sc === 'pack') return '자동 출제 · 20번의 기회';
+    return '자동 출제 · ' + scopeLabel(sc) + ' (' + scopeCount(sc) + '단어)';
+  }
+  function renderHangScope() {
+    const box = $('#hangScopeBox');
+    const two = HANG.mode === 'two';
+    if (box) box.hidden = two;
+    if (!two) renderScopeStrip('#hangScope', SCOPE_SEL.hang);
+  }
+  function hangSetScope(id) {
+    const sc = scopeById(id).id;
+    if (SCOPE_SEL.hang === sc) return;
+    SCOPE_SEL.hang = sc;
+    store.set(K_HM_SCOPE, sc);
+    if (HANG.mode === 'two') return;
+    hangNewAi();
   }
   function startHang() {
+    renderHangScope();
     if (HANG.mode === 'two') { renderHangSetup(); return; }
     hangNewAi();
   }
   function hangNewAi() {
     if (!guardWords()) { go('home'); return; }
+    renderHangScope();
+    const token = (HANG.req = (HANG.req || 0) + 1);
+    const sc = SCOPE_SEL.hang;
+    if (!scopeReady(sc)) {
+      /* the elementary or 토익 file is still on its way: say so, then play */
+      $('#hangSub').textContent = scopeLoadingNote(sc);
+      const rid = $('#hangRiddle');
+      if (rid) rid.textContent = '단어를 불러오는 중…';
+      $('#hangPlay').hidden = true;
+      $('#hangSetup').hidden = true;
+      $('#btnHangNext').hidden = true;
+      const pill = $('#hangScope .scope-pill.on');
+      if (pill) pill.classList.add('loading');
+      scopeWait(sc).then(ok => {
+        if (token !== HANG.req || !screenActive('hangman') || HANG.mode !== 'ai') return;
+        renderHangScope();
+        if (!ok) {
+          $('#hangSub').textContent = '단어를 불러오지 못했어요';
+          if (rid) rid.textContent = '단어를 불러오지 못했어요. 잠시 뒤 다시 열어 주세요';
+          return;
+        }
+        if (SCOPE_SEL.hang === sc) hangBeginFromPool();
+      });
+      return;
+    }
+    hangBeginFromPool();
+  }
+  function hangBeginFromPool() {
     const pool = hangPickPool();
-    if (!pool.length) { toast('추리할 수 있는 단어가 이 팩에 없어요'); go('home'); return; }
+    $('#hangSub').textContent = hangSub();
+    if (!pool.length) {
+      toast('추리할 수 있는 단어가 이 범위에 없어요');
+      $('#hangSetup').hidden = true;
+      $('#hangPlay').hidden = false;
+      $('#hangRiddle').textContent = '이 범위에는 추리할 단어가 없어요';
+      if ($('#hangBlanks')) $('#hangBlanks').innerHTML = '';
+      if ($('#hangKeys')) { $('#hangKeys').innerHTML = ''; delete $('#hangKeys').dataset.built; }
+      $('#btnHangNext').hidden = true;
+      return;
+    }
     const w = pool[Math.floor(Math.random() * pool.length)];
-    const row = STORY_BANK[wgNorm(w.word)];
-    const topic = (row && row[1]) || wgPos(w.pos);
-    $('#hangSub').textContent = '자동 출제 · 20번의 기회';
+    const topic = hangTopic(w);
     hangBegin(w.word, topic, w, '');
   }
   function renderHangSetup() {
+    renderHangScope();
     $('#hangSetup').hidden = false;
     $('#hangPlay').hidden = true;
     $('#hangSub').textContent = '2인 대결 · 출제자와 풀이자';
@@ -8544,6 +8904,14 @@
     $('#storyMode').addEventListener('click', (ev) => {
       const b = ev.target.closest('button[data-mode]');
       if (b) storySetMode(b.dataset.mode);
+    });
+    if ($('#storyScope')) $('#storyScope').addEventListener('click', (ev) => {
+      const b = ev.target.closest('.scope-pill');
+      if (b && b.dataset.scope) storySetScope(b.dataset.scope);
+    });
+    if ($('#hangScope')) $('#hangScope').addEventListener('click', (ev) => {
+      const b = ev.target.closest('.scope-pill');
+      if (b && b.dataset.scope) hangSetScope(b.dataset.scope);
     });
     $('#storyChoices').addEventListener('click', (ev) => {
       const b = ev.target.closest('.choice');
