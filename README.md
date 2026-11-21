@@ -18,9 +18,11 @@ Open `index.html` (or the GitHub Pages URL) on a phone or tablet.
 
 ## The word packs
 
+`📝 11월 23일 테스트` is the Jupiter Class November theme quiz (test date 11월 23일): Volcano, Magma, Lava, Ozone, Evaporation, Pollution, Oxygen, Conserve, Carbon Dioxide, Greenhouse Gas, in sheet order. It sits first in the pack strip and is the pack a device shows until another one is picked. Its twenty pictures are drawn by their own set of helpers (`sciSvg`, `sciBack`, `sciSmoke`, `sciSub`, `sciMol`, `sciTag`, plus the `SCI` scene table) because the science words that look alike on paper — magma/lava, ozone/oxygen, carbon dioxide/greenhouse gas — need two clearly different situations each. Gas formulas (`O₃`, `O₂`, `CO₂`) are drawn as separate `text` runs with an explicit subscript, not as a translatable word.
+
 `📸 오늘의 단어장` is the environment unit (Reduce ~ Waste). The six grade packs follow the 2022 revised curriculum elementary vocabulary, ten words each: 초1 기초 (apple ~ happy), 초2 일상 (run ~ school), 초3 필수 (animal ~ smile), 초4 필수 (arrive ~ weather), 초5 심화 (agree ~ wonder), 초6 심화 (achieve ~ responsible). English starts in grade 3 in the curriculum, so the 초1·초2 packs draw their words from the foundational, everyday part of that list.
 
-Every word carries two inline SVG scenes, built from a shared set of flat-shape pieces (`artBg`, the `G` glyph library and `artScene`) so all 70 words stay crisp at phone size without external files.
+Every word carries two inline SVG scenes, built from a shared set of flat-shape pieces (`artBg`, the `G` glyph library and `artScene`) so all 70 grade-pack words stay crisp at phone size without external files.
 
 ## The environment unit (📸 오늘의 단어장)
 

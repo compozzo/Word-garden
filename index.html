@@ -2507,6 +2507,589 @@
     }
   ];
 
+  /* =========================================================================
+     Science pack — 11월 23일 테스트 (Jupiter Class, November)
+     화산·지구 내부·대기·물의 순환. Test Stage 에서 서로 닮은 과학 낱말
+     (magma/lava, ozone/oxygen, carbon dioxide/greenhouse gas)이 헷갈리지
+     않도록 단어마다 상황이 다른 그림 두 장을 붙였습니다.
+     학년 팩과 같은 세로 캔버스(320×315)에 그립니다.
+     ========================================================================= */
+  const sciSvg = (inner) =>
+    '<svg viewBox="0 -45 320 315" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" translate="no" aria-hidden="true" focusable="false">' + inner + '</svg>';
+
+  const sciBack = (sky, horizon, ground, opts) => {
+    const o = opts || {};
+    let out = '<rect x="0" y="-45" width="320" height="' + (horizon + 45) + '" fill="' + sky + '"/>';
+    if (o.sun) out += sunBurst(o.sun[0], o.sun[1], o.sun[2] == null ? 16 : o.sun[2], '#ffe27a');
+    (o.clouds || []).forEach(c => { out += cloud(c[0], c[1], c[2] == null ? 1 : c[2]); });
+    out += '<rect x="0" y="' + horizon + '" width="320" height="' + (272 - horizon) + '" fill="' + ground + '"/>';
+    out += '<ellipse cx="160" cy="' + (horizon + 2) + '" rx="176" ry="9" fill="#ffffff" opacity=".18"/>';
+    return out;
+  };
+
+  const sciPuff = (x, y, r, c, o) =>
+    '<circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="' + c + '" opacity="' + (o == null ? .9 : o) + '"/>';
+
+  /* a small cluster of gas puffs */
+  const sciSmoke = (x, y, s, c, o) => {
+    const col = c || '#9aa3ad';
+    const op = o == null ? .9 : o;
+    return '<g transform="translate(' + x + ' ' + y + ') scale(' + (s == null ? 1 : s) + ')">'
+      + '<circle cx="0" cy="0" r="15" fill="' + col + '" opacity="' + op + '"/>'
+      + '<circle cx="-16" cy="8" r="11" fill="' + col + '" opacity="' + op + '"/>'
+      + '<circle cx="16" cy="6" r="12" fill="' + col + '" opacity="' + op + '"/>'
+      + '<circle cx="-4" cy="-12" r="10" fill="' + col + '" opacity="' + op + '"/>'
+      + '</g>';
+  };
+
+  /* "O3" / "O2" / "CO2" — the subscript is its own text run, placed by hand so
+     the pair stays centred whatever font the device substitutes */
+  const sciSub = (x, y, head, num, size, fill) => {
+    const fs = size;
+    const wHead = fs * .6 * head.length;
+    const wSub = fs * .7 * .56;
+    const hx = x + (wHead - wSub) / 2;
+    const fam = ' font-family="system-ui,-apple-system,sans-serif" font-weight="800"';
+    return '<text x="' + hx.toFixed(1) + '" y="' + y + '"' + fam + ' font-size="' + fs + '" text-anchor="end" fill="' + fill + '">' + head + '</text>'
+      + '<text x="' + (hx + .4).toFixed(1) + '" y="' + (y + Math.round(fs * .24)) + '"' + fam + ' font-size="' + Math.round(fs * .7) + '" text-anchor="start" fill="' + fill + '">' + num + '</text>';
+  };
+
+  const sciMol = (x, y, r, head, num, fill, ink, stroke) => {
+    const fs = Math.round(r * (head.length > 1 ? .74 : 1.02));
+    return '<g transform="translate(' + x + ' ' + y + ')">'
+      + '<circle r="' + r + '" fill="' + fill + '"' + (stroke ? ' stroke="' + stroke + '" stroke-width="2.5"' : '') + '/>'
+      + sciSub(0, Math.round(fs * .34), head, num, fs, ink)
+      + '</g>';
+  };
+
+  /* a gas label on a soft plate — the plate keeps the letters inside even
+     when the fallback font measures them a little wide */
+  const sciTag = (x, y, head, num, fill, ink, stroke, size) => {
+    const fs = size || 20;
+    const w = Math.round(fs * (head.length > 1 ? 2.4 : 1.6)) + 16;
+    const h = Math.round(fs * 1.55);
+    return '<g transform="translate(' + x + ' ' + y + ')">'
+      + '<rect x="' + (-w / 2) + '" y="' + (-h / 2) + '" width="' + w + '" height="' + h + '" rx="' + (h / 2) + '" fill="' + fill + '"'
+      + (stroke ? ' stroke="' + stroke + '" stroke-width="2.5"' : '') + '/>'
+      + sciSub(0, Math.round(fs * .36), head, num, fs, ink)
+      + '</g>';
+  };
+
+  const sciStars = (pts) => pts.map((p, i) =>
+    '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="' + (i % 2 ? 1.9 : 2.7) + '" fill="#ffe9a8" opacity="' + (i % 3 ? '.55' : '.9') + '"/>').join('');
+
+  const SCI = {};
+
+  /* ---------- 1. Volcano ---------- */
+  SCI.volcanoErupt = sciSvg(
+    sciBack('#e9f1f8', 198, '#cfc3ac', { sun: [276, 40, 13], clouds: [[62, 34, 1]] })
+    + sciSmoke(128, 18, 2, '#8f99a4', .95) + sciSmoke(156, -6, 1.35, '#a3adb8', .9)
+    + sciPuff(100, 40, 11, '#9aa3ad', .8) + sciPuff(174, 36, 10, '#9aa3ad', .75)
+    + '<path d="M-30 202 L108 68 L146 68 L266 202 Z" fill="#8a7c6a"/>'
+    + '<path d="M108 68 L146 68 L266 202 L178 202 Z" fill="#796b5b"/>'
+    + '<path d="M112 72 C102 108 118 148 104 194" fill="none" stroke="#ff6b35" stroke-width="15" stroke-linecap="round"/>'
+    + '<path d="M112 72 C104 108 118 150 106 192" fill="none" stroke="#ffcf5a" stroke-width="6" stroke-linecap="round"/>'
+    + '<path d="M143 72 C152 102 144 132 154 162" fill="none" stroke="#ff6b35" stroke-width="9" stroke-linecap="round"/>'
+    + '<path d="M143 74 C150 102 145 132 154 158" fill="none" stroke="#ffcf5a" stroke-width="3.5" stroke-linecap="round"/>'
+    + '<path d="M127 74 C125 112 132 144 126 178" fill="none" stroke="#ff8a3d" stroke-width="6" stroke-linecap="round" opacity=".95"/>'
+    + '<ellipse cx="127" cy="69" rx="18" ry="7" fill="#4b3f36"/>'
+    + '<ellipse cx="127" cy="69" rx="12" ry="4.5" fill="#ff7a2f"/>'
+    + sciPuff(112, 58, 4, '#ffb703', .9) + sciPuff(146, 52, 3, '#ffcc48', .85)
+    + '<ellipse cx="120" cy="212" rx="120" ry="24" fill="#bfb29b" opacity=".55"/>'
+    + '<ellipse cx="264" cy="222" rx="90" ry="26" fill="#c6baa4" opacity=".6"/>'
+  );
+
+  SCI.volcanoIsland = sciSvg(
+    sciBack('#ddf0fb', 148, '#8ecfe8', { sun: [268, 34, 15] })
+    + '<path d="M0 168 q22 -7 44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0" fill="none" stroke="#a7ddef" stroke-width="4" opacity=".8"/>'
+    + '<path d="M0 204 q22 -7 44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0" fill="none" stroke="#a7ddef" stroke-width="4" opacity=".6"/>'
+    + '<path d="M0 242 q22 -7 44 0 t44 0 t44 0 t44 0 t44 0 t44 0 t44 0" fill="none" stroke="#a7ddef" stroke-width="4" opacity=".45"/>'
+    + '<ellipse cx="160" cy="152" rx="64" ry="14" fill="#f4ecd2"/>'
+    + '<path d="M112 152 L160 86 L208 152 Z" fill="#857a68"/>'
+    + '<path d="M160 86 L208 152 L176 152 Z" fill="#756b5a"/>'
+    + '<ellipse cx="160" cy="86" rx="12" ry="4.5" fill="#4b3f36"/>'
+    + '<ellipse cx="160" cy="150" rx="58" ry="10" fill="#9fd6a3"/>'
+    + sciSmoke(166, 64, 1.05, '#b7c0c8', .92) + sciPuff(176, 42, 9, '#c2cad2', .8) + sciPuff(168, 24, 7, '#ccd4db', .7)
+    + cloud(52, 44, .8) + cloud(272, 62, .65)
+    + bird(84, 88) + bird(240, 104)
+  );
+
+  /* ---------- 2. Magma ---------- */
+  SCI.magmaLayer = sciSvg(
+    '<rect x="0" y="-45" width="320" height="163" fill="#e7f3fd"/>'
+    + sunBurst(268, 22, 12, '#ffe27a') + cloud(64, 34, .9)
+    + '<rect x="0" y="118" width="320" height="18" fill="#84cf93"/>'
+    + '<path d="M0 118 h320" stroke="#6cb27d" stroke-width="3" opacity=".7"/>'
+    + '<rect x="0" y="136" width="320" height="52" fill="#b9834f"/>'
+    + '<rect x="0" y="188" width="320" height="84" fill="#8b5c39"/>'
+    + '<path d="M0 218 q20 -12 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 L320 272 L0 272 Z" fill="#e2591f"/>'
+    + '<path d="M0 218 q20 -12 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 L320 238 L0 238 Z" fill="#ff8a3d"/>'
+    + '<ellipse cx="90" cy="250" rx="46" ry="14" fill="#ffb703" opacity=".95"/>'
+    + '<ellipse cx="222" cy="258" rx="52" ry="13" fill="#ffb703" opacity=".9"/>'
+    + '<ellipse cx="164" cy="240" rx="26" ry="9" fill="#ffd166" opacity=".9"/>'
+    + '<circle cx="52" cy="158" r="5" fill="#a9743f" opacity=".8"/><circle cx="96" cy="146" r="4" fill="#a9743f" opacity=".7"/>'
+    + '<circle cx="238" cy="164" r="6" fill="#a9743f" opacity=".75"/><circle cx="196" cy="200" r="5" fill="#7a4f33" opacity=".7"/>'
+    + tree(74, 94, .95) + flower(228, 116, '#ffb3c7') + flower(252, 114, '#ffd166')
+    + '<path d="M24 118 q6 -12 12 0 M272 118 q6 -12 12 0" stroke="#6cb27d" stroke-width="3" fill="none" stroke-linecap="round"/>'
+  );
+
+  SCI.magmaChamber = sciSvg(
+    '<rect x="0" y="-45" width="320" height="128" fill="#e7f3fd"/>'
+    + cloud(56, 30, .9) + sunBurst(266, 20, 12, '#ffe27a')
+    + '<path d="M112 83 L160 34 L208 83 Z" fill="#9a8b78"/>'
+    + '<path d="M160 34 L208 83 L180 83 Z" fill="#897a68"/>'
+    + '<ellipse cx="160" cy="35" rx="10" ry="4" fill="#4b3f36"/>'
+    + '<rect x="0" y="83" width="320" height="20" fill="#a9743f"/>'
+    + '<rect x="0" y="103" width="320" height="169" fill="#8a5a3a"/>'
+    + '<path d="M0 103 h320" stroke="#c08a52" stroke-width="3" opacity=".6"/>'
+    + '<path d="M72 196 C68 158 106 132 148 131 C186 130 222 142 240 168 C254 188 248 212 230 228 C210 244 174 252 148 246 C110 238 74 224 72 196 Z" fill="#ff7a2f"/>'
+    + '<ellipse cx="160" cy="192" rx="58" ry="34" fill="#ffb703"/>'
+    + '<ellipse cx="146" cy="184" rx="26" ry="15" fill="#ffd166"/>'
+    + '<circle cx="196" cy="206" r="7" fill="#ffe58a" opacity=".9"/>'
+    + '<circle cx="128" cy="212" r="6" fill="#ffe58a" opacity=".85"/>'
+    + '<circle cx="206" cy="176" r="5" fill="#ffe58a" opacity=".8"/>'
+    + '<path d="M138 142 C142 124 146 112 154 103 L170 103 C176 116 182 128 186 144 Z" fill="#ff8a3d"/>'
+    + '<path d="M152 142 C154 126 157 114 160 104 L164 104 C167 116 172 128 174 142 Z" fill="#ffcf5a"/>'
+    + '<path d="M18 140 q22 -10 40 2 q-16 14 -40 4 Z" fill="#7a4f33" opacity=".7"/>'
+    + '<path d="M252 156 q24 -8 42 4 q-18 12 -42 2 Z" fill="#7a4f33" opacity=".6"/>'
+    + '<path d="M40 236 q20 -8 36 2 q-14 12 -36 3 Z" fill="#7a4f33" opacity=".55"/>'
+  );
+
+  /* ---------- 3. Lava ---------- */
+  SCI.lavaFlow = sciSvg(
+    sciBack('#ece6de', 186, '#b7ab97', {})
+    + cloud(64, 26, .9) + cloud(240, 38, .8)
+    + '<path d="M-40 200 L56 76 L152 200 Z" fill="#7f7364"/>'
+    + '<path d="M56 76 L152 200 L104 200 Z" fill="#6f6455"/>'
+    + '<ellipse cx="56" cy="77" rx="13" ry="5" fill="#4b3f36"/>'
+    + sciSmoke(58, 44, 1.05, '#9aa3ad', .75)
+    + '<path d="M56 84 C70 118 104 136 152 158 C200 180 244 196 306 208" fill="none" stroke="#ff6b35" stroke-width="24" stroke-linecap="round"/>'
+    + '<path d="M56 84 C70 118 104 136 152 158 C200 180 244 196 306 208" fill="none" stroke="#ffcf5a" stroke-width="10" stroke-linecap="round"/>'
+    + '<path d="M272 214 L292 196 L314 206 L320 232 L288 238 L266 230 Z" fill="#33373d"/>'
+    + '<path d="M292 196 L314 206 L306 220 L284 214 Z" fill="#454b53"/>'
+    + '<path d="M240 226 L262 214 L280 226 L270 244 L246 242 Z" fill="#2b2f35"/>'
+    + '<path d="M212 238 L234 230 L248 242 L236 254 L214 252 Z" fill="#3a4048"/>'
+    + '<path d="M300 196 q-8 -18 4 -30" fill="none" stroke="#ffffff" stroke-width="4" opacity=".7" stroke-linecap="round"/>'
+    + '<path d="M282 186 q-6 -14 4 -24" fill="none" stroke="#ffffff" stroke-width="3.5" opacity=".55" stroke-linecap="round"/>'
+    + sciPuff(180, 168, 3, '#ffb703', .9) + sciPuff(228, 188, 3, '#ffcc48', .8)
+  );
+
+  SCI.lavaRock = sciSvg(
+    sciBack('#eae7e1', 158, '#cfc4b2', { sun: [266, 32, 13] })
+    + cloud(70, 40, .8)
+    + '<path d="M20 232 L56 176 L124 176 L150 214 L120 250 L56 250 Z" fill="#2f333a"/>'
+    + '<path d="M56 176 L124 176 L112 200 L70 200 Z" fill="#3d434b"/>'
+    + '<path d="M132 210 L176 168 L232 176 L244 216 L206 246 L150 240 Z" fill="#262a30"/>'
+    + '<path d="M176 168 L232 176 L214 196 L182 190 Z" fill="#3a4048"/>'
+    + '<path d="M252 236 L258 178 L282 170 L298 190 L292 240 Z" fill="#33383f"/>'
+    + '<path d="M258 178 L282 170 L276 188 L264 192 Z" fill="#434a53"/>'
+    + '<path d="M214 250 L228 214 L252 210 L262 244 L244 258 Z" fill="#2b3037"/>'
+    + '<path d="M76 188 l10 14 M118 226 l-6 12 M186 202 l10 12 M232 230 l-8 10" fill="none" stroke="#4c545e" stroke-width="2.6" stroke-linecap="round"/>'
+    + '<path d="M24 200 q18 8 12 24 M96 254 q14 -12 30 -6" fill="none" stroke="#b3a795" stroke-width="3" stroke-linecap="round"/>'
+    + '<path d="M180 262 q22 -10 40 -2" fill="none" stroke="#b3a795" stroke-width="3" stroke-linecap="round"/>'
+    + '<path d="M296 156 q6 -14 12 0 M306 158 q6 -12 12 -2" stroke="#84cf93" stroke-width="3.4" fill="none" stroke-linecap="round"/>'
+    + '<path d="M14 154 q6 -14 12 0" stroke="#84cf93" stroke-width="3.4" fill="none" stroke-linecap="round"/>'
+  );
+
+  /* ---------- 4. Ozone ---------- */
+  SCI.ozoneShield = sciSvg(
+    '<rect x="0" y="-45" width="320" height="240" fill="#bcdcf5"/>'
+    + '<rect x="0" y="-45" width="320" height="120" fill="#a8cff2" opacity=".75"/>'
+    + sunBurst(46, 8, 19, '#ffe066')
+    + '<path d="M62 34 L124 54" stroke="#ffc247" stroke-width="4" stroke-linecap="round"/>'
+    + '<path d="M78 26 L154 52" stroke="#ffc247" stroke-width="4" stroke-linecap="round"/>'
+    + '<path d="M96 20 L188 52" stroke="#ffc247" stroke-width="4" stroke-linecap="round"/>'
+    + '<rect x="-10" y="54" width="340" height="38" rx="19" fill="#8f7fe0"/>'
+    + '<path d="M0 62 q30 8 60 0 t60 0 t60 0 t60 0 t60 0" fill="none" stroke="#b7a9ff" stroke-width="3" opacity=".7"/>'
+    + '<path d="M0 84 q30 8 60 0 t60 0 t60 0 t60 0 t60 0" fill="none" stroke="#7a68d4" stroke-width="3" opacity=".55"/>'
+    + sciSub(112, 81, 'O', '3', 22, '#ffffff')
+    + sciSub(234, 81, 'O', '3', 22, '#ffffff')
+    + '<circle cx="124" cy="52" r="5.5" fill="#ffffff" opacity=".9"/>'
+    + '<circle cx="154" cy="50" r="5.5" fill="#ffffff" opacity=".9"/>'
+    + '<circle cx="188" cy="50" r="5.5" fill="#ffffff" opacity=".9"/>'
+    + '<rect x="0" y="196" width="320" height="76" fill="#a6dca4"/>'
+    + '<ellipse cx="160" cy="196" rx="176" ry="8" fill="#ffffff" opacity=".2"/>'
+    + tree(64, 170, 1.05) + G.house(240, 194, .6)
+    + cloud(96, 140, .9) + cloud(252, 128, .75)
+    + bird(180, 148)
+  );
+
+  SCI.ozoneGlobe = sciSvg(
+    '<rect x="0" y="-45" width="320" height="315" fill="#26345c"/>'
+    + sciStars([[30, -10], [74, 20], [120, -24], [250, -12], [292, 24], [40, 90], [286, 96], [200, -18]])
+    + sunBurst(48, 18, 15, '#ffe066')
+    + '<ellipse cx="170" cy="192" rx="86" ry="78" fill="#8f7fe0" opacity=".12"/>'
+    + '<ellipse cx="170" cy="192" rx="74" ry="66" fill="none" stroke="#8f7fe0" stroke-width="14" opacity=".6"/>'
+    + '<ellipse cx="170" cy="192" rx="74" ry="66" fill="none" stroke="#c9bcff" stroke-width="4" opacity=".85"/>'
+    + earth(170, 192, 54)
+    + '<path d="M66 40 Q92 92 118 146" fill="none" stroke="#ffc247" stroke-width="4" stroke-dasharray="9 7" stroke-linecap="round"/>'
+    + '<path d="M122 150 C146 152 160 134 163 116" fill="none" stroke="#ffc247" stroke-width="4.5" stroke-linecap="round"/>'
+    + '<path d="M156 118 l7 -16 l8 13 Z" fill="#ffc247"/>'
+    + sciSub(170, 108, 'O', '3', 26, '#d5c9ff')
+    + '<circle cx="117" cy="146" r="6" fill="#ffffff" opacity=".85"/>'
+  );
+
+  /* ---------- 5. Evaporation ---------- */
+  SCI.evapSun = sciSvg(
+    sciBack('#e6f5ff', 168, '#e3dccb', { sun: [252, 34, 20] })
+    + cloud(150, 56, 1.5) + cloud(66, 76, .9)
+    + '<path d="M236 60 L206 176 M258 66 L236 176 M270 78 L252 168" stroke="#ffd166" stroke-width="3" stroke-dasharray="8 8" opacity=".9"/>'
+    + '<ellipse cx="150" cy="204" rx="86" ry="28" fill="#8fd4f0"/>'
+    + '<ellipse cx="132" cy="196" rx="40" ry="10" fill="#bfe9f8" opacity=".85"/>'
+    + '<ellipse cx="150" cy="204" rx="86" ry="28" fill="none" stroke="#6fbcdc" stroke-width="3" opacity=".8"/>'
+    + '<path d="M40 232 q16 -10 34 2 M232 238 q18 -12 36 0 M96 252 q14 -8 26 2" fill="none" stroke="#c9bda6" stroke-width="3" stroke-linecap="round"/>'
+    + '<path d="M116 178 q-12 -18 0 -34 q12 -16 0 -30" fill="none" stroke="#c9e9f7" stroke-width="6" stroke-linecap="round"/>'
+    + '<path d="M150 172 q-12 -18 0 -34 q12 -16 0 -30" fill="none" stroke="#d7f0fb" stroke-width="6" stroke-linecap="round"/>'
+    + '<path d="M184 180 q-12 -16 0 -30 q12 -14 0 -26" fill="none" stroke="#c9e9f7" stroke-width="5" stroke-linecap="round"/>'
+    + '<path d="M204 190 q-10 -14 0 -26" fill="none" stroke="#d7f0fb" stroke-width="4.5" stroke-linecap="round"/>'
+  );
+
+  SCI.evapPot = sciSvg(
+    '<rect x="0" y="-45" width="320" height="235" fill="#fff6ea"/>'
+    + '<rect x="0" y="190" width="320" height="82" fill="#e2cdb0"/>'
+    + '<path d="M0 190 h320" stroke="#d3bb9a" stroke-width="3"/>'
+    + '<path d="M130 112 q-14 -20 0 -38 q14 -18 0 -36" fill="none" stroke="#c9dce8" stroke-width="7" stroke-linecap="round" opacity=".85"/>'
+    + '<path d="M160 104 q-16 -24 0 -44 q16 -20 0 -40" fill="none" stroke="#d7e7f0" stroke-width="8" stroke-linecap="round" opacity=".9"/>'
+    + '<path d="M192 114 q-14 -20 0 -38 q14 -18 0 -36" fill="none" stroke="#c9dce8" stroke-width="6" stroke-linecap="round" opacity=".8"/>'
+    + '<path d="M112 118 h96 v44 a20 20 0 0 1 -20 20 h-56 a20 20 0 0 1 -20 -20 Z" fill="#cfd8e0" stroke="#a8b6c2" stroke-width="3"/>'
+    + '<ellipse cx="160" cy="118" rx="48" ry="9" fill="#e8eef4" stroke="#a8b6c2" stroke-width="3"/>'
+    + '<ellipse cx="160" cy="121" rx="42" ry="7" fill="#8fd4f0"/>'
+    + '<path d="M134 121 q7 4 14 0 M170 122 q7 4 14 0" fill="none" stroke="#c9ecfa" stroke-width="2.4" stroke-linecap="round"/>'
+    + '<path d="M110 128 q-14 6 0 16 M210 128 q14 6 0 16" fill="none" stroke="#a8b6c2" stroke-width="5" stroke-linecap="round"/>'
+    + '<circle cx="146" cy="117" r="4" fill="#ffffff" opacity=".85"/><circle cx="172" cy="116" r="3" fill="#ffffff" opacity=".8"/>'
+    + '<rect x="100" y="184" width="120" height="12" rx="5" fill="#6b7480"/>'
+    + '<ellipse cx="160" cy="184" rx="44" ry="7" fill="#ff8a3d" opacity=".9"/>'
+    + '<path d="M120 178 q10 -8 20 0 M180 178 q10 -8 20 0" fill="none" stroke="#ff6b35" stroke-width="3.5" stroke-linecap="round" opacity=".85"/>'
+    + '<rect x="34" y="44" width="66" height="58" rx="7" fill="#dff0fb" stroke="#e0cdb2" stroke-width="4"/>'
+    + '<path d="M67 44 v58 M34 73 h66" stroke="#e0cdb2" stroke-width="4"/>'
+    + '<path d="M36 44 l28 28 M98 44 l-28 28" stroke="#ffffff" stroke-width="4" opacity=".65" stroke-linecap="round"/>'
+  );
+
+  /* ---------- 6. Pollution ---------- */
+  SCI.pollutionFactory = sciSvg(
+    sciBack('#e8eef3', 186, '#b9bec4', {})
+    + sciPuff(278, 40, 15, '#cfd6dd', .7)
+    + sciPuff(50, 62, 9, '#6f7a86', .9) + sciPuff(56, 48, 11, '#67727e', .88)
+    + sciPuff(66, 32, 13, '#5f6a76', .85) + sciPuff(82, 20, 11, '#6f7a86', .75) + sciPuff(100, 14, 7, '#7b8794', .6)
+    + sciPuff(116, 84, 6, '#7b8794', .85) + sciPuff(124, 72, 8, '#7b8794', .75) + sciPuff(138, 62, 6, '#8b95a0', .6)
+    + '<rect x="24" y="120" width="112" height="66" fill="#a8b2bc"/>'
+    + '<path d="M24 120 l28 -16 l28 16 l28 -16 l28 16 Z" fill="#95a1ac"/>'
+    + '<rect x="44" y="74" width="20" height="48" fill="#8f9aa5"/>'
+    + '<rect x="42" y="68" width="24" height="8" rx="2" fill="#7b8794"/>'
+    + '<rect x="106" y="98" width="18" height="24" fill="#8f9aa5"/>'
+    + '<rect x="104" y="92" width="22" height="7" rx="2" fill="#7b8794"/>'
+    + '<rect x="38" y="136" width="20" height="16" rx="2" fill="#f4d98a"/>'
+    + '<rect x="70" y="136" width="20" height="16" rx="2" fill="#f4d98a"/>'
+    + '<rect x="102" y="136" width="20" height="16" rx="2" fill="#f4d98a"/>'
+    + '<path d="M196 176 h84 v20 h-84 Z" fill="#8fb3d6"/>'
+    + '<path d="M210 176 l12 -16 h40 l12 16 Z" fill="#a9c6e3"/>'
+    + '<rect x="222" y="164" width="16" height="12" rx="2" fill="#e8f4ff"/>'
+    + '<rect x="244" y="164" width="16" height="12" rx="2" fill="#e8f4ff"/>'
+    + '<circle cx="214" cy="198" r="9" fill="#4a5460"/><circle cx="214" cy="198" r="4" fill="#cfd6dd"/>'
+    + '<circle cx="262" cy="198" r="9" fill="#4a5460"/><circle cx="262" cy="198" r="4" fill="#cfd6dd"/>'
+    + sciPuff(186, 190, 7, '#9aa4af', .8) + sciPuff(174, 186, 5, '#a9b3bd', .7) + sciPuff(180, 202, 4, '#9aa4af', .6)
+    + '<rect x="0" y="150" width="320" height="26" fill="#8a949f" opacity=".18"/>'
+    + '<rect x="0" y="176" width="320" height="12" fill="#7f8994" opacity=".14"/>'
+  );
+
+  SCI.pollutionCity = sciSvg(
+    '<rect x="0" y="-45" width="320" height="251" fill="#dfe6ec"/>'
+    + '<circle cx="240" cy="42" r="20" fill="#f2e6c4"/>'
+    + '<circle cx="240" cy="42" r="31" fill="#f2e6c4" opacity=".3"/>'
+    + '<rect x="18" y="96" width="46" height="110" fill="#8d99a6"/>'
+    + '<rect x="70" y="120" width="38" height="86" fill="#98a4b0"/>'
+    + '<rect x="112" y="76" width="52" height="130" fill="#7d8996"/>'
+    + '<rect x="170" y="112" width="40" height="94" fill="#94a0ac"/>'
+    + '<rect x="214" y="92" width="34" height="114" fill="#828e9b"/>'
+    + '<rect x="252" y="126" width="52" height="80" fill="#8d99a6"/>'
+    + '<g fill="#e8eef4" opacity=".5">'
+    + '<rect x="28" y="108" width="8" height="9"/><rect x="44" y="108" width="8" height="9"/><rect x="28" y="126" width="8" height="9"/><rect x="44" y="126" width="8" height="9"/>'
+    + '<rect x="124" y="90" width="9" height="10"/><rect x="140" y="90" width="9" height="10"/><rect x="124" y="110" width="9" height="10"/><rect x="140" y="110" width="9" height="10"/>'
+    + '<rect x="224" y="104" width="8" height="9"/><rect x="224" y="122" width="8" height="9"/>'
+    + '<rect x="264" y="140" width="9" height="10"/><rect x="280" y="140" width="9" height="10"/>'
+    + '</g>'
+    + '<rect x="0" y="128" width="320" height="30" fill="#c5ced6" opacity=".55"/>'
+    + '<rect x="0" y="156" width="320" height="24" fill="#cbd4db" opacity=".65"/>'
+    + '<rect x="0" y="180" width="320" height="26" fill="#b6c0c9" opacity=".7"/>'
+    + '<rect x="0" y="206" width="320" height="66" fill="#8e98a3"/>'
+    + '<path d="M0 232 h320" stroke="#e8eef4" stroke-width="4" stroke-dasharray="18 14" opacity=".6"/>'
+    + '<path d="M118 240 h64 v22 h-64 Z" fill="#6f7a86"/>'
+    + '<path d="M128 240 l8 -12 h28 l8 12 Z" fill="#7b8794"/>'
+    + '<circle cx="130" cy="262" r="7" fill="#3f4a58"/><circle cx="170" cy="262" r="7" fill="#3f4a58"/>'
+  );
+
+  /* ---------- 7. Oxygen ---------- */
+  SCI.oxygenTree = sciSvg(
+    sciBack('#e9f8ff', 176, '#a9dca6', { sun: [272, 32, 16] })
+    + cloud(70, 44, .9) + bird(202, 62)
+    + tree(88, 138, 1.85)
+    + sciMol(160, 104, 17, 'O', '2', '#ffffff', '#2b6c96', '#7cc4e8')
+    + sciMol(198, 76, 14, 'O', '2', '#ffffff', '#2b6c96', '#7cc4e8')
+    + sciMol(128, 62, 12, 'O', '2', '#ffffff', '#2b6c96', '#7cc4e8')
+    + G.kidStand(246, 178, 1.05, '#8fc9ff', { arms: 'up' })
+    + heart(294, 78, 1.1, '#ffb3c7')
+    + flower(44, 172, '#ffb3c7') + flower(60, 180, '#ffd166')
+    + '<path d="M18 176 q6 -14 12 0 M300 176 q6 -14 12 0" stroke="#7fc48f" stroke-width="3.4" fill="none" stroke-linecap="round"/>'
+  );
+
+  SCI.oxygenDive = sciSvg(
+    '<rect x="0" y="-45" width="320" height="315" fill="#4fadd6"/>'
+    + '<rect x="0" y="-45" width="320" height="140" fill="#ffffff" opacity=".13"/>'
+    + '<rect x="0" y="200" width="320" height="70" fill="#0d5b86" opacity=".22"/>'
+    + '<path d="M52 -45 L104 210 L126 210 L86 -45 Z" fill="#ffffff" opacity=".07"/>'
+    + '<path d="M184 -45 L214 210 L232 210 L208 -45 Z" fill="#ffffff" opacity=".06"/>'
+    + '<path d="M28 268 q14 -20 -2 -38 q-12 -16 4 -30 M56 268 q12 -22 0 -38 M276 268 q-12 -22 2 -36 q12 -14 -2 -26" fill="none" stroke="#4fae74" stroke-width="7" stroke-linecap="round" opacity=".8"/>'
+    + G.fish(64, 118, 1.05, '#ffd166') + G.fish(262, 92, .9, '#ff9fb2')
+    + '<rect x="130" y="92" width="28" height="58" rx="13" fill="#cfdae6" stroke="#9fb4c8" stroke-width="2.5"/>'
+    + '<rect x="141" y="82" width="9" height="12" rx="3" fill="#9fb4c8"/>'
+    + '<path d="M156 128 q14 12 12 26" fill="none" stroke="#2f4a6b" stroke-width="4" opacity=".45"/>'
+    + '<rect x="140" y="138" width="46" height="54" rx="18" fill="#2f4a6b"/>'
+    + '<circle cx="182" cy="122" r="16" fill="#f7c9a3"/>'
+    + '<path d="M166 114 q18 -8 34 0" fill="none" stroke="#2f4a6b" stroke-width="7" stroke-linecap="round"/>'
+    + '<rect x="176" y="118" width="20" height="14" rx="6" fill="#bfe3ff" stroke="#2f4a6b" stroke-width="2.5"/>'
+    + '<path d="M198 126 q8 4 12 0" fill="none" stroke="#f7c9a3" stroke-width="8" stroke-linecap="round"/>'
+    + '<path d="M184 152 q20 6 26 20" fill="none" stroke="#2f4a6b" stroke-width="10" stroke-linecap="round"/>'
+    + '<circle cx="212" cy="176" r="6" fill="#f7c9a3"/>'
+    + '<path d="M152 190 v22 M166 190 v22" stroke="#2f4a6b" stroke-width="12" stroke-linecap="round"/>'
+    + '<path d="M146 212 q-14 4 -16 14 q14 2 22 -6 Z" fill="#e8563f"/>'
+    + '<path d="M172 212 q14 4 16 14 q-14 2 -22 -6 Z" fill="#e8563f"/>'
+    + '<path d="M186 130 q12 -12 8 -28" fill="none" stroke="#e8f4ff" stroke-width="3" opacity=".8"/>'
+    + sciMol(214, 90, 16, 'O', '2', '#e8f4ff', '#1f6f96', '#7cc4e8')
+    + sciPuff(208, 114, 5, '#ffffff', .8) + sciPuff(216, 132, 4, '#ffffff', .7)
+  );
+
+  /* ---------- 8. Conserve ---------- */
+  SCI.conserveTap = sciSvg(
+    '<rect x="0" y="-45" width="320" height="237" fill="#eef7fb"/>'
+    + '<rect x="0" y="192" width="320" height="80" fill="#f4f8fb"/>'
+    + '<path d="M0 40 h320 M0 96 h320 M0 152 h320" stroke="#dbe8f1" stroke-width="2" opacity=".9"/>'
+    + '<rect x="0" y="186" width="320" height="14" fill="#ffffff" stroke="#dbe8f1" stroke-width="2"/>'
+    + '<ellipse cx="168" cy="232" rx="66" ry="20" fill="#dbe8f1" opacity=".55"/>'
+    + '<path d="M0 186 h320" stroke="#cbd9e4" stroke-width="3"/>'
+    + '<ellipse cx="168" cy="228" rx="70" ry="24" fill="#ffffff" stroke="#cbd9e4" stroke-width="3"/>'
+    + '<ellipse cx="168" cy="226" rx="62" ry="19" fill="#b9d7e8"/>'
+    + '<ellipse cx="168" cy="226" rx="58" ry="16" fill="#a8cde2"/>'
+    + '<ellipse cx="152" cy="222" rx="26" ry="6" fill="#cfe4ee" opacity=".8"/>'
+    + '<ellipse cx="168" cy="228" rx="13" ry="4" fill="#7fb2c9"/>'
+    + '<rect x="154" y="146" width="14" height="48" rx="4" fill="#b9c6d3"/>'
+    + '<path d="M161 150 C161 128 176 120 194 120 C204 120 208 128 208 136" fill="none" stroke="#b9c6d3" stroke-width="13" stroke-linecap="round"/>'
+    + '<rect x="200" y="130" width="16" height="14" rx="4" fill="#a8b6c2"/>'
+    + '<rect x="118" y="138" width="40" height="12" rx="6" fill="#7fb2e5"/>'
+    + '<rect x="118" y="138" width="12" height="12" rx="6" fill="#5c92c8"/>'
+    + '<path d="M150 118 q-26 4 -28 20" fill="none" stroke="#4fae74" stroke-width="4" stroke-linecap="round"/>'
+    + '<path d="M116 130 l8 12 l10 -8 Z" fill="#4fae74"/>'
+    + G.check(252, 158, 1.3, '#4fae74')
+    + heart(250, 120, 1.3, '#ff9fb2')
+    + '<path d="M34 194 q10 -22 24 -26 q-2 20 -24 26 Z" fill="#8fd4a0"/>'
+    + '<path d="M40 200 q-4 14 8 18" fill="none" stroke="#4fae74" stroke-width="3" stroke-linecap="round"/>'
+  );
+
+  SCI.conservePower = sciSvg(
+    '<rect x="0" y="-45" width="320" height="237" fill="#fdf6ee"/>'
+    + '<rect x="0" y="192" width="320" height="80" fill="#e7d6bd"/>'
+    + '<path d="M0 192 h320" stroke="#d6c2a4" stroke-width="3"/>'
+    + '<rect x="86" y="126" width="56" height="60" rx="10" fill="#ffffff" stroke="#dbe6f0" stroke-width="3"/>'
+    + '<rect x="104" y="140" width="6" height="14" rx="3" fill="#b9c6d3"/>'
+    + '<rect x="118" y="140" width="6" height="14" rx="3" fill="#b9c6d3"/>'
+    + '<rect x="50" y="150" width="30" height="26" rx="8" fill="#f2a93b"/>'
+    + '<rect x="80" y="154" width="12" height="5" rx="2" fill="#b9c6d3"/>'
+    + '<rect x="80" y="166" width="12" height="5" rx="2" fill="#b9c6d3"/>'
+    + '<path d="M54 176 q-12 20 6 28 q20 8 30 -6" fill="none" stroke="#8fa8c8" stroke-width="5" stroke-linecap="round"/>'
+    + '<rect x="176" y="118" width="54" height="66" rx="10" fill="#ffffff" stroke="#dbe6f0" stroke-width="3"/>'
+    + '<rect x="192" y="150" width="24" height="26" rx="6" fill="#c9b49a"/>'
+    + '<rect x="192" y="150" width="24" height="10" rx="5" fill="#e0d2bd"/>'
+    + '<path d="M186 130 h8 M212 130 h8" stroke="#c9d6e2" stroke-width="3" stroke-linecap="round"/>'
+    + '<path d="M282 72 v38" stroke="#c9b49a" stroke-width="3"/>'
+    + '<path d="M282 110 C265 115 260 133 267 147 C275 161 289 161 297 147 C304 133 299 115 282 110 Z" fill="#eef3f8" stroke="#8fa6bb" stroke-width="3"/>'
+    + '<path d="M275 137 q7 9 14 0" fill="none" stroke="#8fa6bb" stroke-width="2.8" stroke-linecap="round"/>'
+    + '<rect x="273" y="158" width="18" height="11" rx="3" fill="#c9b49a"/>'
+    + '<path d="M276 169 h12" stroke="#c9b49a" stroke-width="3" stroke-linecap="round"/>'
+    + '<path d="M40 116 q10 -22 24 -26 q-2 20 -24 26 Z" fill="#8fd4a0"/>'
+    + '<path d="M46 126 q-4 18 10 26" fill="none" stroke="#4fae74" stroke-width="3.4" stroke-linecap="round"/>'
+    + G.check(160, 224, 1.4, '#4fae74')
+    + heart(298, 208, 1.4, '#ff9fb2')
+  );
+
+  /* ---------- 9. Carbon Dioxide ---------- */
+  SCI.co2Fire = sciSvg(
+    '<rect x="0" y="-45" width="320" height="239" fill="#cfe0f2"/>'
+    + '<rect x="0" y="194" width="320" height="78" fill="#a9906f"/>'
+    + '<path d="M0 194 h320" stroke="#8f7757" stroke-width="3"/>'
+    + sciPuff(250, 38, 14, '#e8eef4', .8)
+    + pine(30, 174, 1.15, '#2f7a52') + pine(292, 178, 1, '#2f7a52')
+    + sciSmoke(160, 70, 1.6, '#dfe6ee', .85)
+    + sciTag(206, 46, 'CO', '2', '#eef3f8', '#5a6f93', '#c3d0da', 19)
+    + '<ellipse cx="160" cy="206" rx="62" ry="16" fill="#ffb703" opacity=".45"/>'
+    + '<rect x="96" y="198" width="128" height="20" rx="9" fill="#a9785a" transform="rotate(-8 160 208)"/>'
+    + '<rect x="98" y="204" width="124" height="18" rx="8" fill="#8f6243" transform="rotate(8 160 212)"/>'
+    + '<path d="M108 200 l14 10 M204 198 l-14 10" stroke="#6f4a30" stroke-width="3" stroke-linecap="round"/>'
+    + '<path d="M160 208 C132 196 140 160 160 140 C180 160 188 196 160 208 Z" fill="#ff8a3d"/>'
+    + '<path d="M160 202 C148 194 152 172 160 160 C168 172 172 194 160 202 Z" fill="#ffd166"/>'
+    + sciPuff(120, 130, 3.5, '#ffb703', .9) + sciPuff(202, 120, 3, '#ffcc48', .85)
+    + sciPuff(184, 100, 2.5, '#ffd166', .8)
+  );
+
+  SCI.co2Candle = sciSvg(
+    '<rect x="0" y="-45" width="320" height="237" fill="#fdf5e8"/>'
+    + '<rect x="0" y="196" width="320" height="76" fill="#dcc6a5"/>'
+    + '<path d="M0 196 h320" stroke="#c9b291" stroke-width="3"/>'
+    + '<rect x="34" y="46" width="76" height="76" rx="8" fill="#dff0fb" stroke="#e0cdb2" stroke-width="4"/>'
+    + '<path d="M72 46 v76 M34 84 h76" stroke="#e0cdb2" stroke-width="4"/>'
+    + sciSmoke(196, 92, 1.35, '#efe4d6', .95)
+    + sciTag(242, 62, 'CO', '2', '#ffffff', '#7a6a52', '#e0cdb2', 19)
+    + '<circle cx="160" cy="116" r="24" fill="#ffd166" opacity=".22"/>'
+    + '<rect x="146" y="140" width="28" height="58" rx="5" fill="#fdf7ea" stroke="#e8dbc2" stroke-width="2.5"/>'
+    + '<path d="M160 140 v-8" stroke="#7a6a52" stroke-width="3"/>'
+    + '<path d="M160 136 C150 124 154 106 160 96 C166 106 170 124 160 136 Z" fill="#ffb703"/>'
+    + '<path d="M160 133 C155 124 157 112 160 106 C163 112 165 124 160 133 Z" fill="#fff3c4"/>'
+    + '<ellipse cx="160" cy="200" rx="34" ry="9" fill="#c9a06b"/>'
+    + '<ellipse cx="160" cy="197" rx="26" ry="6" fill="#e0b98a"/>'
+    + '<rect x="252" y="176" width="24" height="22" rx="4" fill="#d98f6b"/>'
+    + '<path d="M264 176 q-14 -18 0 -30 q14 12 0 30" fill="#8fd4a0"/>'
+  );
+
+  /* ---------- 10. Greenhouse Gas ---------- */
+  SCI.greenhouseGlass = sciSvg(
+    sciBack('#e3f3ff', 198, '#a8d9a6', { sun: [40, 20, 17] })
+    + cloud(272, 48, .9)
+    + '<path d="M62 40 L104 128 M78 34 L124 122 M94 32 L146 118" stroke="#ffd166" stroke-width="4" stroke-dasharray="9 9" opacity=".9"/>'
+    + '<path d="M62 206 L62 104 L160 48 L258 104 L258 206 Z" fill="#effcf5" opacity=".72"/>'
+    + '<path d="M62 206 L62 104 L160 48 L258 104 L258 206 Z" fill="none" stroke="#4fae74" stroke-width="6" stroke-linejoin="round"/>'
+    + '<path d="M62 104 h196 M160 48 v158 M62 154 h196" stroke="#4fae74" stroke-width="4" opacity=".9"/>'
+    + '<path d="M110 66 v88 M210 66 v88" stroke="#4fae74" stroke-width="3" opacity=".5"/>'
+    + '<ellipse cx="160" cy="184" rx="76" ry="22" fill="#ffd166" opacity=".35"/>'
+    + '<path d="M124 184 v-40" stroke="#ff8a3d" stroke-width="5" stroke-linecap="round"/>'
+    + '<path d="M116 146 h16 l-8 -14 Z" fill="#ff8a3d"/>'
+    + '<path d="M124 142 Q160 112 196 142" fill="none" stroke="#ff6b35" stroke-width="4.5" stroke-linecap="round"/>'
+    + '<path d="M196 144 v40" stroke="#ff8a3d" stroke-width="5" stroke-linecap="round"/>'
+    + '<path d="M188 184 h16 l-8 14 Z" fill="#ff8a3d"/>'
+    + '<path d="M84 186 v-18" stroke="#4fae74" stroke-width="4" stroke-linecap="round"/>'
+    + '<path d="M84 172 q-14 -4 -12 -18 q14 2 12 18" fill="#7fd196"/>'
+    + '<path d="M84 176 q14 -4 12 -18 q-14 2 -12 18" fill="#8fdca4"/>'
+    + '<path d="M236 186 v-18" stroke="#4fae74" stroke-width="4" stroke-linecap="round"/>'
+    + '<path d="M236 172 q-14 -4 -12 -18 q14 2 12 18" fill="#7fd196"/>'
+    + '<path d="M236 176 q14 -4 12 -18 q-14 2 -12 18" fill="#8fdca4"/>'
+    + '<rect x="56" y="200" width="208" height="12" rx="5" fill="#c9b291"/>'
+  );
+
+  SCI.greenhouseEarth = sciSvg(
+    '<rect x="0" y="-45" width="320" height="315" fill="#26345c"/>'
+    + sciStars([[28, 8], [80, -16], [128, 24], [212, -10], [296, 38], [38, 82], [288, 94], [186, 4]])
+    + sunBurst(52, 4, 18, '#ffe066')
+    + '<path d="M78 34 L136 218 M100 26 L158 212" stroke="#ffc247" stroke-width="4" stroke-dasharray="10 8" stroke-linecap="round"/>'
+    + '<path d="M-40 316 Q160 146 360 316 Z" fill="#6d9e63"/>'
+    + '<path d="M-40 316 Q160 146 360 316" fill="none" stroke="#8fc47f" stroke-width="6"/>'
+    + pine(84, 236, .7, '#3f8a5e') + pine(268, 250, .6, '#3f8a5e')
+    + '<path d="M-40 250 Q160 90 360 250" fill="none" stroke="#e8a76b" stroke-width="20" opacity=".38"/>'
+    + '<path d="M-40 250 Q160 90 360 250" fill="none" stroke="#ffd6a8" stroke-width="5" opacity=".85"/>'
+    + '<path d="M196 226 v-28" stroke="#ff8a3d" stroke-width="5" stroke-linecap="round"/>'
+    + '<path d="M188 198 h16 l-8 -14 Z" fill="#ff8a3d"/>'
+    + '<path d="M196 196 Q218 170 240 196" fill="none" stroke="#ff6b35" stroke-width="4.5" stroke-linecap="round"/>'
+    + '<path d="M240 198 v28" stroke="#ff8a3d" stroke-width="5" stroke-linecap="round"/>'
+    + '<path d="M232 226 h16 l-8 14 Z" fill="#ff8a3d"/>'
+  );
+
+  /* =========================================================================
+     The quiz sheet — Jupiter Class, November. Test date 11월 23일.
+     ========================================================================= */
+  const NOV23_DEF = {
+    id: 'nov23',
+    label: '11월 23일 테스트',
+    emoji: '📝',
+    words: [
+      {
+        word: 'Volcano', pos: 'noun', en: 'A mountain or hill that vents ash and lava', ko: '화산',
+        scenes: [
+          { html: SCI.volcanoErupt, cap: '화산이 재와 용암을 뿜어 올려요' },
+          { html: SCI.volcanoIsland, cap: '바다 가운데 화산섬에서 연기가 올라와요' }
+        ]
+      },
+      {
+        word: 'Magma', pos: 'noun', en: 'Molten material beneath the Earth\'s crust', ko: '마그마',
+        scenes: [
+          { html: SCI.magmaLayer, cap: '땅속 깊은 곳에 뜨거운 마그마가 흐르고 있어요' },
+          { html: SCI.magmaChamber, cap: '마그마가 지하의 방에 모여 있어요' }
+        ]
+      },
+      {
+        word: 'Lava', pos: 'noun', en: 'The black rock that is formed when magma becomes hard', ko: '용암',
+        scenes: [
+          { html: SCI.lavaFlow, cap: '흘러내린 용암이 식어서 검은 돌이 돼요' },
+          { html: SCI.lavaRock, cap: '굳은 용암이 검은 바위밭으로 남았어요' }
+        ]
+      },
+      {
+        word: 'Ozone', pos: 'noun', en: 'A form of oxygen in the atmosphere', ko: '오존',
+        scenes: [
+          { html: SCI.ozoneShield, cap: '높은 하늘의 오존층이 해로운 햇빛을 막아 줘요' },
+          { html: SCI.ozoneGlobe, cap: '지구를 감싼 오존층이 자외선을 걸러 줘요' }
+        ]
+      },
+      {
+        word: 'Evaporation', pos: 'noun', en: 'The process of water changes into a gas', ko: '증발',
+        scenes: [
+          { html: SCI.evapSun, cap: '해가 물을 데우면 물이 수증기로 올라가요' },
+          { html: SCI.evapPot, cap: '끓는 물에서 김이 올라와요' }
+        ]
+      },
+      {
+        word: 'Pollution', pos: 'noun', en: 'Harmful gases in the environment', ko: '오염',
+        scenes: [
+          { html: SCI.pollutionFactory, cap: '공장 굴뚝과 자동차가 나쁜 기체를 내보내요' },
+          { html: SCI.pollutionCity, cap: '오염된 도시 공기가 뿌옇게 변했어요' }
+        ]
+      },
+      {
+        word: 'Oxygen', pos: 'noun', en: 'A colorless, odorless gas we need to live', ko: '산소',
+        scenes: [
+          { html: SCI.oxygenTree, cap: '나무가 내놓은 산소를 마시며 숨을 쉬어요' },
+          { html: SCI.oxygenDive, cap: '잠수부가 산소통으로 숨을 쉬어요' }
+        ]
+      },
+      {
+        word: 'Conserve', pos: 'verb', en: 'To manage and protect the use of a product', ko: '보존하다, 아껴 쓰다',
+        scenes: [
+          { html: SCI.conserveTap, cap: '물을 아끼려고 수도꼭지를 꼭 잠가요' },
+          { html: SCI.conservePower, cap: '안 쓸 때는 전기를 끄고 아껴 써요' }
+        ]
+      },
+      {
+        word: 'Carbon Dioxide', pos: 'noun', en: 'A colorless, odorless gas made by burning things', ko: '이산화탄소',
+        scenes: [
+          { html: SCI.co2Fire, cap: '나무를 태우면 이산화탄소가 나와요' },
+          { html: SCI.co2Candle, cap: '초를 태울 때도 이산화탄소가 나와요' }
+        ]
+      },
+      {
+        word: 'Greenhouse Gas', pos: 'noun', en: 'Any gas that traps the sun\'s heat on earth', ko: '온실가스',
+        scenes: [
+          { html: SCI.greenhouseGlass, cap: '온실 안에 갇힌 열이 빠져나가지 못해요' },
+          { html: SCI.greenhouseEarth, cap: '지구를 덮은 기체가 열을 붙잡아요' }
+        ]
+      }
+    ]
+  };
+
+  function buildSciencePack(def) {
+    return {
+      id: def.id,
+      label: def.label,
+      emoji: def.emoji,
+      words: def.words.map((w, i) => ({
+        id: def.id + '-' + w.word.replace(/[^a-z0-9]+/gi, '-').toLowerCase().replace(/^-+|-+$/g, ''),
+        builtin: true,
+        pack: def.id,
+        order: i + 1,
+        word: w.word,
+        pos: w.pos,
+        en: w.en,
+        ko: w.ko,
+        fruit: FRUITS[i % FRUITS.length],
+        scenes: w.scenes
+      }))
+    };
+  }
+
   function buildGradePack(def) {
     return {
       id: def.id,
@@ -2527,7 +3110,7 @@
     };
   }
 
-  const PACKS = [{ id: 'photo', label: '오늘의 단어장', emoji: '📸', words: BUILTIN }]
+  const PACKS = [buildSciencePack(NOV23_DEF), { id: 'photo', label: '오늘의 단어장', emoji: '📸', words: BUILTIN }]
     .concat(GRADE_PACK_DEFS.map(buildGradePack));
 
   function packById(id) {
@@ -2564,8 +3147,8 @@
   };
 
   function loadState() {
-    const savedPack = store.get(K_PACK, 'photo');
-    state.packId = packById(savedPack) ? savedPack : 'photo';
+    const savedPack = store.get(K_PACK, 'nov23');
+    state.packId = packById(savedPack) ? savedPack : 'nov23';
     const c = store.get(K_WORDS, []);
     state.custom = Array.isArray(c) ? c.filter(w => w && w.word) : [];
     const s = store.get(K_STICKERS, {});
